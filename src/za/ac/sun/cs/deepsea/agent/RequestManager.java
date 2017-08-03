@@ -1,8 +1,9 @@
-package agent;
+package za.ac.sun.cs.deepsea.agent;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 
 import com.sun.jdi.Field;
 import com.sun.jdi.Location;
@@ -28,21 +29,24 @@ import com.sun.jdi.request.ThreadDeathRequest;
 import com.sun.jdi.request.ThreadStartRequest;
 import com.sun.jdi.request.VMDeathRequest;
 
-import main.DEEPSEA;
+import za.ac.sun.cs.deepsea.diver.Diver;
 
 public class RequestManager {
+
+	private final Logger log;
 
 	private final EventRequestManager mgr;
 
 	private final Set<String> excludes = new HashSet<>();
 
-	public RequestManager(final EventRequestManager mgr) {
+	public RequestManager(final Diver diver, final EventRequestManager mgr) {
+		this.log = diver.getLog();
 		this.mgr = mgr;
 	}
 
 	public void addExclude(String... excludes) {
 		for (String exclude : excludes) {
-			DEEPSEA.log.config("EXCLUDED: " + exclude);
+			log.config("EXCLUDED: " + exclude);
 			this.excludes.add(exclude);
 		}
 	}

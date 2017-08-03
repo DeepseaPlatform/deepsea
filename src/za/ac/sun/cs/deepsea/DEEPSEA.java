@@ -1,19 +1,11 @@
-package main;
+package za.ac.sun.cs.deepsea;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Properties;
 
-import com.sun.jdi.ThreadReference;
-import com.sun.jdi.VirtualMachine;
-import com.sun.jdi.request.StepRequest;
-
-import agent.EventReader;
-import agent.RequestManager;
-import agent.StreamRedirector;
-import agent.VMConnectLauncher;
-import logging.SEALogHandler;
+import za.ac.sun.cs.deepsea.diver.Diver;
 
 /**
  * Main class and launcher for the DEEPSEA project. It
@@ -33,11 +25,6 @@ import logging.SEALogHandler;
 public class DEEPSEA {
 
 	/**
-	 * Public logger for whole of project.
-	 */
-	public static final Logger log = Logger.getLogger("SEA");
-
-	/**
 	 * The main function.
 	 * 
 	 * TODO: command-line arguments are still in a state of flux
@@ -45,64 +32,16 @@ public class DEEPSEA {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		log.setUseParentHandlers(false);
-		log.setLevel(Level.ALL);
-		log.addHandler(new SEALogHandler(Level.ALL));
-		log.info("----- DEEPSEA start -----");
-
-		log.fine("launch VM");
-		VirtualMachine vm = VMConnectLauncher.launchTarget(args);
-		vm.setDebugTraceMode(0);
-
-		log.fine("redirect output");
-		Process pr = vm.process();
-		InputStream es = pr.getErrorStream();
-		InputStream is = pr.getInputStream();
-		StreamRedirector errThread = new StreamRedirector("error reader", es, System.err);
-		StreamRedirector outThread = new StreamRedirector("output reader", is, System.out);
-		errThread.start();
-		outThread.start();
-
-		log.fine("issue monitor requests");
-		RequestManager mgr = new RequestManager(vm.eventRequestManager());
-		mgr.addExclude("java.*", "javax.*", "sun.*", "com.sun.*");
-		mgr.createClassPrepareRequest(r -> mgr.filterExcludes(r));
-		ThreadReference mt = RequestManager.findThread(vm, "main");
-		mgr.createStepRequest(mt, StepRequest.STEP_MIN, StepRequest.STEP_INTO, r -> {
-			mgr.filterExcludes(r);
-			r.addCountFilter(1);
-		});
-
-		log.fine("set up event monitoring");
-		EventReader eventReader = new EventReader("x", vm.eventQueue());
-		eventReader.addEventListener(new Stepper(mgr));
-		eventReader.start();
-
-		log.fine("start VM");
-		vm.resume();
-
-		log.fine("waiting for completion");
-		while (!eventReader.isStopping()) {
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-
-		log.fine("shutting down threads");
-		eventReader.stop();
-		errThread.interrupt();
-		outThread.interrupt();
-		// Don't do this: vm.dispose();
+		Properties pr = new Properties();
 		try {
-			es.close();
-			is.close();
+			pr.load(new FileInputStream(args[0]));
+		} catch (FileNotFoundException x) {
+			x.printStackTrace();
 		} catch (IOException x) {
 			x.printStackTrace();
 		}
-
-		log.info("----- DEEPSEA done -----");
+		Diver dv = new Diver("DEEPSEA");
+		dv.start();
 	}
 
 }

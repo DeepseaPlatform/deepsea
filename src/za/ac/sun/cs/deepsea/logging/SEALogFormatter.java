@@ -1,4 +1,4 @@
-package logging;
+package za.ac.sun.cs.deepsea.logging;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

@@ -1,4 +1,4 @@
-package logging;
+package za.ac.sun.cs.deepsea.logging;
 
 import java.util.logging.Level;
 import java.util.logging.LogRecord;

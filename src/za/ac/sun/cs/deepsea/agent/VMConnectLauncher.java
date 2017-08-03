@@ -1,4 +1,4 @@
-package agent;
+package za.ac.sun.cs.deepsea.agent;
 
 import java.io.IOException;
 import java.util.List;
@@ -23,11 +23,10 @@ public class VMConnectLauncher {
 			throw new Error("Bad launching connector");
 		}
 		mainArg.setValue(String.join(" ", args));
-		
-//		-javaagent:${project_loc}/eeagent.jar
-		
 		try {
-			return connector.launch(arguments);
+			VirtualMachine vm = connector.launch(arguments);
+			vm.setDebugTraceMode(0);
+			return vm;
 		} catch (IOException x) {
 			throw new Error("Unable to launch target VM: " + x);
 		} catch (IllegalConnectorArgumentsException x) {

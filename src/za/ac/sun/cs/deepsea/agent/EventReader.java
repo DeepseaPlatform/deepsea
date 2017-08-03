@@ -1,7 +1,8 @@
-package agent;
+package za.ac.sun.cs.deepsea.agent;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import com.sun.jdi.VMDisconnectedException;
 import com.sun.jdi.event.AccessWatchpointEvent;
@@ -22,7 +23,7 @@ import com.sun.jdi.event.ThreadStartEvent;
 import com.sun.jdi.event.VMDeathEvent;
 import com.sun.jdi.event.VMDisconnectEvent;
 
-import main.DEEPSEA;
+import za.ac.sun.cs.deepsea.diver.Diver;
 
 /**
  * An event reader that continuously reads events coming from the VM and
@@ -30,6 +31,8 @@ import main.DEEPSEA;
  */
 
 public class EventReader extends AbstractReader {
+
+	private final Logger log;
 
 	private EventQueue eventQueue;
 
@@ -41,8 +44,9 @@ public class EventReader extends AbstractReader {
 	 * @param name
 	 * @param queue
 	 */
-	public EventReader(final String name, EventQueue queue) {
-		super(name);
+	public EventReader(final Diver diver, EventQueue queue) {
+		super();
+		this.log = diver.getLog();
 		eventQueue = queue;
 	}
 
@@ -123,7 +127,7 @@ public class EventReader extends AbstractReader {
 				}
 			} catch (InterruptedException e) {
 				if (!isStopping) {
-					DEEPSEA.log.info("Event reader loop was interrupted");
+					log.finest("Event reader loop was interrupted");
 					return;
 				}
 			} catch (VMDisconnectedException e) {

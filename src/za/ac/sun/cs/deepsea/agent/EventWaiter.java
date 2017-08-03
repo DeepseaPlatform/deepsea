@@ -1,4 +1,4 @@
-package agent;
+package za.ac.sun.cs.deepsea.agent;
 
 import com.sun.jdi.event.AccessWatchpointEvent;
 import com.sun.jdi.event.BreakpointEvent;
@@ -40,49 +40,49 @@ public class EventWaiter implements EventListener {
 	}
 
 	/**
-	 * @see agent.EventListener#accessWatchpoint(com.sun.jdi.event.AccessWatchpointEvent)
+	 * @see za.ac.sun.cs.deepsea.agent.EventListener#accessWatchpoint(com.sun.jdi.event.AccessWatchpointEvent)
 	 */
 	public boolean accessWatchpoint(AccessWatchpointEvent event) {
 		return handleEvent(event);
 	}
 
 	/**
-	 * @see agent.EventListener#methodEntry(com.sun.jdi.event.MethodEntryEvent)
+	 * @see za.ac.sun.cs.deepsea.agent.EventListener#methodEntry(com.sun.jdi.event.MethodEntryEvent)
 	 */
 	public boolean methodEntry(MethodEntryEvent event) {
 		return handleEvent(event);
 	}
 
 	/**
-	 * @see agent.EventListener#methodExit(com.sun.jdi.event.MethodExitEvent)
+	 * @see za.ac.sun.cs.deepsea.agent.EventListener#methodExit(com.sun.jdi.event.MethodExitEvent)
 	 */
 	public boolean methodExit(MethodExitEvent event) {
 		return handleEvent(event);
 	}
 
 	/**
-	 * @see agent.EventListener#breakpoint(com.sun.jdi.event.BreakpointEvent)
+	 * @see za.ac.sun.cs.deepsea.agent.EventListener#breakpoint(com.sun.jdi.event.BreakpointEvent)
 	 */
 	public boolean breakpoint(BreakpointEvent event) {
 		return handleEvent(event);
 	}
 
 	/**
-	 * @see agent.EventListener#classPrepare(com.sun.jdi.event.ClassPrepareEvent)
+	 * @see za.ac.sun.cs.deepsea.agent.EventListener#classPrepare(com.sun.jdi.event.ClassPrepareEvent)
 	 */
 	public boolean classPrepare(ClassPrepareEvent event) {
 		return handleEvent(event);
 	}
 
 	/**
-	 * @see agent.EventListener#classUnload(com.sun.jdi.event.ClassUnloadEvent)
+	 * @see za.ac.sun.cs.deepsea.agent.EventListener#classUnload(com.sun.jdi.event.ClassUnloadEvent)
 	 */
 	public boolean classUnload(ClassUnloadEvent event) {
 		return handleEvent(event);
 	}
 
 	/**
-	 * @see agent.EventListener#exception(com.sun.jdi.event.ExceptionEvent)
+	 * @see za.ac.sun.cs.deepsea.agent.EventListener#exception(com.sun.jdi.event.ExceptionEvent)
 	 */
 	public boolean exception(ExceptionEvent event) {
 		return handleEvent(event);
@@ -101,7 +101,7 @@ public class EventWaiter implements EventListener {
 	}
 
 	/**
-	 * @see agent.EventListener#modificationWatchpoint(com.sun.jdi.event.ModificationWatchpointEvent)
+	 * @see za.ac.sun.cs.deepsea.agent.EventListener#modificationWatchpoint(com.sun.jdi.event.ModificationWatchpointEvent)
 	 */
 	public boolean modificationWatchpoint(ModificationWatchpointEvent event) {
 		return handleEvent(event);
@@ -116,28 +116,28 @@ public class EventWaiter implements EventListener {
 	}
 
 	/**
-	 * @see agent.EventListener#step(com.sun.jdi.event.StepEvent)
+	 * @see za.ac.sun.cs.deepsea.agent.EventListener#step(com.sun.jdi.event.StepEvent)
 	 */
 	public boolean step(StepEvent event) {
 		return handleEvent(event);
 	}
 
 	/**
-	 * @see agent.EventListener#threadDeath(com.sun.jdi.event.ThreadDeathEvent)
+	 * @see za.ac.sun.cs.deepsea.agent.EventListener#threadDeath(com.sun.jdi.event.ThreadDeathEvent)
 	 */
 	public boolean threadDeath(ThreadDeathEvent event) {
 		return handleEvent(event);
 	}
 
 	/**
-	 * @see agent.EventListener#threadStart(com.sun.jdi.event.ThreadStartEvent)
+	 * @see za.ac.sun.cs.deepsea.agent.EventListener#threadStart(com.sun.jdi.event.ThreadStartEvent)
 	 */
 	public boolean threadStart(ThreadStartEvent event) {
 		return handleEvent(event);
 	}
 
 	/**
-	 * @see agent.EventListener#vmDeath(com.sun.jdi.event.VMDeathEvent)
+	 * @see za.ac.sun.cs.deepsea.agent.EventListener#vmDeath(com.sun.jdi.event.VMDeathEvent)
 	 */
 	public boolean vmDeath(VMDeathEvent event) {
 		if (prevEvent == null) { // Last ever event but not what we expected
@@ -148,7 +148,7 @@ public class EventWaiter implements EventListener {
 	}
 
 	/**
-	 * @see agent.EventListener#vmDisconnect(com.sun.jdi.event.VMDisconnectEvent)
+	 * @see za.ac.sun.cs.deepsea.agent.EventListener#vmDisconnect(com.sun.jdi.event.VMDisconnectEvent)
 	 */
 	public boolean vmDisconnect(VMDisconnectEvent event) {
 		return handleEvent(event);

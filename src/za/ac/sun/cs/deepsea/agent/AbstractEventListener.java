@@ -1,4 +1,4 @@
-package agent;
+package za.ac.sun.cs.deepsea.agent;
 
 import com.sun.jdi.event.AccessWatchpointEvent;
 import com.sun.jdi.event.BreakpointEvent;

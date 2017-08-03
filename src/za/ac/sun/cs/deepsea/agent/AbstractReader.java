@@ -1,11 +1,9 @@
-package agent;
+package za.ac.sun.cs.deepsea.agent;
 
 /**
  * An abstract reader that continuously reads.
  */
 abstract public class AbstractReader {
-
-	protected final String name;
 
 	protected Thread readerThread;
 
@@ -16,8 +14,7 @@ abstract public class AbstractReader {
 	 * 
 	 * @param name
 	 */
-	public AbstractReader(final String name) {
-		this.name = name;
+	public AbstractReader() {
 	}
 
 	/**
@@ -36,7 +33,7 @@ abstract public class AbstractReader {
 				readerLoop();
 				isStopping = true;
 			}
-		}, name);
+		});
 		readerThread.setDaemon(true);
 		readerThread.start();
 	}

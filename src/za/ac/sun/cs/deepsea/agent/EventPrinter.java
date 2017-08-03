@@ -1,4 +1,6 @@
-package agent;
+package za.ac.sun.cs.deepsea.agent;
+
+import java.util.logging.Logger;
 
 import com.sun.jdi.event.AccessWatchpointEvent;
 import com.sun.jdi.event.BreakpointEvent;
@@ -14,85 +16,91 @@ import com.sun.jdi.event.ThreadStartEvent;
 import com.sun.jdi.event.VMDeathEvent;
 import com.sun.jdi.event.VMDisconnectEvent;
 
-import main.DEEPSEA;
+import za.ac.sun.cs.deepsea.diver.Diver;
 
 public class EventPrinter extends AbstractEventListener {
 
+	private final Logger log;
+
+	public EventPrinter(final Diver diver) {
+		this.log = diver.getLog();
+	}
+
 	@Override
 	public boolean accessWatchpoint(AccessWatchpointEvent event) {
-		DEEPSEA.log.fine(event.toString());
+		log.fine(event.toString());
 		return true;
 	}
 
 	@Override
 	public boolean breakpoint(BreakpointEvent event) {
-		DEEPSEA.log.fine(event.toString());
+		log.fine(event.toString());
 		return true;
 	}
 
 	@Override
 	public boolean classPrepare(ClassPrepareEvent event) {
-		DEEPSEA.log.fine(event.toString());
+		log.fine(event.toString());
 		return true;
 	}
 
 	@Override
 	public boolean classUnload(ClassUnloadEvent event) {
-		DEEPSEA.log.fine(event.toString());
+		log.fine(event.toString());
 		return true;
 	}
 
 	@Override
 	public boolean exception(ExceptionEvent event) {
-		DEEPSEA.log.fine(event.toString());
+		log.fine(event.toString());
 		return true;
 	}
 
 	@Override
 	public boolean methodEntry(MethodEntryEvent event) {
-		DEEPSEA.log.fine(event.toString());
+		log.fine(event.toString());
 		return true;
 	}
 
 	@Override
 	public boolean methodExit(MethodExitEvent event) {
-		DEEPSEA.log.fine(event.toString());
+		log.fine(event.toString());
 		return true;
 	}
 
 	@Override
 	public boolean modificationWatchpoint(ModificationWatchpointEvent event) {
-		DEEPSEA.log.fine(event.toString());
+		log.fine(event.toString());
 		return true;
 	}
 
 	@Override
 	public boolean step(StepEvent event) {
-		DEEPSEA.log.fine(event.toString());
+		log.fine(event.toString());
 		return true;
 	}
 
 	@Override
 	public boolean threadDeath(ThreadDeathEvent event) {
-		DEEPSEA.log.fine(event.toString());
+		log.fine(event.toString());
 		return true;
 	}
 
 	@Override
 	public boolean threadStart(ThreadStartEvent event) {
-		DEEPSEA.log.fine(event.toString());
+		log.fine(event.toString());
 		return true;
 	}
 
 	@Override
 	public boolean vmDeath(VMDeathEvent event) {
-		DEEPSEA.log.fine(event.toString());
+		log.fine(event.toString());
 		return true;
 	}
 
 	@Override
 	public boolean vmDisconnect(VMDisconnectEvent event) {
-		DEEPSEA.log.fine(event.toString());
+		log.fine(event.toString());
 		return true;
 	}
 

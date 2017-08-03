@@ -1,7 +1,8 @@
-package main;
+package za.ac.sun.cs.deepsea;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.apache.bcel.classfile.JavaClass;
 import org.apache.bcel.classfile.Method;
@@ -15,10 +16,15 @@ import com.sun.jdi.event.ClassPrepareEvent;
 import com.sun.jdi.event.StepEvent;
 import com.sun.jdi.request.StepRequest;
 
-import agent.AbstractEventListener;
-import agent.RequestManager;
+import za.ac.sun.cs.deepsea.agent.AbstractEventListener;
+import za.ac.sun.cs.deepsea.agent.RequestManager;
+import za.ac.sun.cs.deepsea.diver.Diver;
 
 public class Stepper extends AbstractEventListener {
+
+	// private final Diver diver;
+
+	private final Logger log;
 
 	private final RequestManager mgr;
 
@@ -28,7 +34,9 @@ public class Stepper extends AbstractEventListener {
 
 	private final StringBuilder sb = new StringBuilder();
 	
-	public Stepper(final RequestManager mgr) {
+	public Stepper(final Diver diver, final RequestManager mgr) {
+		// this.diver = diver;
+		this.log = diver.getLog();
 		this.mgr = mgr;
 	}
 
@@ -44,11 +52,11 @@ public class Stepper extends AbstractEventListener {
 			sb.append("class:" + clsName);
 			sb.append(" method:" + methodName);
 			sb.append(" bci:" + bci);
-			DEEPSEA.log.fine(sb.toString());
+			log.fine(sb.toString());
 		} else {
 			sb.setLength(0);
 			sb.append(methodName).append(' ').append(handle.toString());
-			DEEPSEA.log.fine(sb.toString());
+			log.fine(sb.toString());
 		}
 		
 		// ---- Schedule the next StepRequest 
@@ -74,9 +82,9 @@ public class Stepper extends AbstractEventListener {
 					insMap.put(prefix + ":" + insOfs[i], insHdl[i]);
 				}
 			}
-			DEEPSEA.log.fine(">--> " + event.referenceType().name() + " " + cls.getFileName());
+			log.fine(">--> " + event.referenceType().name() + " " + cls.getFileName());
 		} catch (ClassNotFoundException e) {
-			DEEPSEA.log.fine(">>>> " + event.referenceType().name());
+			log.fine(">>>> " + event.referenceType().name());
 		}
 		return true;
 	}

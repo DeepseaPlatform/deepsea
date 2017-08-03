@@ -1,4 +1,4 @@
-package agent;
+package za.ac.sun.cs.deepsea.agent;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -25,8 +25,8 @@ public class StreamRedirector extends Thread {
 	 * @param out
 	 *            Stream to copy to
 	 */
-	public StreamRedirector(String name, InputStream in, OutputStream out) {
-		super(name);
+	public StreamRedirector(InputStream in, OutputStream out) {
+		super();
 		InputStream interruptibleInputStream = Channels.newInputStream(Channels.newChannel(in));
 		this.in = new DataInputStream(interruptibleInputStream);
 		this.out = out;
@@ -59,7 +59,7 @@ public class StreamRedirector extends Thread {
 			}
 			out.flush();
 		} catch (ClosedByInterruptException x) {
-			// do nothing
+			// ignore
 		} catch (IOException x) {
 			System.err.println("Child I/O Transfer - " + x);
 		}
