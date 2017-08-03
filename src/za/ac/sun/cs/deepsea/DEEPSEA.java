@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 
+import za.ac.sun.cs.deepsea.configuration.Configuration;
 import za.ac.sun.cs.deepsea.diver.Diver;
 
 /**
@@ -41,6 +42,7 @@ public class DEEPSEA {
 			x.printStackTrace();
 		}
 		Diver dv = new Diver("DEEPSEA");
+		new Configuration(dv, pr).apply();
 		dv.start();
 	}
 
