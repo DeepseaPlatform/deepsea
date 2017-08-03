@@ -1,4 +1,4 @@
-package za.ac.sun.cs.deepsea;
+package za.ac.sun.cs.deepsea.diver;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +18,6 @@ import com.sun.jdi.request.StepRequest;
 
 import za.ac.sun.cs.deepsea.agent.AbstractEventListener;
 import za.ac.sun.cs.deepsea.agent.RequestManager;
-import za.ac.sun.cs.deepsea.diver.Diver;
 
 public class Stepper extends AbstractEventListener {
 

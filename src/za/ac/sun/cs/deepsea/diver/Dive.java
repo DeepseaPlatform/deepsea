@@ -8,7 +8,6 @@ import com.sun.jdi.ThreadReference;
 import com.sun.jdi.VirtualMachine;
 import com.sun.jdi.request.StepRequest;
 
-import za.ac.sun.cs.deepsea.Stepper;
 import za.ac.sun.cs.deepsea.agent.EventReader;
 import za.ac.sun.cs.deepsea.agent.RequestManager;
 import za.ac.sun.cs.deepsea.agent.StreamRedirector;
