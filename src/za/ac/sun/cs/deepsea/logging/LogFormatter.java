@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
-public class SEALogFormatter extends Formatter {
+public class LogFormatter extends Formatter {
 
 	private Date date = new Date();
 

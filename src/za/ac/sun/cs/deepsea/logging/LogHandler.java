@@ -4,19 +4,19 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.StreamHandler;
 
-public class SEALogHandler extends StreamHandler {
+public class LogHandler extends StreamHandler {
 
 	/**
 	 * Constructs a <code>StreamHandler</code> that publishes log records to
 	 * <code>System.err</code>. The initial configuration is determined by the
 	 * <code>LogManager</code> properties described above.
 	 */
-	public SEALogHandler() {
-		super(System.out, new SEALogFormatter());
+	public LogHandler() {
+		super(System.out, new LogFormatter());
 	}
 
-	public SEALogHandler(Level level) {
-		super(System.out, new SEALogFormatter());
+	public LogHandler(Level level) {
+		super(System.out, new LogFormatter());
 		setLevel(level);
 	}
 

@@ -3,7 +3,7 @@ package za.ac.sun.cs.deepsea.diver;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import za.ac.sun.cs.deepsea.logging.SEALogHandler;
+import za.ac.sun.cs.deepsea.logging.LogHandler;
 
 /**
  * Driver for dynamic symbolic execution.
@@ -47,7 +47,7 @@ public class Diver {
 		this.log = Logger.getLogger(getClass().getCanonicalName() + "[" + name + "]");
 		log.setUseParentHandlers(false);
 		log.setLevel(Level.ALL);
-		log.addHandler(new SEALogHandler(Level.ALL));
+		log.addHandler(new LogHandler(Level.ALL));
 		diveCounter = 0;
 	}
 

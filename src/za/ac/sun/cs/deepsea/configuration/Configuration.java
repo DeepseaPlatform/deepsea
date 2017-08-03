@@ -6,7 +6,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import za.ac.sun.cs.deepsea.diver.Diver;
-import za.ac.sun.cs.deepsea.logging.SEALogHandler;
+import za.ac.sun.cs.deepsea.logging.LogHandler;
 
 /**
  * A {@link Configuration} takes an instance of {@link Properties} and processes
@@ -60,7 +60,7 @@ public class Configuration {
 				Level l = Level.parse(p);
 				log.setLevel(l);
 				for (Handler h : log.getHandlers()) {
-					if (h instanceof SEALogHandler) {
+					if (h instanceof LogHandler) {
 						h.setLevel(l);
 					}
 				}
