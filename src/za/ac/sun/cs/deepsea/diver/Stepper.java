@@ -27,16 +27,19 @@ public class Stepper extends AbstractEventListener {
 
 	private final RequestManager mgr;
 
+	private final Symbolizer symbolizer;
+
 	private final Repository repo = new ClassLoaderRepository(this.getClass().getClassLoader());
 
 	private final Map<String, InstructionHandle> insMap = new HashMap<>();
 
 	private final StringBuilder sb = new StringBuilder();
 	
-	public Stepper(final Diver diver, final RequestManager mgr) {
+	public Stepper(final Diver diver, Symbolizer symbolizer, final RequestManager mgr) {
 		// this.diver = diver;
 		this.log = diver.getLog();
 		this.mgr = mgr;
+		this.symbolizer = symbolizer;
 	}
 
 	@Override
@@ -53,9 +56,10 @@ public class Stepper extends AbstractEventListener {
 			sb.append(" bci:" + bci);
 			log.fine(sb.toString());
 		} else {
-			sb.setLength(0);
-			sb.append(methodName).append(' ').append(handle.toString());
-			log.fine(sb.toString());
+			symbolizer.execute(loc, handle);
+//			sb.setLength(0);
+//			sb.append(methodName).append(' ').append(handle.toString());
+//			log.fine(sb.toString());
 		}
 		
 		// ---- Schedule the next StepRequest 

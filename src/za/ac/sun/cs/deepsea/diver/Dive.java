@@ -29,6 +29,11 @@ public class Dive {
 	 * 
 	 */
 	private final int id;
+
+	/**
+	 * 
+	 */
+	private final Symbolizer symbolizer;
 	
 	/**
 	 * @param diver
@@ -37,6 +42,7 @@ public class Dive {
 		this.diver = diver;
 		this.log = diver.getLog();
 		this.id = diver.getDiveId();
+		this.symbolizer = new Symbolizer(diver);
 	}
 
 	public void dive() {
@@ -66,7 +72,7 @@ public class Dive {
 
 		log.fine("setting up event monitoring");
 		EventReader ev = new EventReader(diver, vm.eventQueue());
-		ev.addEventListener(new Stepper(diver, m));
+		ev.addEventListener(new Stepper(diver, symbolizer, m));
 		ev.start();
 
 		log.fine("starting vm");
