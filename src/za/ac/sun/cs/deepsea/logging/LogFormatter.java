@@ -43,8 +43,8 @@ public class LogFormatter extends Formatter {
 			pw.close();
 			throwable = sw.toString();
 		}
-		return String.format(format, date, source.toString(), record.getLoggerName(),
-				record.getLevel().getLocalizedName(), message, throwable);
+		return String.format(format, date, source.toString().replace("za.ac.sun.cs.deepsea.", ""),
+				record.getLoggerName(), record.getLevel().getLocalizedName(), message, throwable);
 	}
 
 }

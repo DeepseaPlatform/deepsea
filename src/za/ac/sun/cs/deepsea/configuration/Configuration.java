@@ -6,6 +6,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import za.ac.sun.cs.deepsea.diver.Diver;
+import za.ac.sun.cs.deepsea.diver.Trigger;
 import za.ac.sun.cs.deepsea.logging.LogHandler;
 
 /**
@@ -41,6 +42,36 @@ public class Configuration {
 		this.properties = properties;
 	}
 
+	public static int getIntegerProperty(Properties properties, String key, int defaultValue) {
+		String s = properties.getProperty(key, Integer.toString(defaultValue));
+		try {
+			return Integer.parseInt(s);
+		} catch (NumberFormatException x) {
+			// ignore
+		}
+		return defaultValue;
+	}
+
+	public static boolean getBooleanProperty(Properties properties, String key, boolean defaultValue) {
+		String s = properties.getProperty(key, Boolean.toString(defaultValue)).trim();
+		try {
+			if (s.equalsIgnoreCase("true")) {
+				return true;
+			} else if (s.equalsIgnoreCase("yes")) {
+				return true;
+			} else if (s.equalsIgnoreCase("on")) {
+				return true;
+			} else if (s.equalsIgnoreCase("1")) {
+				return true;
+			} else {
+				return false;
+			}
+		} catch (NumberFormatException x) {
+			// ignore
+		}
+		return defaultValue;
+	}
+	
 	/**
 	 * 
 	 */
@@ -48,6 +79,9 @@ public class Configuration {
 		setLevel();
 		setTarget();
 		setArgs();
+		setTriggers();
+		setProduceOutput();
+		dump();
 	}
 
 	/**
@@ -87,6 +121,35 @@ public class Configuration {
 		String p = properties.getProperty("deepsea.args");
 		if (p != null) {
 			diver.setArgs(p);
+		}
+	}
+
+	private void setTriggers() {
+		String p = properties.getProperty("deepsea.triggers");
+		if (p != null) {
+			String[] ts = p.trim().split(";");
+			for (String t : ts) {
+				int i = t.indexOf('(');
+				if (i == -1) {
+					String methodName = t.trim();
+					diver.addTrigger(new Trigger(methodName));
+				} else {
+					String methodName = t.substring(0, i - 1).trim();
+					diver.addTrigger(new Trigger(methodName));
+				}
+			}
+		}
+	}
+
+	private void setProduceOutput() {
+		diver.produceOutput(getBooleanProperty(properties, "deepsea.produceoutput", diver.isProducintOutput()));
+	}
+
+	private void dump() {
+		if (getBooleanProperty(properties, "deepsea.log.dump", false)) {
+			for (Object k : properties.keySet()) {
+				log.config(k.toString() + " =  " + properties.getProperty(k.toString()));
+			}
 		}
 	}
 

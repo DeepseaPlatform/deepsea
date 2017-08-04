@@ -4,7 +4,6 @@ public class XYChoice {
 
 	public static void main(String[] args) {
 		choose(3, 4);
-		choose(4, 3);
 	}
 
 	private static int choose(int x, int y) {

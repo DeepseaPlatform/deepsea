@@ -3,7 +3,6 @@ package za.ac.sun.cs.deepsea.agent;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.logging.Logger;
 
 import com.sun.jdi.Field;
 import com.sun.jdi.Location;
@@ -33,20 +32,20 @@ import za.ac.sun.cs.deepsea.diver.Diver;
 
 public class RequestManager {
 
-	private final Logger log;
+	@SuppressWarnings("unused")
+	private final Diver diver;
 
 	private final EventRequestManager mgr;
-
+	
 	private final Set<String> excludes = new HashSet<>();
 
 	public RequestManager(final Diver diver, final EventRequestManager mgr) {
-		this.log = diver.getLog();
+		this.diver = diver;
 		this.mgr = mgr;
 	}
 
 	public void addExclude(String... excludes) {
 		for (String exclude : excludes) {
-			log.config("EXCLUDED: " + exclude);
 			this.excludes.add(exclude);
 		}
 	}
@@ -81,6 +80,10 @@ public class RequestManager {
 
 	public void removeRequest(EventRequest eventRequest) {
 		mgr.deleteEventRequest(eventRequest);
+	}
+
+	public VirtualMachine getVM() {
+		return mgr.virtualMachine();
 	}
 
 	public AccessWatchpointRequest createAccessWatchpointRequest(Field field) {

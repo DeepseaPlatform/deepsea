@@ -25,18 +25,20 @@ public class StreamRedirector extends Thread {
 	 * @param out
 	 *            Stream to copy to
 	 */
-	public StreamRedirector(InputStream in, OutputStream out) {
+	public StreamRedirector(InputStream in, OutputStream out, boolean produceOutput) {
 		super();
 		InputStream interruptibleInputStream = Channels.newInputStream(Channels.newChannel(in));
 		this.in = new DataInputStream(interruptibleInputStream);
-		this.out = out;
+		this.out = produceOutput ? out : null;
 		setPriority(Thread.NORM_PRIORITY); //  MAX_PRIORITY - 1);
 		setDaemon(true);
 	}
 
 	public void terminate() {
 		try {
-			out.flush();
+			if (out != null) {
+				out.flush();
+			}
 			join();
 		} catch (IOException x) {
 			// ignore
@@ -55,9 +57,13 @@ public class StreamRedirector extends Thread {
 			byte[] cbuf = new byte[BUFFER_SIZE];
 			int count;
 			while ((count = in.read(cbuf, 0, BUFFER_SIZE)) >= 0) {
-				out.write(cbuf, 0, count);
+				if (out != null) {
+					out.write(cbuf, 0, count);
+				}
 			}
-			out.flush();
+			if (out != null) {
+				out.flush();
+			}
 		} catch (ClosedByInterruptException x) {
 			// ignore
 		} catch (IOException x) {

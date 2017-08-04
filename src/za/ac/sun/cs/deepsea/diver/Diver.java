@@ -1,7 +1,12 @@
 package za.ac.sun.cs.deepsea.diver;
 
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.apache.bcel.classfile.Method;
 
 import za.ac.sun.cs.deepsea.logging.LogHandler;
 
@@ -36,7 +41,17 @@ public class Diver {
 	 * 
 	 */
 	private String args = null;
-	
+
+	/**
+	 * 
+	 */
+	private List<Trigger> triggers = new LinkedList<>();
+
+	/**
+	 * 
+	 */
+	private boolean produceOutput = false;
+
 	/**
 	 * Constructs a {@link Diver} instance.
 	 * 
@@ -76,20 +91,66 @@ public class Diver {
 		return diveCounter++;
 	}
 
+	/**
+	 * @return
+	 */
 	public String getTarget() {
 		return target;
 	}
 
+	/**
+	 * @param target
+	 */
 	public void setTarget(String target) {
 		this.target = target;
 	}
 	
+	/**
+	 * @return
+	 */
 	public String getArgs() {
 		return args;
 	}
 	
+	/**
+	 * @param args
+	 */
 	public void setArgs(String args) {
 		this.args = args;
+	}
+
+	/**
+	 * @param trigger
+	 */
+	public void addTrigger(Trigger trigger) {
+		triggers.add(trigger);
+	}
+	
+	/**
+	 * @param method
+	 * @return
+	 */
+	public Iterator<Trigger> findTriggers(Method method) {
+		return triggers.stream().filter(tr -> {
+			if (!tr.getName().equals(method.getName())) {
+				return false;
+			}
+			return true;
+		}).iterator();
+	}
+	
+	/**
+	 * @return
+	 */
+	public boolean isProducintOutput() {
+		return produceOutput;
+	}
+	
+	/**
+	 * @param produceOutput
+	 */
+	public void produceOutput(boolean produceOutput) {
+		this.produceOutput = produceOutput;
 	}
 	
 	/**

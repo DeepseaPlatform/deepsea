@@ -50,17 +50,19 @@ public class Dive {
 		
 		log.finer("launching vm");
 		VirtualMachine vm = VMConnectLauncher.launchTarget(new String[] { diver.getTarget(), diver.getArgs() });
+		log.finest("target vm details:\n" + vm.description());
+		log.info("CANREDEFINECLASSES " + vm.canRedefineClasses());
 
 		log.finer("redirecting output");
 		Process pr = vm.process();
 		InputStream es = pr.getErrorStream();
 		InputStream is = pr.getInputStream();
-		StreamRedirector er = new StreamRedirector(es, System.err);
-		StreamRedirector or = new StreamRedirector(is, System.out);
+		StreamRedirector er = new StreamRedirector(es, System.err, diver.isProducintOutput());
+		StreamRedirector or = new StreamRedirector(is, System.out, diver.isProducintOutput());
 		er.start();
 		or.start();
 
-		log.fine("issuing monitor requests");
+		log.finer("issuing monitor requests");
 		RequestManager m = new RequestManager(diver, vm.eventRequestManager());
 		m.addExclude("java.*", "javax.*", "sun.*", "com.sun.*");
 		m.createClassPrepareRequest(r -> m.filterExcludes(r));
@@ -70,15 +72,15 @@ public class Dive {
 			r.addCountFilter(1);
 		});
 
-		log.fine("setting up event monitoring");
+		log.finer("setting up event monitoring");
 		EventReader ev = new EventReader(diver, vm.eventQueue());
 		ev.addEventListener(new Stepper(diver, symbolizer, m));
 		ev.start();
 
-		log.fine("starting vm");
+		log.finer("starting vm");
 		vm.resume();
 
-		log.fine("waiting for completion");
+		log.finer("waiting for completion");
 		while (!ev.isStopping()) {
 			try {
 				Thread.sleep(100);
@@ -87,7 +89,7 @@ public class Dive {
 			}
 		}
 
-		log.fine("shutting down event monitoring");
+		log.finer("shutting down event monitoring");
 		ev.stop();
 		er.interrupt();
 		or.interrupt();
