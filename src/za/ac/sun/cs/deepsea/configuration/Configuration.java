@@ -134,7 +134,7 @@ public class Configuration {
 					String methodName = t.trim();
 					diver.addTrigger(new Trigger(methodName));
 				} else {
-					String methodName = t.substring(0, i - 1).trim();
+					String methodName = t.substring(0, i).trim();
 					diver.addTrigger(new Trigger(methodName));
 				}
 			}

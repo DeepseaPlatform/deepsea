@@ -130,9 +130,10 @@ public class Diver {
 	 * @param method
 	 * @return
 	 */
-	public Iterator<Trigger> findTriggers(Method method) {
+	public Iterator<Trigger> findTriggers(Method method, String className) {
+		final String n = className + "." + method.getName();
 		return triggers.stream().filter(tr -> {
-			if (!tr.getName().equals(method.getName())) {
+			if (!tr.getName().equals(n)) {
 				return false;
 			}
 			return true;

@@ -1,13 +1,19 @@
 package za.ac.sun.cs.deepsea.diver;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Logger;
 
 import org.apache.bcel.Const;
+import org.apache.bcel.classfile.Attribute;
 import org.apache.bcel.classfile.JavaClass;
 import org.apache.bcel.classfile.Method;
+import org.apache.bcel.classfile.StackMap;
+import org.apache.bcel.classfile.StackMapEntry;
 import org.apache.bcel.generic.BasicType;
 import org.apache.bcel.generic.BranchInstruction;
 import org.apache.bcel.generic.ClassGen;
@@ -18,6 +24,7 @@ import org.apache.bcel.generic.InstructionFactory;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.InstructionList;
 import org.apache.bcel.generic.MethodGen;
+import org.apache.bcel.generic.NOP;
 import org.apache.bcel.generic.Type;
 import org.apache.bcel.util.ClassLoaderRepository;
 import org.apache.bcel.util.Repository;
@@ -143,6 +150,15 @@ public class Stepper extends AbstractEventListener {
 			/*
 			 * Refine the class on the target machine.
 			 */
+			try {
+				FileOutputStream fos = new FileOutputStream("/tmp/x.class");
+				fos.write(cg.getJavaClass().getBytes());
+				fos.close();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			Map<ReferenceType, byte[]> map = new HashMap<>();
 			map.put(event.referenceType(), cg.getJavaClass().getBytes());
 			VirtualMachine vm = mgr.getVM();
@@ -158,22 +174,40 @@ public class Stepper extends AbstractEventListener {
 	}
 
 	private MethodGen modifyMethod(Method m, String className, ConstantPoolGen cpg) {
-		Iterator<Trigger> ti = diver.findTriggers(m);
+		Iterator<Trigger> ti = diver.findTriggers(m, className);
 		while (ti.hasNext()) {
 			Trigger tr = ti.next();
 			MethodGen mg = new MethodGen(m, className, cpg);
-			InstructionList ol = mg.getInstructionList();
-			InstructionList il = new InstructionList();
-			InstructionFactory f = new InstructionFactory(cpg);
-			// il.append(f.createGetStatic(className, "$dp$bypassFlag", Type.BOOLEAN));
-			il.append(f.createConstant(0));
-			BranchInstruction b = new IFEQ(null); 
-			il.append(b);
-			il.append(f.createConstant(22));
-			il.append(InstructionFactory.createStore(Type.INT, 0));
-			b.setTarget(ol.getStart());
-			ol.insert(il);
-			mg.setInstructionList(ol);
+//			InstructionList ol = new InstructionList(mg.getInstructionList().getByteCode());
+			// InstructionList il = new InstructionList(new NOP());
+			// InstructionFactory f = new InstructionFactory(cpg);
+//			ol.insert(new NOP());
+//			ol.setPositions(true);
+			// il.append(new NOP());
+//			// il.append(f.createGetStatic(className, "$dp$bypassFlag", Type.BOOLEAN));
+//			il.append(f.createConstant(0));
+//			BranchInstruction b = new IFEQ(null); 
+//			il.append(b);
+//			il.append(f.createConstant(22));
+//			il.append(InstructionFactory.createStore(Type.INT, 0));
+//			b.setTarget(ol.getStart());
+			// ol.insert(il);
+//			mg.setInstructionList(ol);
+			// il.dispose();
+			// ol.dispose();
+//			mg.setMaxLocals();
+//			mg.setMaxStack();
+			Attribute[] as = mg.getCodeAttributes();
+			StackMap sm = null; 
+			for (Attribute a : as) {
+				if (a instanceof StackMap) {
+					sm = (StackMap) a;
+					break;
+				}
+			}
+//			StackMapEntry sme = sm.getStackMap()[0];
+//			sme.setByteCodeOffset(18);
+			System.out.println(sm);
 			return mg;
 		}
 		return null;
