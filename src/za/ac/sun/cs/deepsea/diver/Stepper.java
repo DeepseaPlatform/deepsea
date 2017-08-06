@@ -93,9 +93,9 @@ public class Stepper extends AbstractEventListener {
 		String key = method.name() + method.signature();
 		String fullKey = method.declaringType().name() + "." + key;
 		if (instructionListMap.containsKey(key)) {
-			InsnList insnList = instructionListMap.remove(key);
+			instructionListMap.remove(key);
 			byte[] bytecodes = method.bytecodes();
-			Instruction.map(bytecodes, insnList, fullKey, instructionMap);
+			Instruction.map(bytecodes, fullKey, instructionMap);
 		}
 		return true;
 	}

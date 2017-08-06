@@ -18,4 +18,11 @@ public class INVOKESTATIC extends Instruction {
 		return 3;
 	}
 
+	@Override
+	public String toString() {
+		sb.setLength(0);
+		sb.append("invokestatic ").append(index);
+		return sb.toString();
+	}
+
 }

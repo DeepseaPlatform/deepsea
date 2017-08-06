@@ -18,4 +18,11 @@ public class IFEQ extends Instruction {
 		return 3;
 	}
 
+	@Override
+	public String toString() {
+		sb.setLength(0);
+		sb.append("ifeq ").append(offset);
+		return sb.toString();
+	}
+
 }

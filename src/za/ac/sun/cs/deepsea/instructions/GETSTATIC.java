@@ -18,4 +18,11 @@ public class GETSTATIC extends Instruction {
 		return 3;
 	}
 
+	@Override
+	public String toString() {
+		sb.setLength(0);
+		sb.append("getstatic ").append(index);
+		return sb.toString();
+	}
+
 }

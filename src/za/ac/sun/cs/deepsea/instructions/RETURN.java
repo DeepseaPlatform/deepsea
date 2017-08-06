@@ -6,4 +6,9 @@ public class RETURN extends Instruction {
 		super(177);
 	}
 	
+	@Override
+	public String toString() {
+		return "return";
+	}
+
 }

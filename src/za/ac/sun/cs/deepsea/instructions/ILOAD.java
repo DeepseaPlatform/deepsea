@@ -27,4 +27,15 @@ public class ILOAD extends Instruction {
 		return size;
 	}
 
+	@Override
+	public String toString() {
+		sb.setLength(0);
+		if (size == 1) {
+			sb.append("iload_").append(index);
+		} else {
+			sb.append("iload ").append(index);
+		}
+		return sb.toString();
+	}
+
 }

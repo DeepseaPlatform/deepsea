@@ -13,4 +13,16 @@ public class ICONST extends Instruction {
 		return index;
 	}
 
+	@Override
+	public String toString() {
+		sb.setLength(0);
+		sb.append("iconst_");
+		if (index == -1) {
+			sb.append("m1");
+		} else {
+			sb.append(index);
+		}
+		return sb.toString();
+	}
+
 }

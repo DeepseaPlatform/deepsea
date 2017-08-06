@@ -18,4 +18,11 @@ public class INVOKEVIRTUAL extends Instruction {
 		return 3;
 	}
 
+	@Override
+	public String toString() {
+		sb.setLength(0);
+		sb.append("invokevirtual ").append(index);
+		return sb.toString();
+	}
+
 }

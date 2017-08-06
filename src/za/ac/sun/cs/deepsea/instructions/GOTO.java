@@ -18,4 +18,11 @@ public class GOTO extends Instruction {
 		return 3;
 	}
 
+	@Override
+	public String toString() {
+		sb.setLength(0);
+		sb.append("goto ").append(offset);
+		return sb.toString();
+	}
+
 }

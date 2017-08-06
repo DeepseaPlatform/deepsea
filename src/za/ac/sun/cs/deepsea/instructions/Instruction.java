@@ -2,19 +2,11 @@ package za.ac.sun.cs.deepsea.instructions;
 
 import java.util.Map;
 
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.InsnList;
-
 public abstract class Instruction {
 
+	protected static final StringBuilder sb = new StringBuilder();
+
 	private final int opcode;
-
-	//	private final AbstractInsnNode instruction;
-
-	//	public Instruction(int opcode, AbstractInsnNode instruction) {
-	//		this.opcode = opcode;
-	//		this.instruction = instruction;
-	//	}
 
 	public Instruction(int opcode) {
 		this.opcode = opcode;
@@ -28,20 +20,30 @@ public abstract class Instruction {
 		return 1;
 	}
 
-	//	public AbstractInsnNode getInstruction() {
-	//		return instruction;
-	//	}
+	@Override
+	public String toString() {
+		sb.setLength(0);
+		sb.append("op:").append(opcode);
+		sb.append(" [").append(getSize()).append(']');
+		return sb.toString();
+	}
 
-	public static Instruction createInstruction(byte[] bytecodes) {
-		int opcode = bytecodes[0] & 0xFF;
-		int operandU1 = bytecodes[1] & 0xFF;
-		int operand3U1 = bytecodes[3] & 0xFF;
-		int operandS1 = bytecodes[1];
-		int operand2S1 = bytecodes[2];
-		int operandU2 = ((bytecodes[1] & 0xFF) << 8) | (bytecodes[2] & 0xFF);
-		int operandS2 = (bytecodes[1] << 8) | (bytecodes[2] & 0xFF);
-		int operandS4 = (bytecodes[1] << 24) | ((bytecodes[2] & 0xFF) << 16) | ((bytecodes[3] & 0xFF) << 8)
-				| (bytecodes[4] & 0xFF);
+	public static Instruction createInstruction(int offset, byte[] bytecodes) {
+		int u0 = bytecodes[offset] & 0xFF;
+		int u1 = (offset + 1 < bytecodes.length) ? (bytecodes[offset + 1] & 0xFF) : 0;
+		int u2 = (offset + 2 < bytecodes.length) ? (bytecodes[offset + 2] & 0xFF) : 0;
+		int u3 = (offset + 3 < bytecodes.length) ? (bytecodes[offset + 3] & 0xFF) : 0;
+		int u4 = (offset + 4 < bytecodes.length) ? (bytecodes[offset + 4] & 0xFF) : 0;
+		int s1 = (offset + 1 < bytecodes.length) ? bytecodes[offset + 1] : 0;
+		int s2 = (offset + 2 < bytecodes.length) ? bytecodes[offset + 2] : 0;
+		int opcode = u0;
+		int operandU1 = u1;
+		int operand3U1 = u3;
+		int operandS1 = s1;
+		int operand2S1 = s2;
+		int operandU2 = (u1 << 8) | u2;
+		int operandS2 = (s1 << 8) | u2;
+		int operandS4 = (s1 << 24) | (u2 << 16) | (u3 << 8) | u4;
 		switch (opcode) {
 		case 0:
 			return new NOP();
@@ -452,16 +454,12 @@ public abstract class Instruction {
 		}
 	}
 
-	public static void map(byte[] bytecodes, InsnList insnList, String key, Map<String, Instruction> map) {
+	public static void map(byte[] bytecodes, String key, Map<String, Instruction> map) {
 		int offset = 0;
-		AbstractInsnNode insn = insnList.getFirst();
-		while ((offset < bytecodes.length) && (insn != null)) {
-			if (insn.getOpcode() != -1) {
-				Instruction ins = createInstruction(bytecodes);
-				map.put(key + "." + offset, ins);
-				offset += ins.getSize();
-			}
-			insn = insn.getNext();
+		while (offset < bytecodes.length) {
+			Instruction ins = createInstruction(offset, bytecodes);
+			map.put(key + "." + offset, ins);
+			offset += ins.getSize();
 		}
 	}
 

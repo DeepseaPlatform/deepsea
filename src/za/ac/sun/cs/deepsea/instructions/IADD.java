@@ -6,4 +6,9 @@ public class IADD extends Instruction {
 		super(96);
 	}
 	
+	@Override
+	public String toString() {
+		return "iadd";
+	}
+
 }

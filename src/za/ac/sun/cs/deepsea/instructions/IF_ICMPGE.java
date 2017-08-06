@@ -18,4 +18,11 @@ public class IF_ICMPGE extends Instruction {
 		return 3;
 	}
 
+	@Override
+	public String toString() {
+		sb.setLength(0);
+		sb.append("if_icmpge ").append(offset);
+		return sb.toString();
+	}
+
 }
