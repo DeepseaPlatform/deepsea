@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.bcel.classfile.Method;
-
 import za.ac.sun.cs.deepsea.logging.LogHandler;
 
 /**
@@ -130,14 +128,15 @@ public class Diver {
 	 * @param method
 	 * @return
 	 */
-	public Iterator<Trigger> findTriggers(Method method, String className) {
-		final String n = className + "." + method.getName();
-		return triggers.stream().filter(tr -> {
-			if (!tr.getName().equals(n)) {
-				return false;
-			}
-			return true;
-		}).iterator();
+	public Iterator<Trigger> findTriggers(int method, String className) {
+		return triggers.stream().filter(tr -> false).iterator();
+//		final String n = className + "." + method.getName();
+//		return triggers.stream().filter(tr -> {
+//			if (!tr.getName().equals(n)) {
+//				return false;
+//			}
+//			return true;
+//		}).iterator();
 	}
 	
 	/**

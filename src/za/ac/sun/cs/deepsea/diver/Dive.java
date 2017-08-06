@@ -66,6 +66,7 @@ public class Dive {
 		RequestManager m = new RequestManager(diver, vm.eventRequestManager());
 		m.addExclude("java.*", "javax.*", "sun.*", "com.sun.*");
 		m.createClassPrepareRequest(r -> m.filterExcludes(r));
+		m.createMethodEntryRequest(r -> m.filterExcludes(r));
 		ThreadReference mt = RequestManager.findThread(vm, "main");
 		m.createStepRequest(mt, StepRequest.STEP_MIN, StepRequest.STEP_INTO, r -> {
 			m.filterExcludes(r);
