@@ -11,7 +11,6 @@ public class SymbolicFrame {
 
 	public void push(Expression v) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	public Expression getLocal(int index) {

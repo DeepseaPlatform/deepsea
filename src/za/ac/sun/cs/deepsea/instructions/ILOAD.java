@@ -1,5 +1,10 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import com.sun.jdi.Location;
+
+import za.ac.sun.cs.deepsea.diver.SymbolicFrame;
+import za.ac.sun.cs.deepsea.diver.Symbolizer;
+
 public class ILOAD extends Instruction {
 
 	private final int index;
@@ -27,6 +32,12 @@ public class ILOAD extends Instruction {
 		return size;
 	}
 
+	@Override
+	public void execute(Location loc, Symbolizer symbolizer) {
+		SymbolicFrame frame = symbolizer.getTopFrame();
+		frame.push(frame.getLocal(index));
+	}
+	
 	@Override
 	public String toString() {
 		sb.setLength(0);

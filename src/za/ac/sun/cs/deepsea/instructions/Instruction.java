@@ -2,6 +2,10 @@ package za.ac.sun.cs.deepsea.instructions;
 
 import java.util.Map;
 
+import com.sun.jdi.Location;
+
+import za.ac.sun.cs.deepsea.diver.Symbolizer;
+
 public abstract class Instruction {
 
 	protected static final StringBuilder sb = new StringBuilder();
@@ -18,6 +22,9 @@ public abstract class Instruction {
 
 	public int getSize() {
 		return 1;
+	}
+
+	public void execute(Location loc, Symbolizer symbolizer) {
 	}
 
 	@Override

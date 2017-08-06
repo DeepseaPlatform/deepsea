@@ -51,7 +51,6 @@ public class Dive {
 		log.finer("launching vm");
 		VirtualMachine vm = VMConnectLauncher.launchTarget(new String[] { diver.getTarget(), diver.getArgs() });
 		log.finest("target vm details:\n" + vm.description());
-		log.info("CANREDEFINECLASSES " + vm.canRedefineClasses());
 
 		log.finer("redirecting output");
 		Process pr = vm.process();
