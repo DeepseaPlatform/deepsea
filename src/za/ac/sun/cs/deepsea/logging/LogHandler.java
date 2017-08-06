@@ -2,19 +2,32 @@ package za.ac.sun.cs.deepsea.logging;
 
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 import java.util.logging.StreamHandler;
 
+/**
+ * DEEPSEA log handler that outputs all log messages to the standard output.
+ * 
+ * @author Jaco Geldenhuys (geld@sun.ac.za)
+ */
 public class LogHandler extends StreamHandler {
 
 	/**
-	 * Constructs a <code>StreamHandler</code> that publishes log records to
-	 * <code>System.err</code>. The initial configuration is determined by the
-	 * <code>LogManager</code> properties described above.
+	 * Constructs a {@link StreamHandler} that publishes log records to
+	 * {@code System.out} using {@link LogFormatter} to reformat the message.
 	 */
 	public LogHandler() {
 		super(System.out, new LogFormatter());
 	}
 
+	/**
+	 * Constructs a {@link StreamHandler} that publishes log records to
+	 * {@code System.out} using {@link LogFormatter} to reformat the message,
+	 * and setting the handler's level to {@code level}.
+	 * 
+	 * @param level
+	 *            the log level
+	 */
 	public LogHandler(Level level) {
 		super(System.out, new LogFormatter());
 		setLevel(level);
@@ -22,12 +35,7 @@ public class LogHandler extends StreamHandler {
 
 	/**
 	 * Forces any data that may have been buffered to the underlying output
-	 * device, but does <i>not</i> close <code>System.err</code>.
-	 * 
-	 * <p>
-	 * In case of an I/O failure, the <code>ErrorManager</code> of this
-	 * <code>ConsoleHandler</code> will be informed, but the caller of this
-	 * method will not receive an exception.
+	 * device, but does <i>not</i> close {@code System.out}.
 	 */
 	@Override
 	public void close() {
@@ -35,23 +43,10 @@ public class LogHandler extends StreamHandler {
 	}
 
 	/**
-	 * Publishes a <code>LogRecord</code> to the console, provided the record
-	 * passes all tests for being loggable.
-	 * 
-	 * <p>
-	 * Most applications do not need to call this method directly. Instead, they
-	 * will use use a <code>Logger</code>, which will create LogRecords and
-	 * distribute them to registered handlers.
-	 * 
-	 * <p>
-	 * In case of an I/O failure, the <code>ErrorManager</code> of this
-	 * <code>SocketHandler</code> will be informed, but the caller of this
-	 * method will not receive an exception.
-	 * 
-	 * <p>
-	 * The GNU implementation of <code>ConsoleHandler.publish</code> calls
-	 * flush() for every request to publish a record, so they appear immediately
-	 * on the console.
+	 * Publishes a {@link LogRecord} to the console, provided the record passes
+	 * all tests for being loggable. Most applications do not need to call this
+	 * method directly. Instead, they will use use a {@link Logger}, which will
+	 * create LogRecords and distribute them to registered handlers.
 	 * 
 	 * @param record
 	 *            the log event to be published.

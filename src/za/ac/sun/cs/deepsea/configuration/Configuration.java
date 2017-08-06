@@ -15,30 +15,37 @@ import za.ac.sun.cs.deepsea.logging.LogHandler;
  * A {@link Configuration} takes an instance of {@link Properties} and processes
  * all the "{@code deepsea}" properties to configure a {@link Diver} instance.
  *
- * @author Jaco Geldenhuys <geld@sun.ac.za>
+ * @author Jaco Geldenhuys (geld@sun.ac.za)
  */
 public class Configuration {
 
 	/**
-	 * 
+	 * The {@link Diver} instance to configure.
 	 */
 	private final Diver diver;
 
 	/**
-	 * 
+	 * The {@link Logger} associated with the {@link #diver}.
 	 */
 	private final Logger log;
 
 	/**
-	 * 
+	 * The {@link Properties} instance where the settings are read from.
 	 */
 	private final Properties properties;
 
+	/**
+	 * An internal instance used to construct log messages.
+	 */
 	private static final StringBuilder sb = new StringBuilder();
 
 	/**
+	 * Constructs an instance of the configuration manager.
+	 * 
 	 * @param diver
+	 *            the {@link Diver} instance to configure
 	 * @param properties
+	 *            the {@link Properties} instance to read settings from
 	 */
 	public Configuration(final Diver diver, final Properties properties) {
 		this.diver = diver;
@@ -46,6 +53,18 @@ public class Configuration {
 		this.properties = properties;
 	}
 
+	/**
+	 * Reads an integer property from a {@link Properties} file.
+	 * 
+	 * @param properties
+	 *            the {@link Properties} instance to read from
+	 * @param key
+	 *            the property key
+	 * @param defaultValue
+	 *            the default value to return if the key is not found
+	 * @return the integer value associated with the key (or the default value
+	 *         supplied)
+	 */
 	public static int getIntegerProperty(Properties properties, String key, int defaultValue) {
 		String s = properties.getProperty(key, Integer.toString(defaultValue));
 		try {
@@ -56,6 +75,18 @@ public class Configuration {
 		return defaultValue;
 	}
 
+	/**
+	 * Reads a boolean property from a {@link Properties} file.
+	 * 
+	 * @param properties
+	 *            the {@link Properties} instance to read from
+	 * @param key
+	 *            the property key
+	 * @param defaultValue
+	 *            the default value to return if the key is not found
+	 * @return the boolean value associated with the key (or the default value
+	 *         supplied)
+	 */
 	public static boolean getBooleanProperty(Properties properties, String key, boolean defaultValue) {
 		String s = properties.getProperty(key, Boolean.toString(defaultValue)).trim();
 		try {
@@ -75,9 +106,10 @@ public class Configuration {
 		}
 		return defaultValue;
 	}
-	
+
 	/**
-	 * 
+	 * Does the actual work of reading properties and calling the appropriate
+	 * routines of the {@link Diver} instance.
 	 */
 	public void apply() {
 		setLevel();
@@ -89,7 +121,7 @@ public class Configuration {
 	}
 
 	/**
-	 * 
+	 * Reads and sets the "{@code deepsea.log.level}" setting.
 	 */
 	private void setLevel() {
 		String p = properties.getProperty("deepsea.log.level");
@@ -109,7 +141,7 @@ public class Configuration {
 	}
 
 	/**
-	 * 
+	 * Reads and sets the "{@code deepsea.target}" setting.
 	 */
 	private void setTarget() {
 		String p = properties.getProperty("deepsea.target");
@@ -119,7 +151,7 @@ public class Configuration {
 	}
 
 	/**
-	 * 
+	 * Reads and sets the "{@code deepsea.args}" setting.
 	 */
 	private void setArgs() {
 		String p = properties.getProperty("deepsea.args");
@@ -128,6 +160,17 @@ public class Configuration {
 		}
 	}
 
+	/**
+	 * Reads and sets the "{@code deepsea.triggers}" setting. The value of this
+	 * setting is expected to be a "<code>;</code>" separated list. Each
+	 * components is the fully qualified name of a method with its parameters.
+	 * The parameters is given as a "<code>,</code>" separated list of
+	 * "<code>name:type</code>" and "<code>type</code>" entries. Parameters with
+	 * a name is treated symbolically when the method is invoked; parameters
+	 * without a name remain concrete. A trigger is only activated when the
+	 * number of parameters and their types match; this caters for method
+	 * overloading.
+	 */
 	private void setTriggers() {
 		String p = properties.getProperty("deepsea.triggers");
 		if (p != null) {
@@ -138,6 +181,12 @@ public class Configuration {
 		}
 	}
 
+	/**
+	 * Processes a single method description.
+	 * 
+	 * @param triggerDesc
+	 *            description of a triggering method
+	 */
 	private void processTrigger(String triggerDesc) {
 		final Set<String> names = new HashSet<>();
 		int paramStart = triggerDesc.indexOf('(');
@@ -182,6 +231,13 @@ public class Configuration {
 		}
 	}
 
+	/**
+	 * Parses a string and returns the corresponding internal Java class.
+	 * 
+	 * @param type
+	 *            a string such as "<code>int</code>" or "<code>boolean</code>"
+	 * @return the corresponding Java class of the type
+	 */
 	private Object parseType(String type) {
 		if (type.equals("int")) {
 			return Integer.class;
@@ -192,10 +248,16 @@ public class Configuration {
 		}
 	}
 
+	/**
+	 * Reads and sets the "{@code deepsea.produceoutput}" setting.
+	 */
 	private void setProduceOutput() {
 		diver.produceOutput(getBooleanProperty(properties, "deepsea.produceoutput", diver.isProducintOutput()));
 	}
 
+	/**
+	 * Dumps all the settings in the {@link Properties} file to the log.
+	 */
 	private void dump() {
 		if (getBooleanProperty(properties, "deepsea.log.dump", false)) {
 			for (Object k : properties.keySet()) {

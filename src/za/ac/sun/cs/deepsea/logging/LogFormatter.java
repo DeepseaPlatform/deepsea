@@ -6,20 +6,29 @@ import java.util.Date;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
+/**
+ * Customized log message formatting.
+ * 
+ * @author Jaco Geldenhuys (geld@sun.ac.za)
+ */
 public class LogFormatter extends Formatter {
 
-	private Date date = new Date();
+	/**
+	 * A private instance used for formatting timestamps.
+	 */
+	private static Date date = new Date();
 
+	/**
+	 * 
+	 */
 	private String format = "[%1$tY%1$tm%1$td %1$tH:%1$tM:%1$tS][%2$s ][%4$s] %5$s%6$s%n";
 
-	public String getFormat() {
-		return format;
-	}
-
-	public void setFormat(String format) {
-		this.format = format;
-	}
-
+	/**
+	 * Formats the given log record and return the formatted string.
+	 * 
+	 * @param record
+	 *            the log record to format
+	 */
 	@Override
 	public synchronized String format(LogRecord record) {
 		date.setTime(record.getMillis());

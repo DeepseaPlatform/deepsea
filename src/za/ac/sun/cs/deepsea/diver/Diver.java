@@ -12,7 +12,7 @@ import za.ac.sun.cs.deepsea.logging.LogHandler;
 /**
  * Driver for dynamic symbolic execution.
  * 
- * @author Jaco Geldenhuys <geld@sun.ac.za>
+ * @author Jaco Geldenhuys (geld@sun.ac.za)
  */
 public class Diver {
 
