@@ -1,6 +1,8 @@
 package za.ac.sun.cs.deepsea.configuration;
 
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,6 +33,8 @@ public class Configuration {
 	 * 
 	 */
 	private final Properties properties;
+
+	private static final StringBuilder sb = new StringBuilder();
 
 	/**
 	 * @param diver
@@ -127,17 +131,64 @@ public class Configuration {
 	private void setTriggers() {
 		String p = properties.getProperty("deepsea.triggers");
 		if (p != null) {
-			String[] ts = p.trim().split(";");
-			for (String t : ts) {
-				int i = t.indexOf('(');
-				if (i == -1) {
-					String methodName = t.trim();
-					diver.addTrigger(new Trigger(methodName));
-				} else {
-					String methodName = t.substring(0, i).trim();
-					diver.addTrigger(new Trigger(methodName));
-				}
+			String[] triggers = p.trim().split(";");
+			for (String trigger : triggers) {
+				processTrigger(trigger);
 			}
+		}
+	}
+
+	private void processTrigger(String triggerDesc) {
+		final Set<String> names = new HashSet<>();
+		int paramStart = triggerDesc.indexOf('(');
+		assert paramStart != -1;
+		int paramEnd = triggerDesc.indexOf(')', paramStart);
+		assert paramEnd != -1;
+		String methodName = triggerDesc.substring(0, paramStart).trim();
+		Trigger trigger = new Trigger(methodName);
+		String parameterString = triggerDesc.substring(paramStart + 1, paramEnd).trim();
+		if (parameterString.length() > 0) {
+			String[] parameters = parameterString.split(",");
+			trigger.setParameterCount(parameters.length);
+			int index = 0;
+			for (String parameter : parameters) {
+				int colonPos = parameter.indexOf(':');
+				if (colonPos == -1) {
+					trigger.setParameterType(index, parseType(parameter.trim()));
+				} else {
+					String name = parameter.substring(0, colonPos).trim();
+					if (names.contains(name)) {
+						sb.setLength(0);
+						sb.append("ignored trigger with duplicates, ");
+						sb.append('"').append(triggerDesc).append('"');
+						log.warning(sb.toString());
+						return;
+					}
+					names.add(name);
+					Object type = parseType(parameter.substring(colonPos + 1).trim());
+					trigger.setParameterName(index, name);
+					trigger.setParameterType(index, type);
+				}
+				index++;
+			}
+		}
+		if (names.size() > 0) {
+			diver.addTrigger(trigger);
+		} else {
+			sb.setLength(0);
+			sb.append("ignored non-symbolic trigger ");
+			sb.append('"').append(triggerDesc).append('"');
+			log.warning(sb.toString());
+		}
+	}
+
+	private Object parseType(String type) {
+		if (type.equals("int")) {
+			return Integer.class;
+		} else if (type.equals("boolean")) {
+			return Boolean.class;
+		} else {
+			return Object.class;
 		}
 	}
 

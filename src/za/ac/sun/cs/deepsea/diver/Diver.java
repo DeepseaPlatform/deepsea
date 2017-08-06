@@ -1,6 +1,5 @@
 package za.ac.sun.cs.deepsea.diver;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -128,17 +127,19 @@ public class Diver {
 	 * @param method
 	 * @return
 	 */
-	public Iterator<Trigger> findTriggers(int method, String className) {
-		return triggers.stream().filter(tr -> false).iterator();
-//		final String n = className + "." + method.getName();
-//		return triggers.stream().filter(tr -> {
-//			if (!tr.getName().equals(n)) {
-//				return false;
-//			}
-//			return true;
-//		}).iterator();
+	public Trigger findTriggers(int method, String className) {
+		for (Trigger trigger : triggers) {
+			if (triggerMatch(trigger, method, className)) {
+				return trigger;
+			}
+		}
+		return null;
 	}
 	
+	private boolean triggerMatch(Trigger trigger, int method, String className) {
+		return false;
+	}
+
 	/**
 	 * @return
 	 */
