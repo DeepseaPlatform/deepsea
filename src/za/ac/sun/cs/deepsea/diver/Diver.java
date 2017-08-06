@@ -159,6 +159,7 @@ public class Diver {
 		Dive d = new Dive(this);
 		d.dive();
 		log.info("%%%% " + d.getPathCondition());
+		log.info("Done.");
 	}
 
 }
