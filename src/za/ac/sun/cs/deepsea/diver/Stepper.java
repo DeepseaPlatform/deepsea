@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.sun.jdi.AbsentInformationException;
@@ -61,20 +62,24 @@ public class Stepper extends AbstractEventListener {
 		long bci = loc.codeIndex();
 		Instruction ins = instructionMap.get(clsName + "." + methodSign + "." + bci);
 		if (ins == null) {
-			sb.setLength(0);
-			sb.append("class:").append(clsName);
-			sb.append(" method:").append(methodSign);
-			sb.append(" bci:").append(bci);
-			log.finest(sb.toString());
-		} else {
-			sb.setLength(0);
-			if (symbolizer.inSymbolicMode()) {
-				sb.append("$$$ ");
+			if (log.getLevel().intValue() < Level.FINEST.intValue()) {
+				sb.setLength(0);
+				sb.append("class:").append(clsName);
+				sb.append(" method:").append(methodSign);
+				sb.append(" bci:").append(bci);
+				log.finest(sb.toString());
 			}
-			sb.append('[').append(methodName);
-			sb.append("::").append(bci);
-			sb.append("] ").append(ins.toString());
-			log.finest(sb.toString());
+		} else {
+			if (log.getLevel().intValue() < Level.FINEST.intValue()) {
+				sb.setLength(0);
+				if (symbolizer.inSymbolicMode()) {
+					sb.append("$$$ ");
+				}
+				sb.append('[').append(methodName);
+				sb.append("::").append(bci);
+				sb.append("] ").append(ins.toString());
+				log.finest(sb.toString());
+			}
 			symbolizer.execute(loc, ins);
 		}
 
