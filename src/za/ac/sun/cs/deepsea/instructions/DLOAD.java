@@ -6,14 +6,14 @@ public class DLOAD extends Instruction {
 
 	private final int size;
 
-	public DLOAD(final int index) {
-		super(24);
+	public DLOAD(final int position, final int index) {
+		super(position, 24);
 		this.index = index;
 		this.size = 1;
 	}
 
-	public DLOAD(final int index, boolean dummy) {
-		super(24);
+	public DLOAD(final int position, final int index, boolean dummy) {
+		super(position, 24);
 		this.index = index;
 		this.size = 2;
 	}

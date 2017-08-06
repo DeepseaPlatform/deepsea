@@ -4,8 +4,8 @@ public class FCONST extends Instruction {
 
 	private final int index;
 
-	public FCONST(final int index) {
-		super(11);
+	public FCONST(final int position, final int index) {
+		super(position, 11);
 		this.index = index;
 	}
 

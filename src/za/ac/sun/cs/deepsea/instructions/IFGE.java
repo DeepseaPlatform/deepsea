@@ -4,8 +4,8 @@ public class IFGE extends Instruction {
 
 	private final int offset;
 
-	public IFGE(final int offset) {
-		super(156);
+	public IFGE(final int position, final int offset) {
+		super(position, 156);
 		this.offset = offset;
 	}
 

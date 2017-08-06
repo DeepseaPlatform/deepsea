@@ -11,14 +11,14 @@ public class ILOAD extends Instruction {
 
 	private final int size;
 
-	public ILOAD(final int index) {
-		super(21);
+	public ILOAD(final int position, final int index) {
+		super(position, 21);
 		this.index = index;
 		this.size = 1;
 	}
 
-	public ILOAD(final int index, boolean dummy) {
-		super(21);
+	public ILOAD(final int position, final int index, boolean dummy) {
+		super(position, 21);
 		this.index = index;
 		this.size = 2;
 	}

@@ -4,8 +4,8 @@ public class ANEWARRAY extends Instruction {
 
 	private final int index;
 
-	public ANEWARRAY(final int index) {
-		super(189);
+	public ANEWARRAY(final int position, final int index) {
+		super(position, 189);
 		this.index = index;
 	}
 

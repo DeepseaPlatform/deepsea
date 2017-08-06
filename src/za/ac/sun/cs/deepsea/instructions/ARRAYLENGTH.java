@@ -2,8 +2,8 @@ package za.ac.sun.cs.deepsea.instructions;
 
 public class ARRAYLENGTH extends Instruction {
 
-	public ARRAYLENGTH() {
-		super(190);
+	public ARRAYLENGTH(final int position) {
+		super(position, 190);
 	}
 	
 }

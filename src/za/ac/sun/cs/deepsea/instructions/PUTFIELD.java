@@ -4,8 +4,8 @@ public class PUTFIELD extends Instruction {
 
 	private final int index;
 
-	public PUTFIELD(final int index) {
-		super(181);
+	public PUTFIELD(final int position, final int index) {
+		super(position, 181);
 		this.index = index;
 	}
 

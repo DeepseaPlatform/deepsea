@@ -6,14 +6,14 @@ public class FLOAD extends Instruction {
 
 	private final int size;
 
-	public FLOAD(final int index) {
-		super(23);
+	public FLOAD(final int position, final int index) {
+		super(position, 23);
 		this.index = index;
 		this.size = 1;
 	}
 
-	public FLOAD(final int index, boolean dummy) {
-		super(23);
+	public FLOAD(final int position, final int index, boolean dummy) {
+		super(position, 23);
 		this.index = index;
 		this.size = 2;
 	}

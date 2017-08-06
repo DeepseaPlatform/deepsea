@@ -2,8 +2,8 @@ package za.ac.sun.cs.deepsea.instructions;
 
 public class I2B extends Instruction {
 
-	public I2B() {
-		super(145);
+	public I2B(final int position) {
+		super(position, 145);
 	}
 	
 }

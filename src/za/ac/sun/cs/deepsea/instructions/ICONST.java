@@ -10,8 +10,8 @@ public class ICONST extends Instruction {
 
 	private final int value;
 
-	public ICONST(final int value) {
-		super(3);
+	public ICONST(final int position, final int value) {
+		super(position, 3);
 		this.value = value;
 	}
 

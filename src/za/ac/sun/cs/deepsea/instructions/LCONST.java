@@ -4,8 +4,8 @@ public class LCONST extends Instruction {
 
 	private final int index;
 
-	public LCONST(final int index) {
-		super(3);
+	public LCONST(final int position, final int index) {
+		super(position, 3);
 		this.index = index;
 	}
 

@@ -2,8 +2,8 @@ package za.ac.sun.cs.deepsea.instructions;
 
 public class AASTORE extends Instruction {
 
-	public AASTORE() {
-		super(83);
+	public AASTORE(final int position) {
+		super(position, 83);
 	}
 
 }

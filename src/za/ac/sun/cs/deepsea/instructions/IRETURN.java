@@ -7,8 +7,8 @@ import za.ac.sun.cs.green.expr.Expression;
 
 public class IRETURN extends Instruction {
 
-	public IRETURN() {
-		super(172);
+	public IRETURN(final int position) {
+		super(position, 172);
 	}
 	
 	@Override

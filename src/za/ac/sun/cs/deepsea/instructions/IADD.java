@@ -10,8 +10,8 @@ import za.ac.sun.cs.green.expr.Operation.Operator;
 
 public class IADD extends Instruction {
 
-	public IADD() {
-		super(96);
+	public IADD(final int position) {
+		super(position, 96);
 	}
 	
 	@Override

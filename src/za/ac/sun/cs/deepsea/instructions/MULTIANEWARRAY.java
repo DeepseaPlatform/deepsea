@@ -6,8 +6,8 @@ public class MULTIANEWARRAY extends Instruction {
 
 	private final int dimensions;
 	
-	public MULTIANEWARRAY(final int index, final int dimensions) {
-		super(197);
+	public MULTIANEWARRAY(final int position, final int index, final int dimensions) {
+		super(position, 197);
 		this.index = index;
 		this.dimensions = dimensions;
 	}

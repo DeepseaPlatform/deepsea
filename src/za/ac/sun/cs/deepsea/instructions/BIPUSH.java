@@ -4,8 +4,8 @@ public class BIPUSH extends Instruction {
 
 	private final int index;
 
-	public BIPUSH(final int index) {
-		super(16);
+	public BIPUSH(final int position, final int index) {
+		super(position, 16);
 		this.index = index;
 	}
 

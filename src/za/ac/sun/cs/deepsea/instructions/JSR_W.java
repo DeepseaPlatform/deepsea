@@ -4,8 +4,8 @@ public class JSR_W extends Instruction {
 
 	private final int offset;
 
-	public JSR_W(final int offset) {
-		super(201);
+	public JSR_W(final int position, final int offset) {
+		super(position, 201);
 		this.offset = offset;
 	}
 

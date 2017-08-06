@@ -4,8 +4,8 @@ public class DCONST extends Instruction {
 	
 	private final int index;
 
-	public DCONST(final int index) {
-		super(14);
+	public DCONST(final int position, final int index) {
+		super(position, 14);
 		this.index = index;
 	}
 

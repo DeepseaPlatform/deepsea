@@ -4,8 +4,8 @@ public class IFNE extends Instruction {
 
 	private final int offset;
 
-	public IFNE(final int offset) {
-		super(154);
+	public IFNE(final int position, final int offset) {
+		super(position, 154);
 		this.offset = offset;
 	}
 

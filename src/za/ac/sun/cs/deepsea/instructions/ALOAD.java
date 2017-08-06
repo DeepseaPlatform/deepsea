@@ -6,14 +6,14 @@ public class ALOAD extends Instruction {
 
 	private final int size;
 
-	public ALOAD(final int index) {
-		super(25);
+	public ALOAD(final int position, final int index) {
+		super(position, 25);
 		this.index = index;
 		this.size = 1;
 	}
 
-	public ALOAD(final int index, boolean dummy) {
-		super(25);
+	public ALOAD(final int position, final int index, boolean dummy) {
+		super(position, 25);
 		this.index = index;
 		this.size = 2;
 	}

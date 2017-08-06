@@ -2,8 +2,8 @@ package za.ac.sun.cs.deepsea.instructions;
 
 public class LCMP extends Instruction {
 
-	public LCMP() {
-		super(148);
+	public LCMP(final int position) {
+		super(position, 148);
 	}
 	
 }

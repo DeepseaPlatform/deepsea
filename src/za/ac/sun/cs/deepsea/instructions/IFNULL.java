@@ -4,8 +4,8 @@ public class IFNULL extends Instruction {
 
 	private final int offset;
 
-	public IFNULL(final int offset) {
-		super(198);
+	public IFNULL(final int position, final int offset) {
+		super(position, 198);
 		this.offset = offset;
 	}
 

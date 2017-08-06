@@ -4,8 +4,8 @@ public class IFLE extends Instruction {
 
 	private final int offset;
 
-	public IFLE(final int offset) {
-		super(158);
+	public IFLE(final int position, final int offset) {
+		super(position, 158);
 		this.offset = offset;
 	}
 

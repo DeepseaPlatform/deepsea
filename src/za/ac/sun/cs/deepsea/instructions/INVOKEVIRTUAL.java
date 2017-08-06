@@ -4,8 +4,8 @@ public class INVOKEVIRTUAL extends Instruction {
 
 	private final int index;
 
-	public INVOKEVIRTUAL(final int index) {
-		super(182);
+	public INVOKEVIRTUAL(final int position, final int index) {
+		super(position, 182);
 		this.index = index;
 	}
 

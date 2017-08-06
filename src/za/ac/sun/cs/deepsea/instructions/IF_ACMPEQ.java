@@ -4,8 +4,8 @@ public class IF_ACMPEQ extends Instruction {
 
 	private final int offset;
 
-	public IF_ACMPEQ(final int offset) {
-		super(165);
+	public IF_ACMPEQ(final int position, final int offset) {
+		super(position, 165);
 		this.offset = offset;
 	}
 

@@ -2,8 +2,8 @@ package za.ac.sun.cs.deepsea.instructions;
 
 public class LSHR extends Instruction {
 
-	public LSHR() {
-		super(123);
+	public LSHR(final int position) {
+		super(position, 123);
 	}
 	
 }

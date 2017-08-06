@@ -2,8 +2,8 @@ package za.ac.sun.cs.deepsea.instructions;
 
 public class ISUB extends Instruction {
 
-	public ISUB() {
-		super(100);
+	public ISUB(final int position) {
+		super(position, 100);
 	}
 
 	@Override

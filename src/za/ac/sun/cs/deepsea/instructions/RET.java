@@ -4,8 +4,8 @@ public class RET extends Instruction {
 
 	private final int index;
 
-	public RET(final int index) {
-		super(169);
+	public RET(final int position, final int index) {
+		super(position, 169);
 		this.index = index;
 	}
 

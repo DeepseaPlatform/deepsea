@@ -6,8 +6,8 @@ public class INVOKEINTERFACE extends Instruction {
 
 	private final int count;
 	
-	public INVOKEINTERFACE(final int index, final int count) {
-		super(185);
+	public INVOKEINTERFACE(final int position, final int index, final int count) {
+		super(position, 185);
 		this.index = index;
 		this.count = count;
 	}

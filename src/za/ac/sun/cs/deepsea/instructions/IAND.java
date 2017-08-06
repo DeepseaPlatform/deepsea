@@ -2,8 +2,8 @@ package za.ac.sun.cs.deepsea.instructions;
 
 public class IAND extends Instruction {
 
-	public IAND() {
-		super(126);
+	public IAND(final int position) {
+		super(position, 126);
 	}
 	
 }

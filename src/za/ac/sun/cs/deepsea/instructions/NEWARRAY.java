@@ -4,8 +4,8 @@ public class NEWARRAY extends Instruction {
 
 	private final int index;
 
-	public NEWARRAY(final int index) {
-		super(188);
+	public NEWARRAY(final int position, final int index) {
+		super(position, 188);
 		this.index = index;
 	}
 

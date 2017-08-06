@@ -4,8 +4,8 @@ public class IFLT extends Instruction {
 
 	private final int offset;
 
-	public IFLT(final int offset) {
-		super(155);
+	public IFLT(final int position, final int offset) {
+		super(position, 155);
 		this.offset = offset;
 	}
 

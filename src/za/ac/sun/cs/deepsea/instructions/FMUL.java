@@ -2,8 +2,8 @@ package za.ac.sun.cs.deepsea.instructions;
 
 public class FMUL extends Instruction {
 
-	public FMUL() {
-		super(106);
+	public FMUL(final int position) {
+		super(position, 106);
 	}
 	
 }

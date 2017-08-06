@@ -4,8 +4,8 @@ public class PUTSTATIC extends Instruction {
 
 	private final int index;
 
-	public PUTSTATIC(final int index) {
-		super(179);
+	public PUTSTATIC(final int position, final int index) {
+		super(position, 179);
 		this.index = index;
 	}
 

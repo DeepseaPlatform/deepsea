@@ -4,8 +4,8 @@ public class CHECKCAST extends Instruction {
 
 	private final int index;
 
-	public CHECKCAST(final int index) {
-		super(192);
+	public CHECKCAST(final int position, final int index) {
+		super(position, 192);
 		this.index = index;
 	}
 

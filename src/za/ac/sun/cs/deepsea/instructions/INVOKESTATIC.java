@@ -4,8 +4,8 @@ public class INVOKESTATIC extends Instruction {
 
 	private final int index;
 
-	public INVOKESTATIC(final int index) {
-		super(184);
+	public INVOKESTATIC(final int position, final int index) {
+		super(position, 184);
 		this.index = index;
 	}
 

@@ -4,8 +4,8 @@ public class IF_ICMPGT extends Instruction {
 
 	private final int offset;
 
-	public IF_ICMPGT(final int offset) {
-		super(163);
+	public IF_ICMPGT(final int position, final int offset) {
+		super(position, 163);
 		this.offset = offset;
 	}
 

@@ -4,8 +4,8 @@ public class IFEQ extends Instruction {
 
 	private final int offset;
 
-	public IFEQ(final int offset) {
-		super(153);
+	public IFEQ(final int position, final int offset) {
+		super(position, 153);
 		this.offset = offset;
 	}
 

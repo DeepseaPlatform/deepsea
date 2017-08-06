@@ -4,8 +4,8 @@ public class NEW extends Instruction {
 
 	private final int index;
 
-	public NEW(final int index) {
-		super(187);
+	public NEW(final int position, final int index) {
+		super(position, 187);
 		this.index = index;
 	}
 

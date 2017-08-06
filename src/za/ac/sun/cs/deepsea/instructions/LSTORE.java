@@ -6,14 +6,14 @@ public class LSTORE extends Instruction {
 
 	private final int size;
 
-	public LSTORE(final int index) {
-		super(55);
+	public LSTORE(final int position, final int index) {
+		super(position, 55);
 		this.index = index;
 		this.size = 1;
 	}
 
-	public LSTORE(final int index, boolean dummy) {
-		super(55);
+	public LSTORE(final int position, final int index, boolean dummy) {
+		super(position, 55);
 		this.index = index;
 		this.size = 2;
 	}

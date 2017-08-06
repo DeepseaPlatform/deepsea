@@ -10,8 +10,8 @@ import za.ac.sun.cs.green.expr.Operation.Operator;
 
 public class IMUL extends Instruction {
 
-	public IMUL() {
-		super(104);
+	public IMUL(final int position) {
+		super(position, 104);
 	}
 	
 	@Override

@@ -2,8 +2,8 @@ package za.ac.sun.cs.deepsea.instructions;
 
 public class IREM extends Instruction {
 
-	public IREM() {
-		super(112);
+	public IREM(final int position) {
+		super(position, 112);
 	}
 	
 }

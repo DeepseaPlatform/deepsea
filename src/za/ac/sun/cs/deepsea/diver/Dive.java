@@ -12,6 +12,7 @@ import za.ac.sun.cs.deepsea.agent.EventReader;
 import za.ac.sun.cs.deepsea.agent.RequestManager;
 import za.ac.sun.cs.deepsea.agent.StreamRedirector;
 import za.ac.sun.cs.deepsea.agent.VMConnectLauncher;
+import za.ac.sun.cs.green.expr.Expression;
 
 public class Dive {
 
@@ -64,7 +65,6 @@ public class Dive {
 		log.finer("issuing monitor requests");
 		RequestManager m = new RequestManager(diver, vm.eventRequestManager());
 		m.addExclude("java.*", "javax.*", "sun.*", "com.sun.*");
-		m.createClassPrepareRequest(r -> m.filterExcludes(r));
 		m.createMethodEntryRequest(r -> m.filterExcludes(r));
 		ThreadReference mt = RequestManager.findThread(vm, "main");
 		m.createStepRequest(mt, StepRequest.STEP_MIN, StepRequest.STEP_INTO, r -> {
@@ -101,8 +101,10 @@ public class Dive {
 		}
 
 		log.fine("----- done with dive " + diver.getName() + "." + id);
-		
-		// TODO return the information collected during dive
+	}
+
+	public Expression getPathCondition() {
+		return symbolizer.getPathCondition();
 	}
 
 }

@@ -2,8 +2,8 @@ package za.ac.sun.cs.deepsea.instructions;
 
 public class LOR extends Instruction {
 
-	public LOR() {
-		super(129);
+	public LOR(final int position) {
+		super(position, 129);
 	}
 	
 }

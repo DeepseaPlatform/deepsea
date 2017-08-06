@@ -4,8 +4,8 @@ public class LDC2_W extends Instruction {
 
 	private final int index;
 
-	public LDC2_W(final int index) {
-		super(20);
+	public LDC2_W(final int position, final int index) {
+		super(position, 20);
 		this.index = index;
 	}
 

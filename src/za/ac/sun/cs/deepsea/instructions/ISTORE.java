@@ -11,14 +11,14 @@ public class ISTORE extends Instruction {
 
 	private final int size;
 
-	public ISTORE(final int index) {
-		super(54);
+	public ISTORE(final int position, final int index) {
+		super(position, 54);
 		this.index = index;
 		this.size = 1;
 	}
 
-	public ISTORE(final int index, boolean dummy) {
-		super(54);
+	public ISTORE(final int position, final int index, boolean dummy) {
+		super(position, 54);
 		this.index = index;
 		this.size = 2;
 	}

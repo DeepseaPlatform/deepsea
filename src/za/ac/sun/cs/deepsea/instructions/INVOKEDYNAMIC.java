@@ -4,8 +4,8 @@ public class INVOKEDYNAMIC extends Instruction {
 
 	private final int index;
 
-	public INVOKEDYNAMIC(final int index) {
-		super(186);
+	public INVOKEDYNAMIC(final int position, final int index) {
+		super(position, 186);
 		this.index = index;
 	}
 

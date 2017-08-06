@@ -4,8 +4,8 @@ public class GETFIELD extends Instruction {
 
 	private final int index;
 
-	public GETFIELD(final int index) {
-		super(180);
+	public GETFIELD(final int position, final int index) {
+		super(position, 180);
 		this.index = index;
 	}
 

@@ -4,8 +4,8 @@ public class INVOKESPECIAL extends Instruction {
 
 	private final int index;
 
-	public INVOKESPECIAL(final int index) {
-		super(183);
+	public INVOKESPECIAL(final int position, final int index) {
+		super(position, 183);
 		this.index = index;
 	}
 

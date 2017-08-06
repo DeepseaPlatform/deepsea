@@ -2,8 +2,8 @@ package za.ac.sun.cs.deepsea.instructions;
 
 public class BASTORE extends Instruction {
 
-	public BASTORE() {
-		super(84);
+	public BASTORE(final int position) {
+		super(position, 84);
 	}
 	
 }

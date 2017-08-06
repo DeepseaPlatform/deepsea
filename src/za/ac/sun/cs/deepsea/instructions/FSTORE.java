@@ -6,14 +6,14 @@ public class FSTORE extends Instruction {
 
 	private final int size;
 
-	public FSTORE(final int index) {
-		super(56);
+	public FSTORE(final int position, final int index) {
+		super(position, 56);
 		this.index = index;
 		this.size = 1;
 	}
 
-	public FSTORE(final int index, boolean dummy) {
-		super(56);
+	public FSTORE(final int position, final int index, boolean dummy) {
+		super(position, 56);
 		this.index = index;
 		this.size = 2;
 	}

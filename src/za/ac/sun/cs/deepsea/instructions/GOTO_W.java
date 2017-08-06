@@ -4,8 +4,8 @@ public class GOTO_W extends Instruction {
 
 	private final int offset;
 
-	public GOTO_W(final int offset) {
-		super(200);
+	public GOTO_W(final int position, final int offset) {
+		super(position, 200);
 		this.offset = offset;
 	}
 

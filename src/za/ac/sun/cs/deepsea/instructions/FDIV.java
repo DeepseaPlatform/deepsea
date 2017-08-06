@@ -2,8 +2,8 @@ package za.ac.sun.cs.deepsea.instructions;
 
 public class FDIV extends Instruction {
 
-	public FDIV() {
-		super(110);
+	public FDIV(final int position) {
+		super(position, 110);
 	}
 	
 }

@@ -156,8 +156,9 @@ public class Diver {
 	 * Run the diver.  
 	 */
 	public void start() {
-		// Dive d = new Dive(this);
-		new Dive(this).dive();
+		Dive d = new Dive(this);
+		d.dive();
+		log.info("%%%% " + d.getPathCondition());
 	}
 
 }

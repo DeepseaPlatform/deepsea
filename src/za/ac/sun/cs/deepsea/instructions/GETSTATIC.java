@@ -4,8 +4,8 @@ public class GETSTATIC extends Instruction {
 
 	private final int index;
 
-	public GETSTATIC(final int index) {
-		super(178);
+	public GETSTATIC(final int position, final int index) {
+		super(position, 178);
 		this.index = index;
 	}
 

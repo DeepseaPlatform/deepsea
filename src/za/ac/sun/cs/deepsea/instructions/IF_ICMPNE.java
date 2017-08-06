@@ -4,8 +4,8 @@ public class IF_ICMPNE extends Instruction {
 
 	private final int offset;
 
-	public IF_ICMPNE(final int offset) {
-		super(160);
+	public IF_ICMPNE(final int position, final int offset) {
+		super(position, 160);
 		this.offset = offset;
 	}
 

@@ -1,6 +1,5 @@
 package za.ac.sun.cs.deepsea.diver;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -8,11 +7,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Logger;
-
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.MethodNode;
 
 import com.sun.jdi.AbsentInformationException;
 import com.sun.jdi.BooleanValue;
@@ -22,7 +16,6 @@ import com.sun.jdi.Location;
 import com.sun.jdi.Method;
 import com.sun.jdi.StackFrame;
 import com.sun.jdi.Value;
-import com.sun.jdi.event.ClassPrepareEvent;
 import com.sun.jdi.event.MethodEntryEvent;
 import com.sun.jdi.event.StepEvent;
 import com.sun.jdi.request.StepRequest;
@@ -35,8 +28,6 @@ import za.ac.sun.cs.green.expr.IntConstant;
 import za.ac.sun.cs.green.expr.IntVariable;
 
 public class Stepper extends AbstractEventListener {
-
-    private static final int EMPTY_FLAGS = 0; 
 
     private final Diver diver;
    
@@ -96,25 +87,6 @@ public class Stepper extends AbstractEventListener {
 		return true;
 	}
 
-	@Override
-	public boolean classPrepare(ClassPrepareEvent event) {
-		final String className = event.referenceType().name();
-		try {
-			ClassReader classReader = new ClassReader(className);
-			ClassNode classNode = new ClassNode(Opcodes.ASM5);
-			classReader.accept(classNode, EMPTY_FLAGS);
-			@SuppressWarnings("unchecked")
-			List<MethodNode> methods = classNode.methods;
-			for (MethodNode methodNode : methods) {
-				log.finest(">>>> " + methodNode.name);
-			}
-			log.finer("loaded " + className);
-		} catch (IOException e) {
-			log.finer("could not load " + className);
-		}
-		return true;
-	}
-	
 	@Override
 	public boolean methodEntry(MethodEntryEvent event) {
 		Method method = event.method();

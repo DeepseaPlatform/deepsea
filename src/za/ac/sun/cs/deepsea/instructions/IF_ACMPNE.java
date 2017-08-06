@@ -4,8 +4,8 @@ public class IF_ACMPNE extends Instruction {
 
 	private final int offset;
 
-	public IF_ACMPNE(final int offset) {
-		super(166);
+	public IF_ACMPNE(final int position, final int offset) {
+		super(position, 166);
 		this.offset = offset;
 	}
 

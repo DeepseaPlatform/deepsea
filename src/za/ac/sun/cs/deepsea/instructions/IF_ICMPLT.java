@@ -4,8 +4,8 @@ public class IF_ICMPLT extends Instruction {
 
 	private final int offset;
 
-	public IF_ICMPLT(final int offset) {
-		super(161);
+	public IF_ICMPLT(final int position, final int offset) {
+		super(position, 161);
 		this.offset = offset;
 	}
 

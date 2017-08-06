@@ -2,8 +2,8 @@ package za.ac.sun.cs.deepsea.instructions;
 
 public class LRETURN extends Instruction {
 
-	public LRETURN() {
-		super(173);
+	public LRETURN(final int position) {
+		super(position, 173);
 	}
 	
 }

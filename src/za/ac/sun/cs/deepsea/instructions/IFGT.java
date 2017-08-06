@@ -4,8 +4,8 @@ public class IFGT extends Instruction {
 
 	private final int offset;
 
-	public IFGT(final int offset) {
-		super(157);
+	public IFGT(final int position, final int offset) {
+		super(position, 157);
 		this.offset = offset;
 	}
 

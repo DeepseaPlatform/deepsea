@@ -6,8 +6,8 @@ import za.ac.sun.cs.deepsea.diver.Symbolizer;
 
 public class RETURN extends Instruction {
 
-	public RETURN() {
-		super(177);
+	public RETURN(final int position) {
+		super(position, 177);
 	}
 
 	@Override

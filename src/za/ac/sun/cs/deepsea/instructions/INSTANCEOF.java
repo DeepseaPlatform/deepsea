@@ -4,8 +4,8 @@ public class INSTANCEOF extends Instruction {
 
 	private final int index;
 
-	public INSTANCEOF(final int index) {
-		super(193);
+	public INSTANCEOF(final int position, final int index) {
+		super(position, 193);
 		this.index = index;
 	}
 

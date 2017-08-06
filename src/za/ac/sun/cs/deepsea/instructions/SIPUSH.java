@@ -4,8 +4,8 @@ public class SIPUSH extends Instruction {
 
 	private final int value;
 
-	public SIPUSH(final int value) {
-		super(17);
+	public SIPUSH(final int position, final int value) {
+		super(position, 17);
 		this.value = value;
 	}
 
