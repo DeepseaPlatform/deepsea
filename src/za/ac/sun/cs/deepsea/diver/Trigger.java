@@ -1,13 +1,16 @@
 package za.ac.sun.cs.deepsea.diver;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+import com.sun.jdi.Method;
 
 public class Trigger {
 
 	private final String name;
-
-	private int parameterCount = 0;
+	
+	private Integer parameterCount = null;
 
 	private String[] parameterName = null;
 
@@ -22,13 +25,13 @@ public class Trigger {
 	public String getName() {
 		return name;
 	}
-
+	
 	public int getParameterCount() {
 		return parameterCount;
 	}
 
 	public void setParameterCount(int parameterCount) {
-		assert parameterCount == 0;
+		assert this.parameterCount == null;
 		this.parameterCount = parameterCount;
 		parameterName = new String[parameterCount];
 		parameterType = new Object[parameterCount];
@@ -64,5 +67,24 @@ public class Trigger {
 		assert type != null;
 		parameterType[index] = type;
 	}
-	
+
+	public boolean match(String className, Method method) {
+		String name = className + "." + method.name();
+		if (!this.name.equals(name)) {
+			return false;
+		}
+		List<String> types = method.argumentTypeNames();
+		if (parameterCount != types.size()) {
+			return false;
+		}
+		for (int i = 0; i < parameterCount; i++) {
+			String type = types.get(i);
+			if (parameterType[i] == null) { continue; }
+			if ((parameterType[i] == Boolean.class) && type.equals("boolean")) { continue; }
+			if ((parameterType[i] == Integer.class) && type.equals("int")) { continue; }
+			return false;
+		}
+		return true;
+	}
+
 }

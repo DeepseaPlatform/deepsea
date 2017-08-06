@@ -13,39 +13,48 @@ public class Symbolizer {
 //	private final Diver diver;
 //	private final Logger log;
 
-	private boolean symbolicMode;
+	private boolean inSymbolicMode;
 
 	private final Stack<SymbolicFrame> frames = new Stack<>();
-
-	private SymbolicFrame frame;
 
 	public Symbolizer(final Diver diver) {
 //		this.diver = diver;
 //		this.log = this.diver.getLog();
-		symbolicMode = false;
+		inSymbolicMode = false;
+	}
+
+	public boolean inSymbolicMode() {
+		return inSymbolicMode;
+	}
+
+	public void enterSymbolicMode() {
+		assert !inSymbolicMode;
+		assert frames.isEmpty();
+		inSymbolicMode = true;
+	}
+
+	public SymbolicFrame pushNewFrame() {
+		return frames.push(new SymbolicFrame());
 	}
 
 	public boolean popFrame() {
+		assert inSymbolicMode;
 		assert !frames.isEmpty();
 		frames.pop();
 		if (frames.isEmpty()) {
-			symbolicMode = false;
-		} else {
-			frame = frames.peek();
+			inSymbolicMode = false;
 		}
-		return symbolicMode;
+		return inSymbolicMode;
 	}
 
 	public SymbolicFrame getTopFrame() {
-		return frame;
+		return frames.peek();
 	}
 
 	public void execute(Location loc, Instruction ins) {
-		if (symbolicMode) {
+		if (inSymbolicMode) {
 			ins.execute(loc, this);
 		}
-//		if (!symbolicMode) {
-//		}
 	}
 
 }

@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.sun.jdi.Method;
+
 import za.ac.sun.cs.deepsea.logging.LogHandler;
 
 /**
@@ -127,19 +129,15 @@ public class Diver {
 	 * @param method
 	 * @return
 	 */
-	public Trigger findTriggers(int method, String className) {
+	public Trigger findTrigger(Method method, String className) {
 		for (Trigger trigger : triggers) {
-			if (triggerMatch(trigger, method, className)) {
+			if (trigger.match(className, method)) {
 				return trigger;
 			}
 		}
 		return null;
 	}
 	
-	private boolean triggerMatch(Trigger trigger, int method, String className) {
-		return false;
-	}
-
 	/**
 	 * @return
 	 */
