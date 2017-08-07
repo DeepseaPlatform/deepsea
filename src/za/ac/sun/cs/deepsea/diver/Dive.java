@@ -37,7 +37,9 @@ public class Dive {
 	 * 
 	 */
 	private final Symbolizer symbolizer;
-	
+
+	private final Map<String, Constant> concreteValues;
+
 	/**
 	 * @param diver
 	 * @param concreteValues 
@@ -47,10 +49,11 @@ public class Dive {
 		this.log = diver.getLog();
 		this.id = diver.getDiveId();
 		this.symbolizer = new Symbolizer(diver);
+		this.concreteValues = concreteValues;
 	}
 
 	public void dive() {
-		log.fine("----- starting dive " + diver.getName() + "." + id);
+		log.fine("----- starting dive " + diver.getName() + "." + id + " -----");
 		
 		log.finer("launching vm");
 		VirtualMachine vm = VMConnectLauncher.launchTarget(new String[] { diver.getTarget(), diver.getArgs() });
@@ -77,7 +80,7 @@ public class Dive {
 
 		log.finer("setting up event monitoring");
 		EventReader ev = new EventReader(diver, vm.eventQueue());
-		ev.addEventListener(new Stepper(diver, symbolizer, m));
+		ev.addEventListener(new Stepper(diver, symbolizer, m, concreteValues));
 		ev.start();
 
 		log.finer("starting vm");
@@ -102,8 +105,6 @@ public class Dive {
 		} catch (IOException x) {
 			x.printStackTrace();
 		}
-
-		log.fine("----- done with dive " + diver.getName() + "." + id);
 	}
 
 	public Expression getPathCondition() {

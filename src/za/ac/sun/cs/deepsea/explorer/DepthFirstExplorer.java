@@ -1,5 +1,6 @@
 package za.ac.sun.cs.deepsea.explorer;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -11,6 +12,7 @@ import za.ac.sun.cs.green.expr.Expression;
 //import za.ac.sun.cs.green.Instance;
 //import za.ac.sun.cs.green.expr.IntVariable;
 //import za.ac.sun.cs.green.util.Configuration;
+import za.ac.sun.cs.green.expr.IntConstant;
 
 public class DepthFirstExplorer extends AbstractExplorer {
 
@@ -29,11 +31,19 @@ public class DepthFirstExplorer extends AbstractExplorer {
 		this.log = diver.getLog();
 	}
 
+	private int counter = 0;
+	
 	@Override
 	public Map<String, Constant> refine(Dive dive) {
 		// String signature = dive.getSignature();
 		Expression pathCondition = dive.getPathCondition();
 		log.fine("PC: " + pathCondition);
+		if (counter == 0) {
+			counter++;
+			Map<String, Constant> model = new HashMap<>();
+			model.put("X", new IntConstant(5));
+			return model;
+		}
 		//		Green solver = new Green("DEEPSEA");
 		//		Properties props = new Properties();
 		//		props.setProperty("green.services", "model");
