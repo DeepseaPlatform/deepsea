@@ -9,28 +9,19 @@ import za.ac.sun.cs.deepsea.configuration.Configuration;
 import za.ac.sun.cs.deepsea.diver.Diver;
 
 /**
- * Main class and launcher for the DEEPSEA project. It
+ * Main class and launcher for the DEEPSEA project. It expects a single
+ * command-line argument: the filename of a properties file. The properties are
+ * processed by an instance of {@link Configuration} which is in turn linked to
+ * an instance of {@link Diver}.  Once configured, the diver is run. 
  * 
- * <ul>
- * <li>creates a JVM to run the target program in,</li>
- * <li>redirects its input and error streams to the standard output and standard error,</li>
- * <li>sets up the monitoring requests,</li>
- * <li>sets up the event monitoring,</li>
- * <li>activates the JVM,</li>
- * <li>waits for the action to dissipate, and</li>
- * <li>shuts down everything.</li> 
- * </ul>
- * 
- * @author jaco
+ * @author Jaco Geldenhuys (geld@sun.ac.za)
  */
 public class DEEPSEA {
 
 	/**
 	 * The main function.
 	 * 
-	 * TODO: command-line arguments are still in a state of flux
-	 * 
-	 * @param args
+	 * @param args command-line arguments.
 	 */
 	public static void main(String[] args) {
 		Properties pr = new Properties();
