@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="javadoc">
+	<target name="javadoc">
+		<javadoc
+			access="public"
+			additionalparam=" -docfilessubdirs"
+			author="true"
+			classpath="."
+			destdir="doc"
+			doctitle="DEEPSEA"
+			header="&lt;b&gt;DEEPSEA&lt;/b&gt;"
+			nodeprecated="true"
+			nodeprecatedlist="true"
+			noindex="false"
+			nonavbar="false"
+			notree="false"
+			overview="src/overview.html"
+			packagenames="za.ac.sun.cs.deepsea.*"
+			sourcepath="src"
+			splitindex="true"
+			use="true"
+			version="true"
+			windowtitle="DEEPSEA"/>
+	</target>
+</project>
