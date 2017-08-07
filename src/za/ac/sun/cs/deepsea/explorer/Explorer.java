@@ -42,7 +42,7 @@ public interface Explorer {
 	public Map<String, Constant> refine(Expression pathCondition);
 
 	/**
-	 * 
+	 * Produce a report at the end of a session. 
 	 */
 	public void report();
 
