@@ -13,10 +13,6 @@ import com.sun.jdi.Method;
 import za.ac.sun.cs.deepsea.explorer.Explorer;
 import za.ac.sun.cs.deepsea.logging.LogHandler;
 import za.ac.sun.cs.green.expr.Constant;
-//import za.ac.sun.cs.green.Green;
-//import za.ac.sun.cs.green.Instance;
-//import za.ac.sun.cs.green.expr.IntVariable;
-//import za.ac.sun.cs.green.util.Configuration;
 
 /**
  * Driver for dynamic symbolic execution. It collects all the settings that
@@ -214,16 +210,6 @@ public class Diver {
 	 * Run the diver.
 	 */
 	public void start() {
-		//		Green solver = new Green("DEEPSEA");
-		//		Properties props = new Properties();
-		//		props.setProperty("green.services", "model");
-		//		props.setProperty("green.service.model", "(bounder z3java)");
-		//		props.setProperty("green.service.model.bounder", "za.ac.sun.cs.green.service.bounder.BounderService");				
-		//		props.setProperty("green.service.model.z3java", "za.ac.sun.cs.green.service.z3.ModelZ3JavaService");
-		//		// props.setProperty("", "/Users/jaco/Documents/RESEARCH/01/SYMEXE/Z3/build/z3");
-		//		Configuration config = new Configuration(solver, props);
-		//		config.configure();
-
 		if (explorer == null) {
 			log.severe("No explorer specified -- terminating");
 		} else {
@@ -231,14 +217,10 @@ public class Diver {
 			do {
 				Dive d = new Dive(this, concreteValues);
 				d.dive();
-				concreteValues = explorer.refine(d.getPathCondition());
+				concreteValues = explorer.refine(d);
 			} while (concreteValues != null);
 			explorer.report();
 		}
-
-		//		Instance instance = new Instance(solver, null, d.getPathCondition());
-		//		@SuppressWarnings({ "unchecked", "unused" })
-		//		Map<IntVariable,Object> model = (Map<IntVariable,Object>) instance.request("model"); 
 		log.info("DONE");
 	}
 

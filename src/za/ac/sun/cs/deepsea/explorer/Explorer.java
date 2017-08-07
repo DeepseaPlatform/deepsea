@@ -2,8 +2,8 @@ package za.ac.sun.cs.deepsea.explorer;
 
 import java.util.Map;
 
+import za.ac.sun.cs.deepsea.diver.Dive;
 import za.ac.sun.cs.green.expr.Constant;
-import za.ac.sun.cs.green.expr.Expression;
 
 /**
  * Controls how DEEPSEA "explores" a target program by repeatedly proposing new
@@ -35,11 +35,11 @@ public interface Explorer {
 	 * conditions or of mappings and it is only this method which can determine
 	 * when to terminate the exploration.
 	 * 
-	 * @param pathCondition
-	 *            the newly discovered path condition
+	 * @param dive
+	 *            the newly completed dive
 	 * @return a mapping from variables names to values, or {@code null}
 	 */
-	public Map<String, Constant> refine(Expression pathCondition);
+	public Map<String, Constant> refine(Dive dive);
 
 	/**
 	 * Produce a report at the end of a session. 
