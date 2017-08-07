@@ -73,7 +73,7 @@ public class Symbolizer {
 	public void execute(Location loc, Instruction ins) {
 		if (inSymbolicMode) {
 			if (pendingConjunct != null) {
-				if (loc.codeIndex() == pendingTarget) {
+				if (loc.codeIndex() != pendingTarget) {
 					pendingConjunct = new Operation(Operator.NOT, pendingConjunct);
 				}
 				pathCondition = new Operation(Operator.AND, pendingConjunct, pathCondition);
