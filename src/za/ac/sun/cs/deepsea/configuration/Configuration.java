@@ -1,5 +1,7 @@
 package za.ac.sun.cs.deepsea.configuration;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
@@ -9,6 +11,7 @@ import java.util.logging.Logger;
 
 import za.ac.sun.cs.deepsea.diver.Diver;
 import za.ac.sun.cs.deepsea.diver.Trigger;
+import za.ac.sun.cs.deepsea.explorer.Explorer;
 import za.ac.sun.cs.deepsea.logging.LogHandler;
 
 /**
@@ -33,6 +36,11 @@ public class Configuration {
 	 * The {@link Properties} instance where the settings are read from.
 	 */
 	private final Properties properties;
+
+	/**
+	 * Classloader for creating instances of user-specified objects.
+	 */
+	private final ClassLoader loader = Configuration.class.getClassLoader();
 
 	/**
 	 * An internal instance used to construct log messages.
@@ -117,6 +125,7 @@ public class Configuration {
 		setArgs();
 		setTriggers();
 		setProduceOutput();
+		setExplorer();
 		dump();
 	}
 
@@ -253,6 +262,77 @@ public class Configuration {
 	 */
 	private void setProduceOutput() {
 		diver.produceOutput(getBooleanProperty(properties, "deepsea.produceoutput", diver.isProducingOutput()));
+	}
+
+	/**
+	 * Reads and sets the "{@code deepsea.explorer}" setting.
+	 */
+	private void setExplorer() {
+		String p = properties.getProperty("deepsea.explorer");
+		if (p != null) {
+			Explorer explorer = (Explorer) createInstance(p);
+			if (explorer != null) {
+				diver.setExplorer(explorer);
+			}
+		}
+	}
+
+	/**
+	 * Creates an instance of the specified class. Two constructor patterns are
+	 * tried to create an instance of {@code X}: first {@code X(Diver)} and
+	 * then, if that does not work, {@code X(Diver, Properties)}.
+	 * 
+	 * @param objectName
+	 *            the name of the class of the instance to create
+	 * @return an instance of the given class
+	 */
+	private Object createInstance(String objectName) {
+		Class<?> classx = loadClass(objectName);
+		try {
+			Constructor<?> constructor = null;
+			try {
+				constructor = classx.getConstructor(Diver.class);
+				return constructor.newInstance(diver);
+			} catch (NoSuchMethodException x) {
+				// ignore
+			}
+			try {
+				constructor = classx.getConstructor(Diver.class, Properties.class);
+				return constructor.newInstance(diver, properties);
+			} catch (NoSuchMethodException x) {
+				log.log(Level.SEVERE, "constructor not found: " + objectName, x);
+			}
+		} catch (SecurityException x) {
+			log.log(Level.SEVERE, "constructor not found: " + objectName, x);
+		} catch (IllegalArgumentException x) {
+			log.log(Level.SEVERE, "constructor error: " + objectName, x);
+		} catch (InstantiationException x) {
+			log.log(Level.SEVERE, "constructor error: " + objectName, x);
+		} catch (IllegalAccessException x) {
+			log.log(Level.SEVERE, "constructor error: " + objectName, x);
+		} catch (InvocationTargetException x) {
+			log.log(Level.SEVERE, "constructor error: " + objectName, x);
+		}
+		return null;
+	}
+
+	/**
+	 * Tries to load the class with the given name.
+	 * 
+	 * @param className name of the class to load
+	 * @return the {@link Class} instance that corresponds to the loaded class
+	 */
+	private Class<?> loadClass(String className) {
+		if ((className != null) && (className.length() > 0)) {
+			try {
+				return loader.loadClass(className);
+			} catch (ClassNotFoundException x) {
+				log.log(Level.SEVERE, "class not found: " + className, x);
+			} catch (ExceptionInInitializerError x) {
+				log.log(Level.SEVERE, "class not found: " + className, x);
+			}
+		}
+		return null;
 	}
 
 	/**

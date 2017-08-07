@@ -33,6 +33,7 @@ public class DepthFirstExplorer extends AbstractExplorer {
 	public Map<String, Constant> refine(Dive dive) {
 		// String signature = dive.getSignature();
 		Expression pathCondition = dive.getPathCondition();
+		log.fine("PC: " + pathCondition);
 		//		Green solver = new Green("DEEPSEA");
 		//		Properties props = new Properties();
 		//		props.setProperty("green.services", "model");
