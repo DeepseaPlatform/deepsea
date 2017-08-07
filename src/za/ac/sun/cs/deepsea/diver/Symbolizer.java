@@ -22,6 +22,8 @@ public class Symbolizer {
 
 	private Expression pathCondition = Operation.TRUE;
 
+	private String signature = "";
+
 	private Expression pendingConjunct = null;
 
 	private int pendingTarget = -1;
@@ -64,6 +66,10 @@ public class Symbolizer {
 		return pathCondition;
 	}
 
+	public String getSignature() {
+		return signature;
+	}
+
 	public void pushConjunct(Expression conjunct, int target) {
 		assert pendingConjunct == null;
 		pendingConjunct = conjunct;
@@ -73,9 +79,12 @@ public class Symbolizer {
 	public void execute(Location loc, Instruction ins) {
 		if (inSymbolicMode) {
 			if (pendingConjunct != null) {
+				char branch = '1';
 				if (loc.codeIndex() != pendingTarget) {
+					branch = '0';
 					pendingConjunct = new Operation(Operator.NOT, pendingConjunct);
 				}
+				signature = branch + signature;
 				pathCondition = new Operation(Operator.AND, pendingConjunct, pathCondition);
 				pendingConjunct = null;
 			}

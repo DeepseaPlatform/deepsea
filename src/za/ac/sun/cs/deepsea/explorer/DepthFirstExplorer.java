@@ -8,10 +8,6 @@ import za.ac.sun.cs.deepsea.diver.Dive;
 import za.ac.sun.cs.deepsea.diver.Diver;
 import za.ac.sun.cs.green.expr.Constant;
 import za.ac.sun.cs.green.expr.Expression;
-//import za.ac.sun.cs.green.Green;
-//import za.ac.sun.cs.green.Instance;
-//import za.ac.sun.cs.green.expr.IntVariable;
-//import za.ac.sun.cs.green.util.Configuration;
 import za.ac.sun.cs.green.expr.IntConstant;
 
 public class DepthFirstExplorer extends AbstractExplorer {
@@ -20,7 +16,8 @@ public class DepthFirstExplorer extends AbstractExplorer {
 	 * A logger for communicating with users.
 	 */
 	private final Logger log;
-	
+
+//	private final Green solver;
 	/**
 	 * Constructs an instance of the depth-first explorer, given the associated diver.
 	 * 
@@ -29,13 +26,23 @@ public class DepthFirstExplorer extends AbstractExplorer {
 	public DepthFirstExplorer(Diver diver) {
 		super(diver);
 		this.log = diver.getLog();
+//		this.solver = new Green("DEEPSEA");
+//		Properties props = new Properties();
+//		props.setProperty("green.services", "model");
+//		props.setProperty("green.service.model", "(bounder z3java)");
+//		props.setProperty("green.service.model.bounder", "za.ac.sun.cs.green.service.bounder.BounderService");				
+//		props.setProperty("green.service.model.z3java", "za.ac.sun.cs.green.service.z3.ModelZ3JavaService");
+//		// props.setProperty("", "/Users/jaco/Documents/RESEARCH/01/SYMEXE/Z3/build/z3");
+//		Configuration config = new Configuration(solver, props);
+//		config.configure();
 	}
 
 	private int counter = 0;
 	
 	@Override
 	public Map<String, Constant> refine(Dive dive) {
-		// String signature = dive.getSignature();
+		String signature = dive.getSignature();
+		log.fine("signature: " + signature);
 		Expression pathCondition = dive.getPathCondition();
 		log.fine("PC: " + pathCondition);
 		if (counter == 0) {
@@ -44,15 +51,6 @@ public class DepthFirstExplorer extends AbstractExplorer {
 			model.put("X", new IntConstant(5));
 			return model;
 		}
-		//		Green solver = new Green("DEEPSEA");
-		//		Properties props = new Properties();
-		//		props.setProperty("green.services", "model");
-		//		props.setProperty("green.service.model", "(bounder z3java)");
-		//		props.setProperty("green.service.model.bounder", "za.ac.sun.cs.green.service.bounder.BounderService");				
-		//		props.setProperty("green.service.model.z3java", "za.ac.sun.cs.green.service.z3.ModelZ3JavaService");
-		//		// props.setProperty("", "/Users/jaco/Documents/RESEARCH/01/SYMEXE/Z3/build/z3");
-		//		Configuration config = new Configuration(solver, props);
-		//		config.configure();
 
 		//		Instance instance = new Instance(solver, null, d.getPathCondition());
 		//		@SuppressWarnings({ "unchecked", "unused" })

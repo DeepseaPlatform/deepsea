@@ -42,7 +42,7 @@ public class Dive {
 
 	/**
 	 * @param diver
-	 * @param concreteValues 
+	 * @param concreteValues
 	 */
 	public Dive(Diver diver, Map<String, Constant> concreteValues) {
 		this.diver = diver;
@@ -54,7 +54,7 @@ public class Dive {
 
 	public void dive() {
 		log.fine("----- starting dive " + diver.getName() + "." + id + " -----");
-		
+
 		log.finer("launching vm");
 		VirtualMachine vm = VMConnectLauncher.launchTarget(new String[] { diver.getTarget(), diver.getArgs() });
 		log.finest("target vm details:\n" + vm.description());
@@ -107,8 +107,26 @@ public class Dive {
 		}
 	}
 
+	/**
+	 * Returns the path condition collected by {@link #symbolizer} during the
+	 * most recent invocation of the target program.
+	 * 
+	 * @return the path condition for the most recent run
+	 */
 	public Expression getPathCondition() {
 		return symbolizer.getPathCondition();
+	}
+
+	/**
+	 * Returns the signature string for the most recent invocation of the target
+	 * program. A signature is a sequence of "{@code 0}s" and "{@code 1}s" that
+	 * describe the branches ({@code 0}=false, {@code 1}=true) taken along the
+	 * path.
+	 * 
+	 * @return the signature string for the most recent run
+	 */
+	public String getSignature() {
+		return symbolizer.getSignature();
 	}
 
 }
