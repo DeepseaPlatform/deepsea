@@ -61,10 +61,16 @@ The properties file may contain the following settings:
 
 ## To do
 
-   * Something
-   * Something
+  * Something
+  * Something
 
 ## Authors
 
-   * [Jaco Geldenhuys](mailto://geld@sun.ac.za)
-   * [Willem Visser](mailto://wvisser@sun.ac.za)
+  * [Jaco Geldenhuys](mailto://geld@sun.ac.za)
+  * [Willem Visser](mailto://wvisser@sun.ac.za)
+
+### Contributors
+
+  * Someone
+  * Someone else
+
