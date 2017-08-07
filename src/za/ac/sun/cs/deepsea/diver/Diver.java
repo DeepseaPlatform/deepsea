@@ -2,6 +2,7 @@ package za.ac.sun.cs.deepsea.diver;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 //import java.util.Map;
 //import java.util.Properties;
 import java.util.logging.Level;
@@ -9,7 +10,9 @@ import java.util.logging.Logger;
 
 import com.sun.jdi.Method;
 
+import za.ac.sun.cs.deepsea.explorer.Explorer;
 import za.ac.sun.cs.deepsea.logging.LogHandler;
+import za.ac.sun.cs.green.expr.Constant;
 //import za.ac.sun.cs.green.Green;
 //import za.ac.sun.cs.green.Instance;
 //import za.ac.sun.cs.green.expr.IntVariable;
@@ -62,6 +65,11 @@ public class Diver {
 	 * ({@code true}) or suppressed ({@code false}).
 	 */
 	private boolean produceOutput = false;
+
+	/**
+	 * The Explorer that directs the investigation of target programs.
+	 */
+	private Explorer explorer;
 
 	/**
 	 * Constructs a {@link Diver} instance. Such an instance represents one
@@ -168,7 +176,10 @@ public class Diver {
 	/**
 	 * @return
 	 */
-	public boolean isProducintOutput() {
+	/**
+	 * @return
+	 */
+	public boolean isProducingOutput() {
 		return produceOutput;
 	}
 
@@ -177,6 +188,26 @@ public class Diver {
 	 */
 	public void produceOutput(boolean produceOutput) {
 		this.produceOutput = produceOutput;
+	}
+
+	/**
+	 * Returns the current explorer for this session.
+	 * 
+	 * @return the current instance of explorer
+	 */
+	public Explorer getExplorer() {
+		return explorer;
+	}
+
+	/**
+	 * Sets a new explorer for this session. Note that there is ever only
+	 * explorer for a session.
+	 * 
+	 * @param explorer
+	 *            the new explorer
+	 */
+	public void setExplorer(Explorer explorer) {
+		this.explorer = explorer;
 	}
 
 	/**
@@ -193,13 +224,22 @@ public class Diver {
 		//		Configuration config = new Configuration(solver, props);
 		//		config.configure();
 
-		Dive d = new Dive(this);
-		d.dive();
+		if (explorer == null) {
+			log.severe("No explorer specified -- terminating");
+		} else {
+			Map<String, Constant> concreteValues = null;
+			do {
+				Dive d = new Dive(this, concreteValues);
+				d.dive();
+				concreteValues = explorer.refine(d.getPathCondition());
+			} while (concreteValues != null);
+			explorer.report();
+		}
+
 		//		Instance instance = new Instance(solver, null, d.getPathCondition());
 		//		@SuppressWarnings({ "unchecked", "unused" })
 		//		Map<IntVariable,Object> model = (Map<IntVariable,Object>) instance.request("model"); 
-		log.info("%%%% " + d.getPathCondition());
-		log.info("Done.");
+		log.info("DONE");
 	}
 
 }

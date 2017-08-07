@@ -252,7 +252,7 @@ public class Configuration {
 	 * Reads and sets the "{@code deepsea.produceoutput}" setting.
 	 */
 	private void setProduceOutput() {
-		diver.produceOutput(getBooleanProperty(properties, "deepsea.produceoutput", diver.isProducintOutput()));
+		diver.produceOutput(getBooleanProperty(properties, "deepsea.produceoutput", diver.isProducingOutput()));
 	}
 
 	/**

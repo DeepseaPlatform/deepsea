@@ -2,6 +2,7 @@ package za.ac.sun.cs.deepsea.diver;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import com.sun.jdi.ThreadReference;
@@ -12,6 +13,7 @@ import za.ac.sun.cs.deepsea.agent.EventReader;
 import za.ac.sun.cs.deepsea.agent.RequestManager;
 import za.ac.sun.cs.deepsea.agent.StreamRedirector;
 import za.ac.sun.cs.deepsea.agent.VMConnectLauncher;
+import za.ac.sun.cs.green.expr.Constant;
 import za.ac.sun.cs.green.expr.Expression;
 
 public class Dive {
@@ -38,8 +40,9 @@ public class Dive {
 	
 	/**
 	 * @param diver
+	 * @param concreteValues 
 	 */
-	public Dive(Diver diver) {
+	public Dive(Diver diver, Map<String, Constant> concreteValues) {
 		this.diver = diver;
 		this.log = diver.getLog();
 		this.id = diver.getDiveId();
@@ -57,8 +60,8 @@ public class Dive {
 		Process pr = vm.process();
 		InputStream es = pr.getErrorStream();
 		InputStream is = pr.getInputStream();
-		StreamRedirector er = new StreamRedirector(es, System.err, diver.isProducintOutput());
-		StreamRedirector or = new StreamRedirector(is, System.out, diver.isProducintOutput());
+		StreamRedirector er = new StreamRedirector(es, System.err, diver.isProducingOutput());
+		StreamRedirector or = new StreamRedirector(is, System.out, diver.isProducingOutput());
 		er.start();
 		or.start();
 
