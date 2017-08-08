@@ -46,8 +46,8 @@ public class DepthFirstExplorer extends AbstractExplorer {
 		props.setProperty("green.service.model", "(bounder (canonizer modeller))");
 		props.setProperty("green.service.model.bounder", "za.ac.sun.cs.green.service.bounder.BounderService");				
 		props.setProperty("green.service.model.canonizer", "za.ac.sun.cs.green.service.canonizer.ModelCanonizerService");				
-		// props.setProperty("green.service.model.modeller", "za.ac.sun.cs.green.service.z3.ModelZ3JavaService");
-		props.setProperty("green.service.model.modeller", "za.ac.sun.cs.green.service.choco3.ModelChoco3Service");
+		props.setProperty("green.service.model.modeller", "za.ac.sun.cs.green.service.z3.ModelZ3JavaService");
+		// props.setProperty("green.service.model.modeller", "za.ac.sun.cs.green.service.choco3.ModelChoco3Service");
 		// props.setProperty("", "/Users/jaco/Documents/RESEARCH/01/SYMEXE/Z3/build/z3");
 		Configuration config = new Configuration(solver, props);
 		config.configure();
@@ -70,6 +70,7 @@ public class DepthFirstExplorer extends AbstractExplorer {
 			String restSignature = signature.substring(1);
 			String candidateSignature = firstSignature + restSignature;
 			if (visitedSignatures.contains(candidateSignature)) {
+				visitedSignatures.add(restSignature); // We know that both children are visited
 				signature = restSignature;
 				assert pathCondition instanceof Operation;
 				Operation pc = (Operation) pathCondition;
@@ -84,7 +85,7 @@ public class DepthFirstExplorer extends AbstractExplorer {
 				Expression firstPC = new Operation(Operator.NOT, pc.getOperand(0));
 				Expression restPC = pc.getOperand(1);
 				pathCondition = new Operation(Operator.AND, firstPC, restPC);
-				log.finest("trying " + pathCondition);
+				log.finest("trying <" + candidateSignature + "> " + pathCondition);
 				Instance instance = new Instance(solver, null, pathCondition);
 				@SuppressWarnings("unchecked")
 				Map<IntVariable, Object> model = (Map<IntVariable, Object>) instance.request("model"); 
@@ -106,6 +107,7 @@ public class DepthFirstExplorer extends AbstractExplorer {
 				}
 			}
 		}
+		log.finest("all signatures explored");
 		return null;
 	}
 
