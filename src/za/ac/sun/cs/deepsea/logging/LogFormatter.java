@@ -21,7 +21,7 @@ public class LogFormatter extends Formatter {
 	/**
 	 * 
 	 */
-	private String format = "[%1$tY%1$tm%1$td %1$tH:%1$tM:%1$tS][%2$s][%4$s] %5$s%6$s%n";
+	private String format = "[%1$tY%1$tm%1$td-%1$tH:%1$tM:%1$tS %2$s %4$s] %5$s%6$s%n";
 
 	/**
 	 * Formats the given log record and return the formatted string.
@@ -36,7 +36,7 @@ public class LogFormatter extends Formatter {
 		if (record.getSourceClassName() != null) {
 			source.append(record.getSourceClassName());
 			if (record.getSourceMethodName() != null) {
-				source.append(' ');
+				source.append("::");
 				source.append(record.getSourceMethodName());
 			}
 		} else {
