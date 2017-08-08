@@ -4,7 +4,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="examples"/>
 	<classpathentry kind="lib" path="/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home/lib/tools.jar"/>
-	<classpathentry kind="lib" path="lib/green.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/green"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -1,14 +1,23 @@
 package za.ac.sun.cs.deepsea.explorer;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import za.ac.sun.cs.deepsea.diver.Dive;
 import za.ac.sun.cs.deepsea.diver.Diver;
+import za.ac.sun.cs.green.Green;
+import za.ac.sun.cs.green.Instance;
 import za.ac.sun.cs.green.expr.Constant;
 import za.ac.sun.cs.green.expr.Expression;
 import za.ac.sun.cs.green.expr.IntConstant;
+import za.ac.sun.cs.green.expr.IntVariable;
+import za.ac.sun.cs.green.expr.Operation;
+import za.ac.sun.cs.green.expr.Operation.Operator;
+import za.ac.sun.cs.green.util.Configuration;
 
 public class DepthFirstExplorer extends AbstractExplorer {
 
@@ -17,7 +26,12 @@ public class DepthFirstExplorer extends AbstractExplorer {
 	 */
 	private final Logger log;
 
-//	private final Green solver;
+	private final Green solver;
+
+	private final Set<String> visitedSignatures = new HashSet<>();
+
+	private int pathCounter = 0;
+
 	/**
 	 * Constructs an instance of the depth-first explorer, given the associated diver.
 	 * 
@@ -26,41 +40,78 @@ public class DepthFirstExplorer extends AbstractExplorer {
 	public DepthFirstExplorer(Diver diver) {
 		super(diver);
 		this.log = diver.getLog();
-//		this.solver = new Green("DEEPSEA");
-//		Properties props = new Properties();
-//		props.setProperty("green.services", "model");
-//		props.setProperty("green.service.model", "(bounder z3java)");
-//		props.setProperty("green.service.model.bounder", "za.ac.sun.cs.green.service.bounder.BounderService");				
-//		props.setProperty("green.service.model.z3java", "za.ac.sun.cs.green.service.z3.ModelZ3JavaService");
-//		// props.setProperty("", "/Users/jaco/Documents/RESEARCH/01/SYMEXE/Z3/build/z3");
-//		Configuration config = new Configuration(solver, props);
-//		config.configure();
+		this.solver = new Green("DEEPSEA");
+		Properties props = new Properties();
+		props.setProperty("green.services", "model");
+		props.setProperty("green.service.model", "(bounder (canonizer modeller))");
+		props.setProperty("green.service.model.bounder", "za.ac.sun.cs.green.service.bounder.BounderService");				
+		props.setProperty("green.service.model.canonizer", "za.ac.sun.cs.green.service.canonizer.ModelCanonizerService");				
+		// props.setProperty("green.service.model.modeller", "za.ac.sun.cs.green.service.z3.ModelZ3JavaService");
+		props.setProperty("green.service.model.modeller", "za.ac.sun.cs.green.service.choco3.ModelChoco3Service");
+		// props.setProperty("", "/Users/jaco/Documents/RESEARCH/01/SYMEXE/Z3/build/z3");
+		Configuration config = new Configuration(solver, props);
+		config.configure();
 	}
 
-	private int counter = 0;
-	
 	@Override
 	public Map<String, Constant> refine(Dive dive) {
+		pathCounter++;
 		String signature = dive.getSignature();
-		log.fine("signature: " + signature);
-		Expression pathCondition = dive.getPathCondition();
-		log.fine("PC: " + pathCondition);
-		if (counter == 0) {
-			counter++;
-			Map<String, Constant> model = new HashMap<>();
-			model.put("X", new IntConstant(5));
-			return model;
+		if (!visitedSignatures.add(signature)) {
+			log.severe("revisit of signature \"" + signature + "\"");
+			return null;
 		}
-
-		//		Instance instance = new Instance(solver, null, d.getPathCondition());
-		//		@SuppressWarnings({ "unchecked", "unused" })
-		//		Map<IntVariable,Object> model = (Map<IntVariable,Object>) instance.request("model"); 
+		log.finest("path signature: " + signature);
+		Expression pathCondition = dive.getPathCondition();
+		log.fine("path condition: " + pathCondition);
+		while (signature.length() > 0) {
+			// flip the first char ('0' <-> '1') of signature
+			char firstSignature = (signature.charAt(0) == '0') ? '1' : '0';
+			String restSignature = signature.substring(1);
+			String candidateSignature = firstSignature + restSignature;
+			if (visitedSignatures.contains(candidateSignature)) {
+				signature = restSignature;
+				assert pathCondition instanceof Operation;
+				Operation pc = (Operation) pathCondition;
+				assert pc.getOperator() == Operator.AND;
+				pathCondition = pc.getOperand(1);
+				log.finest("dropping first conjunct -> " + pathCondition);
+			} else {
+				// negate first conjunct of path condition and check if it has a model
+				assert pathCondition instanceof Operation;
+				Operation pc = (Operation) pathCondition;
+				assert pc.getOperator() == Operator.AND;
+				Expression firstPC = new Operation(Operator.NOT, pc.getOperand(0));
+				Expression restPC = pc.getOperand(1);
+				pathCondition = new Operation(Operator.AND, firstPC, restPC);
+				log.finest("trying " + pathCondition);
+				Instance instance = new Instance(solver, null, pathCondition);
+				@SuppressWarnings("unchecked")
+				Map<IntVariable, Object> model = (Map<IntVariable, Object>) instance.request("model"); 
+				if (model == null) {
+					// again drop the first conjunct
+					signature = restSignature;
+					pathCondition = pc.getOperand(1);
+					log.finest("no model");
+				} else {
+					// translate model
+					Map<String, Constant> newModel = new HashMap<>();
+					for (IntVariable variable : model.keySet()) {
+						String name = variable.getName();
+						Constant value = new IntConstant((Integer) model.get(variable));
+						newModel.put(name, value);
+					}
+					log.finest("new model: " + newModel);
+					return newModel;
+				}
+			}
+		}
 		return null;
 	}
 
 	@Override
 	public void report() {
-		// TODO Auto-generated method stub		
+		log.info("#explored: " + pathCounter);
 	}
 	
 }
