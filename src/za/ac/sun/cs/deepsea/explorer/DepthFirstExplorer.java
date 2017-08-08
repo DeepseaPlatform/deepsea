@@ -37,19 +37,18 @@ public class DepthFirstExplorer extends AbstractExplorer {
 	 * 
 	 * @param diver the associated diver
 	 */
-	public DepthFirstExplorer(Diver diver) {
+	public DepthFirstExplorer(Diver diver, Properties properties) {
 		super(diver);
 		this.log = diver.getLog();
 		this.solver = new Green("DEEPSEA");
-		Properties props = new Properties();
-		props.setProperty("green.services", "model");
-		props.setProperty("green.service.model", "(bounder (canonizer modeller))");
-		props.setProperty("green.service.model.bounder", "za.ac.sun.cs.green.service.bounder.BounderService");				
-		props.setProperty("green.service.model.canonizer", "za.ac.sun.cs.green.service.canonizer.ModelCanonizerService");				
-		props.setProperty("green.service.model.modeller", "za.ac.sun.cs.green.service.z3.ModelZ3JavaService");
+		properties.setProperty("green.log.level", "OFF");
+		properties.setProperty("green.services", "model");
+		properties.setProperty("green.service.model", "(bounder (canonizer modeller))");
+		properties.setProperty("green.service.model.bounder", "za.ac.sun.cs.green.service.bounder.BounderService");				
+		properties.setProperty("green.service.model.canonizer", "za.ac.sun.cs.green.service.canonizer.ModelCanonizerService");				
+		properties.setProperty("green.service.model.modeller", "za.ac.sun.cs.green.service.z3.ModelZ3JavaService");
 		// props.setProperty("green.service.model.modeller", "za.ac.sun.cs.green.service.choco3.ModelChoco3Service");
-		// props.setProperty("", "/Users/jaco/Documents/RESEARCH/01/SYMEXE/Z3/build/z3");
-		Configuration config = new Configuration(solver, props);
+		Configuration config = new Configuration(solver, properties);
 		config.configure();
 	}
 
