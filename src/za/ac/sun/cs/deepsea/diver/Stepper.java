@@ -203,8 +203,7 @@ public class Stepper extends AbstractEventListener {
 	
 	@Override
 	public boolean classPrepare(ClassPrepareEvent event) {
-		log.finest(">>> LOADING >>> " + event.referenceType().name());
-		if ("simple.XYChoice".equals(event.referenceType().name())) {
+		if (dive.getDiver().getTarget().equals(event.referenceType().name())) {
 			mgr.createMethodEntryRequest(r -> mgr.filterExcludes(r));
 			ThreadReference mt = RequestManager.findThread(vm, "main");
 			mgr.createStepRequest(mt, StepRequest.STEP_MIN, StepRequest.STEP_INTO, r -> {
