@@ -1,7 +1,9 @@
 package za.ac.sun.cs.deepsea.instructions;
 
 import com.sun.jdi.Location;
+import com.sun.jdi.event.StepEvent;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
 import za.ac.sun.cs.deepsea.diver.SymbolicFrame;
 import za.ac.sun.cs.deepsea.diver.Symbolizer;
 import za.ac.sun.cs.green.expr.Expression;
@@ -12,8 +14,8 @@ public class IF_ICMPGE extends Instruction {
 
 	private final int offset;
 
-	public IF_ICMPGE(final int position, final int offset) {
-		super(position, 162);
+	public IF_ICMPGE(Stepper stepper, int position, int offset) {
+		super(stepper, position, 162);
 		this.offset = offset;
 	}
 
@@ -27,7 +29,7 @@ public class IF_ICMPGE extends Instruction {
 	}
 
 	@Override
-	public void execute(Location loc, Symbolizer symbolizer) {
+	public void execute(StepEvent event, Location loc, Symbolizer symbolizer) {
 		SymbolicFrame frame = symbolizer.getTopFrame();
 		Expression e1 = frame.pop();
 		Expression e0 = frame.pop();

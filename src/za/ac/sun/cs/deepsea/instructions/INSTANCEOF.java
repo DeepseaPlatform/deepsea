@@ -1,11 +1,13 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class INSTANCEOF extends Instruction {
 
 	private final int index;
 
-	public INSTANCEOF(final int position, final int index) {
-		super(position, 193);
+	public INSTANCEOF(Stepper stepper, int position, int index) {
+		super(stepper, position, 193);
 		this.index = index;
 	}
 

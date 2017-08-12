@@ -1,11 +1,13 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class IFNULL extends Instruction {
 
 	private final int offset;
 
-	public IFNULL(final int position, final int offset) {
-		super(position, 198);
+	public IFNULL(Stepper stepper, int position, int offset) {
+		super(stepper, position, 198);
 		this.offset = offset;
 	}
 

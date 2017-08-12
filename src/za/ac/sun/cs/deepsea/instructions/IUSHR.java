@@ -1,9 +1,11 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class IUSHR extends Instruction {
 
-	public IUSHR(final int position) {
-		super(position, 124);
+	public IUSHR(Stepper stepper, int position) {
+		super(stepper, position, 124);
 	}
 	
 }

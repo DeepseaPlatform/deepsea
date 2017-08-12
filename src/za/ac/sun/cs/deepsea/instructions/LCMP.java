@@ -1,9 +1,11 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class LCMP extends Instruction {
 
-	public LCMP(final int position) {
-		super(position, 148);
+	public LCMP(Stepper stepper, int position) {
+		super(stepper, position, 148);
 	}
 	
 }

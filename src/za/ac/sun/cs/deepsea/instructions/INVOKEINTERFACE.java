@@ -1,13 +1,15 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class INVOKEINTERFACE extends Instruction {
 
 	private final int index;
 
 	private final int count;
 	
-	public INVOKEINTERFACE(final int position, final int index, final int count) {
-		super(position, 185);
+	public INVOKEINTERFACE(Stepper stepper, int position, int index, int count) {
+		super(stepper, position, 185);
 		this.index = index;
 		this.count = count;
 	}

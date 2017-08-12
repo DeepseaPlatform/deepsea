@@ -1,9 +1,11 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class MONITOREXIT extends Instruction {
 
-	public MONITOREXIT(final int position) {
-		super(position, 195);
+	public MONITOREXIT(Stepper stepper, int position) {
+		super(stepper, position, 195);
 	}
 	
 }

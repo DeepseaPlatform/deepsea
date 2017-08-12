@@ -1,9 +1,11 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class IAND extends Instruction {
 
-	public IAND(final int position) {
-		super(position, 126);
+	public IAND(Stepper stepper, int position) {
+		super(stepper, position, 126);
 	}
 	
 }

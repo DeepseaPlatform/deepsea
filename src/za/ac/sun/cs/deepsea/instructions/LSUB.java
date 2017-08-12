@@ -1,9 +1,11 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class LSUB extends Instruction {
 
-	public LSUB(final int position) {
-		super(position, 101);
+	public LSUB(Stepper stepper, int position) {
+		super(stepper, position, 101);
 	}
 	
 }

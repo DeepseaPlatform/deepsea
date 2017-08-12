@@ -1,11 +1,13 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class GOTO extends Instruction {
 
 	private final int offset;
 
-	public GOTO(final int position, final int offset) {
-		super(position, 167);
+	public GOTO(Stepper stepper, int position, int offset) {
+		super(stepper, position, 167);
 		this.offset = offset;
 	}
 

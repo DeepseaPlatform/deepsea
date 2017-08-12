@@ -1,17 +1,13 @@
 package za.ac.sun.cs.deepsea.instructions;
 
-import com.sun.jdi.Location;
-
-import za.ac.sun.cs.deepsea.diver.SymbolicFrame;
-import za.ac.sun.cs.deepsea.diver.Symbolizer;
-import za.ac.sun.cs.green.expr.IntConstant;
+import za.ac.sun.cs.deepsea.diver.Stepper;
 
 public class LDC extends Instruction {
 
 	private final int index;
 
-	public LDC(final int position, final int index) {
-		super(position, 18);
+	public LDC(Stepper stepper, int position, int index) {
+		super(stepper, position, 18);
 		this.index = index;
 	}
 
@@ -24,17 +20,17 @@ public class LDC extends Instruction {
 		return 2;
 	}
 
-	@Override
-	public void execute(Location loc, Symbolizer symbolizer) {
-		SymbolicFrame frame = symbolizer.getTopFrame();
-		// frame.push(new IntConstant(value));
-	}
-	
-	@Override
-	public String toString() {
-		sb.setLength(0);
-		sb.append("ldc ").append(index);
-		return sb.toString();
-	}
+//	@Override
+//	public void execute(Location loc, Symbolizer symbolizer) {
+//		SymbolicFrame frame = symbolizer.getTopFrame();
+//		// frame.push(new IntConstant(value));
+//	}
+//	
+//	@Override
+//	public String toString() {
+//		sb.setLength(0);
+//		sb.append("ldc ").append(index);
+//		return sb.toString();
+//	}
 
 }

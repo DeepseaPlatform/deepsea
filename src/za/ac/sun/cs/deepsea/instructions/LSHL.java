@@ -1,9 +1,11 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class LSHL extends Instruction {
 
-	public LSHL(final int position) {
-		super(position, 121);
+	public LSHL(Stepper stepper, int position) {
+		super(stepper, position, 121);
 	}
 	
 }

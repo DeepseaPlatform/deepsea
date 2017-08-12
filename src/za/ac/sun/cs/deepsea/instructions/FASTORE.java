@@ -1,9 +1,11 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class FASTORE extends Instruction {
 
-	public FASTORE(final int position) {
-		super(position, 81);
+	public FASTORE(Stepper stepper, int position) {
+		super(stepper, position, 81);
 	}
 	
 }

@@ -1,11 +1,13 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class CHECKCAST extends Instruction {
 
 	private final int index;
 
-	public CHECKCAST(final int position, final int index) {
-		super(position, 192);
+	public CHECKCAST(Stepper stepper, int position, int index) {
+		super(stepper, position, 192);
 		this.index = index;
 	}
 

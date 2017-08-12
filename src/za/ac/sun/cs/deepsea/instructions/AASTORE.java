@@ -1,9 +1,11 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class AASTORE extends Instruction {
 
-	public AASTORE(final int position) {
-		super(position, 83);
+	public AASTORE(Stepper stepper, int position) {
+		super(stepper, position, 83);
 	}
 
 }

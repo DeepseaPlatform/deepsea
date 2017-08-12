@@ -1,9 +1,11 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class LALOAD extends Instruction {
 
-	public LALOAD(final int position) {
-		super(position, 47);
+	public LALOAD(Stepper stepper, int position) {
+		super(stepper, position, 47);
 	}
 	
 }

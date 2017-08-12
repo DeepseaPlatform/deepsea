@@ -1,11 +1,13 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class NEWARRAY extends Instruction {
 
 	private final int index;
 
-	public NEWARRAY(final int position, final int index) {
-		super(position, 188);
+	public NEWARRAY(Stepper stepper, int position, int index) {
+		super(stepper, position, 188);
 		this.index = index;
 	}
 

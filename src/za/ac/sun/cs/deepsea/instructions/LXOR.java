@@ -1,9 +1,11 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class LXOR extends Instruction {
 
-	public LXOR(final int position) {
-		super(position, 131);
+	public LXOR(Stepper stepper, int position) {
+		super(stepper, position, 131);
 	}
 	
 }

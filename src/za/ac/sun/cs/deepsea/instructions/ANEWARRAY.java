@@ -1,11 +1,13 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class ANEWARRAY extends Instruction {
 
 	private final int index;
 
-	public ANEWARRAY(final int position, final int index) {
-		super(position, 189);
+	public ANEWARRAY(Stepper stepper, int position, int index) {
+		super(stepper, position, 189);
 		this.index = index;
 	}
 

@@ -1,9 +1,11 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class FCMPL extends Instruction {
 
-	public FCMPL(final int position) {
-		super(position, 149);
+	public FCMPL(Stepper stepper, int position) {
+		super(stepper, position, 149);
 	}
 	
 }

@@ -1,9 +1,11 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class IREM extends Instruction {
 
-	public IREM(final int position) {
-		super(position, 112);
+	public IREM(Stepper stepper, int position) {
+		super(stepper, position, 112);
 	}
 	
 }

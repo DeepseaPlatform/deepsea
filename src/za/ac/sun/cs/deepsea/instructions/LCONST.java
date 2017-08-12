@@ -1,11 +1,13 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class LCONST extends Instruction {
 
 	private final int index;
 
-	public LCONST(final int position, final int index) {
-		super(position, 3);
+	public LCONST(Stepper stepper, int position, int index) {
+		super(stepper, position, 3);
 		this.index = index;
 	}
 

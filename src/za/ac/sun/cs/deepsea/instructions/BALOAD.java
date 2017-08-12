@@ -1,9 +1,11 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class BALOAD extends Instruction {
 
-	public BALOAD(final int position) {
-		super(position, 51);
+	public BALOAD(Stepper stepper, int position) {
+		super(stepper, position, 51);
 	}
 	
 }

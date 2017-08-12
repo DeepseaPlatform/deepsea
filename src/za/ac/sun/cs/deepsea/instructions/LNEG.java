@@ -1,9 +1,11 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class LNEG extends Instruction {
 
-	public LNEG(final int position) {
-		super(position, 117);
+	public LNEG(Stepper stepper, int position) {
+		super(stepper, position, 117);
 	}
 	
 }

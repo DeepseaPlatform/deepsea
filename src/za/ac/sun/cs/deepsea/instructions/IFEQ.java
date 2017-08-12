@@ -1,11 +1,13 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class IFEQ extends Instruction {
 
 	private final int offset;
 
-	public IFEQ(final int position, final int offset) {
-		super(position, 153);
+	public IFEQ(Stepper stepper, int position, int offset) {
+		super(stepper, position, 153);
 		this.offset = offset;
 	}
 

@@ -1,9 +1,11 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class DRETURN extends Instruction {
 
-	public DRETURN(final int position) {
-		super(position, 175);
+	public DRETURN(Stepper stepper, int position) {
+		super(stepper, position, 175);
 	}
 	
 }

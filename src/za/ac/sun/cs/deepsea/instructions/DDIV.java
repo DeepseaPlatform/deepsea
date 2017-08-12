@@ -1,9 +1,11 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class DDIV extends Instruction {
 
-	public DDIV(final int position) {
-		super(position, 111);
+	public DDIV(Stepper stepper, int position) {
+		super(stepper, position, 111);
 	}
 	
 }

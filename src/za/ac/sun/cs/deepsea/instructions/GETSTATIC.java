@@ -1,11 +1,13 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class GETSTATIC extends Instruction {
 
 	private final int index;
 
-	public GETSTATIC(final int position, final int index) {
-		super(position, 178);
+	public GETSTATIC(Stepper stepper, int position, int index) {
+		super(stepper, position, 178);
 		this.index = index;
 	}
 

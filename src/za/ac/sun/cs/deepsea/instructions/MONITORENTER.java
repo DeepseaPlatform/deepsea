@@ -1,9 +1,11 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class MONITORENTER extends Instruction {
 
-	public MONITORENTER(final int position) {
-		super(position, 194);
+	public MONITORENTER(Stepper stepper, int position) {
+		super(stepper, position, 194);
 	}
 	
 }

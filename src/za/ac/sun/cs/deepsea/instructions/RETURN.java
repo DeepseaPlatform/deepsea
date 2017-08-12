@@ -1,17 +1,19 @@
 package za.ac.sun.cs.deepsea.instructions;
 
 import com.sun.jdi.Location;
+import com.sun.jdi.event.StepEvent;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
 import za.ac.sun.cs.deepsea.diver.Symbolizer;
 
 public class RETURN extends Instruction {
 
-	public RETURN(final int position) {
-		super(position, 177);
+	public RETURN(Stepper stepper, int position) {
+		super(stepper, position, 177);
 	}
 
 	@Override
-	public void execute(Location loc, Symbolizer symbolizer) {
+	public void execute(StepEvent event, Location loc, Symbolizer symbolizer) {
 		symbolizer.popFrame();
 	}
 

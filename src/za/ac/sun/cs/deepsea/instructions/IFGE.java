@@ -1,11 +1,13 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class IFGE extends Instruction {
 
 	private final int offset;
 
-	public IFGE(final int position, final int offset) {
-		super(position, 156);
+	public IFGE(Stepper stepper, int position, int offset) {
+		super(stepper, position, 156);
 		this.offset = offset;
 	}
 

@@ -1,18 +1,20 @@
 package za.ac.sun.cs.deepsea.instructions;
 
 import com.sun.jdi.Location;
+import com.sun.jdi.event.StepEvent;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
 import za.ac.sun.cs.deepsea.diver.Symbolizer;
 import za.ac.sun.cs.green.expr.Expression;
 
 public class IRETURN extends Instruction {
 
-	public IRETURN(final int position) {
-		super(position, 172);
+	public IRETURN(Stepper stepper, int position) {
+		super(stepper, position, 172);
 	}
 	
 	@Override
-	public void execute(Location loc, Symbolizer symbolizer) {
+	public void execute(StepEvent event, Location loc, Symbolizer symbolizer) {
 		Expression e = symbolizer.getTopFrame().pop();
 		if (	symbolizer.popFrame()) {
 			symbolizer.getTopFrame().push(e);

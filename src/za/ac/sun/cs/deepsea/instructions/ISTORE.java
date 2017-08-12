@@ -1,7 +1,9 @@
 package za.ac.sun.cs.deepsea.instructions;
 
 import com.sun.jdi.Location;
+import com.sun.jdi.event.StepEvent;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
 import za.ac.sun.cs.deepsea.diver.SymbolicFrame;
 import za.ac.sun.cs.deepsea.diver.Symbolizer;
 
@@ -11,14 +13,14 @@ public class ISTORE extends Instruction {
 
 	private final int size;
 
-	public ISTORE(final int position, final int index) {
-		super(position, 54);
+	public ISTORE(Stepper stepper, int position, int index) {
+		super(stepper, position, 54);
 		this.index = index;
 		this.size = 1;
 	}
 
-	public ISTORE(final int position, final int index, boolean dummy) {
-		super(position, 54);
+	public ISTORE(Stepper stepper, int position, int index, boolean dummy) {
+		super(stepper, position, 54);
 		this.index = index;
 		this.size = 2;
 	}
@@ -33,7 +35,7 @@ public class ISTORE extends Instruction {
 	}
 
 	@Override
-	public void execute(Location loc, Symbolizer symbolizer) {
+	public void execute(StepEvent event, Location loc, Symbolizer symbolizer) {
 		SymbolicFrame frame = symbolizer.getTopFrame();
 		frame.setLocal(index, frame.pop());
 	}

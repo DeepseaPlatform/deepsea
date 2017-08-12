@@ -1,7 +1,9 @@
 package za.ac.sun.cs.deepsea.instructions;
 
 import com.sun.jdi.Location;
+import com.sun.jdi.event.StepEvent;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
 import za.ac.sun.cs.deepsea.diver.SymbolicFrame;
 import za.ac.sun.cs.deepsea.diver.Symbolizer;
 import za.ac.sun.cs.green.expr.IntConstant;
@@ -10,8 +12,8 @@ public class SIPUSH extends Instruction {
 
 	private final int value;
 
-	public SIPUSH(final int position, final int value) {
-		super(position, 17);
+	public SIPUSH(Stepper stepper, int position, int value) {
+		super(stepper, position, 17);
 		this.value = value;
 	}
 
@@ -25,7 +27,7 @@ public class SIPUSH extends Instruction {
 	}
 
 	@Override
-	public void execute(Location loc, Symbolizer symbolizer) {
+	public void execute(StepEvent event, Location loc, Symbolizer symbolizer) {
 		SymbolicFrame frame = symbolizer.getTopFrame();
 		frame.push(new IntConstant(value));
 	}

@@ -1,13 +1,15 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class MULTIANEWARRAY extends Instruction {
 
 	private final int index;
 
 	private final int dimensions;
 	
-	public MULTIANEWARRAY(final int position, final int index, final int dimensions) {
-		super(position, 197);
+	public MULTIANEWARRAY(Stepper stepper, int position, int index, int dimensions) {
+		super(stepper, position, 197);
 		this.index = index;
 		this.dimensions = dimensions;
 	}

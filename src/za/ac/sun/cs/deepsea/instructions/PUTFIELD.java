@@ -1,11 +1,13 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class PUTFIELD extends Instruction {
 
 	private final int index;
 
-	public PUTFIELD(final int position, final int index) {
-		super(position, 181);
+	public PUTFIELD(Stepper stepper, int position, int index) {
+		super(stepper, position, 181);
 		this.index = index;
 	}
 

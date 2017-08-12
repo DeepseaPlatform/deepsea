@@ -1,9 +1,11 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class IOR extends Instruction {
 
-	public IOR(final int position) {
-		super(position, 128);
+	public IOR(Stepper stepper, int position) {
+		super(stepper, position, 128);
 	}
 	
 }

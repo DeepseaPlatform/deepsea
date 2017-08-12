@@ -1,9 +1,11 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class DADD extends Instruction {
 
-	public DADD(final int position) {
-		super(position, 99);
+	public DADD(Stepper stepper, int position) {
+		super(stepper, position, 99);
 	}
 	
 }

@@ -1,11 +1,13 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class INVOKEVIRTUAL extends Instruction {
 
 	private final int index;
 
-	public INVOKEVIRTUAL(final int position, final int index) {
-		super(position, 182);
+	public INVOKEVIRTUAL(Stepper stepper, int position, int index) {
+		super(stepper, position, 182);
 		this.index = index;
 	}
 

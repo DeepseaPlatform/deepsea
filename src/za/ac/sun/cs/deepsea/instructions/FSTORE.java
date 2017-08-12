@@ -1,19 +1,21 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class FSTORE extends Instruction {
 
 	private final int index;
 
 	private final int size;
 
-	public FSTORE(final int position, final int index) {
-		super(position, 56);
+	public FSTORE(Stepper stepper, int position, int index) {
+		super(stepper, position, 56);
 		this.index = index;
 		this.size = 1;
 	}
 
-	public FSTORE(final int position, final int index, boolean dummy) {
-		super(position, 56);
+	public FSTORE(Stepper stepper, int position, int index, boolean dummy) {
+		super(stepper, position, 56);
 		this.index = index;
 		this.size = 2;
 	}

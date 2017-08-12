@@ -1,9 +1,11 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class POP2 extends Instruction {
 
-	public POP2(final int position) {
-		super(position, 88);
+	public POP2(Stepper stepper, int position) {
+		super(stepper, position, 88);
 	}
 	
 }

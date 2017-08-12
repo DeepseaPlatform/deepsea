@@ -1,11 +1,13 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class IF_ICMPGT extends Instruction {
 
 	private final int offset;
 
-	public IF_ICMPGT(final int position, final int offset) {
-		super(position, 163);
+	public IF_ICMPGT(Stepper stepper, int position, int offset) {
+		super(stepper, position, 163);
 		this.offset = offset;
 	}
 

@@ -1,11 +1,13 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import za.ac.sun.cs.deepsea.diver.Stepper;
+
 public class RET extends Instruction {
 
 	private final int index;
 
-	public RET(final int position, final int index) {
-		super(position, 169);
+	public RET(Stepper stepper, int position, int index) {
+		super(stepper, position, 169);
 		this.index = index;
 	}
 
