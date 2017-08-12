@@ -74,16 +74,17 @@ public class Dive {
 		log.finer("issuing monitor requests");
 		RequestManager m = new RequestManager(diver, vm.eventRequestManager());
 		m.addExclude("java.*", "javax.*", "sun.*", "com.sun.*");
-		m.createMethodEntryRequest(r -> m.filterExcludes(r));
-		ThreadReference mt = RequestManager.findThread(vm, "main");
-		m.createStepRequest(mt, StepRequest.STEP_MIN, StepRequest.STEP_INTO, r -> {
-			m.filterExcludes(r);
-			r.addCountFilter(1);
-		});
+		m.createClassPrepareRequest(r -> m.filterExcludes(r));
+//		m.createMethodEntryRequest(r -> m.filterExcludes(r));
+//		ThreadReference mt = RequestManager.findThread(vm, "main");
+//		m.createStepRequest(mt, StepRequest.STEP_MIN, StepRequest.STEP_INTO, r -> {
+//			m.filterExcludes(r);
+//			r.addCountFilter(1);
+//		});
 
 		log.finer("setting up event monitoring");
 		EventReader ev = new EventReader(diver, vm.eventQueue());
-		ev.addEventListener(new Stepper(this, m));
+		ev.addEventListener(new Stepper(this, vm, m));
 		ev.start();
 
 		log.finer("starting vm");

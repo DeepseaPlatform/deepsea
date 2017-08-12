@@ -19,8 +19,10 @@ import com.sun.jdi.LocalVariable;
 import com.sun.jdi.Location;
 import com.sun.jdi.Method;
 import com.sun.jdi.StackFrame;
+import com.sun.jdi.ThreadReference;
 import com.sun.jdi.Value;
 import com.sun.jdi.VirtualMachine;
+import com.sun.jdi.event.ClassPrepareEvent;
 import com.sun.jdi.event.MethodEntryEvent;
 import com.sun.jdi.event.StepEvent;
 import com.sun.jdi.request.StepRequest;
@@ -39,6 +41,8 @@ public class Stepper extends AbstractEventListener {
    
     private final Logger log;
 
+    private final VirtualMachine vm;
+
 	private final RequestManager mgr;
 
 	private final Symbolizer symbolizer;
@@ -51,9 +55,10 @@ public class Stepper extends AbstractEventListener {
 
 	private static final StringBuilder sb = new StringBuilder();
 
-	public Stepper(final Dive dive, final RequestManager mgr) {
+	public Stepper(Dive dive, VirtualMachine vm, RequestManager mgr) {
 		this.dive = dive;
 		this.log = dive.getDiver().getLog();
+		this.vm = vm;
 		this.mgr = mgr;
 		this.symbolizer = dive.getSymbolizer();
 	}
@@ -192,5 +197,23 @@ public class Stepper extends AbstractEventListener {
 		}
 		return true;
 	}
+
+	
+	
+	
+	@Override
+	public boolean classPrepare(ClassPrepareEvent event) {
+		log.finest(">>> LOADING >>> " + event.referenceType().name());
+		if ("simple.XYChoice".equals(event.referenceType().name())) {
+			mgr.createMethodEntryRequest(r -> mgr.filterExcludes(r));
+			ThreadReference mt = RequestManager.findThread(vm, "main");
+			mgr.createStepRequest(mt, StepRequest.STEP_MIN, StepRequest.STEP_INTO, r -> {
+				mgr.filterExcludes(r);
+				r.addCountFilter(1);
+			});
+		}
+		return true;
+	}
+
 
 }
