@@ -13,15 +13,11 @@ public class DART {
 	}
 	
 	public static void abort() {
-		System.out.println("!!");
+		System.out.println("ABORT");
 	}
 	
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		test(2,10);
+		test(2,9);
 	}
 	
 }
