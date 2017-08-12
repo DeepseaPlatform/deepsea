@@ -3,6 +3,7 @@ package za.ac.sun.cs.deepsea.diver;
 import java.util.Stack;
 
 import com.sun.jdi.Location;
+import com.sun.jdi.event.StepEvent;
 
 import za.ac.sun.cs.deepsea.instructions.Instruction;
 import za.ac.sun.cs.green.expr.Expression;
@@ -26,6 +27,8 @@ public class Symbolizer {
 
 	private Expression pendingConjunct = null;
 
+	private Expression pendingExtraConjunct = null;
+	
 	private int pendingTarget = -1;
 
 	public Symbolizer(final Diver diver) {
@@ -76,7 +79,15 @@ public class Symbolizer {
 		pendingTarget = target;
 	}
 
-	public void execute(Location loc, Instruction ins) {
+	public void pushExtraConjunct(Expression extraConjunct) {
+		if (pendingExtraConjunct == null) {
+			pendingExtraConjunct = extraConjunct;
+		} else {
+			pendingExtraConjunct = new Operation(Operator.AND, extraConjunct, pendingExtraConjunct);
+		}
+	}
+
+	public void execute(StepEvent event, Location loc, Instruction ins) {
 		if (inSymbolicMode) {
 			if (pendingConjunct != null) {
 				char branch = '1';
@@ -85,10 +96,14 @@ public class Symbolizer {
 					pendingConjunct = new Operation(Operator.NOT, pendingConjunct);
 				}
 				signature = branch + signature;
+				if (pendingExtraConjunct != null) {
+					pathCondition = new Operation(Operator.AND, pendingExtraConjunct, pathCondition);
+				}
 				pathCondition = new Operation(Operator.AND, pendingConjunct, pathCondition);
 				pendingConjunct = null;
+				pendingExtraConjunct = null;
 			}
-			ins.execute(loc, this);
+			ins.execute(event, loc, this);
 		}
 	}
 

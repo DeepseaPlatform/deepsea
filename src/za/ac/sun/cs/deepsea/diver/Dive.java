@@ -2,6 +2,7 @@ package za.ac.sun.cs.deepsea.diver;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -39,6 +40,8 @@ public class Dive {
 	private final Symbolizer symbolizer;
 
 	private final Map<String, Constant> concreteValues;
+
+	private final Map<String, Expression> actualValues = new HashMap<>();
 
 	/**
 	 * @param diver
@@ -80,7 +83,7 @@ public class Dive {
 
 		log.finer("setting up event monitoring");
 		EventReader ev = new EventReader(diver, vm.eventQueue());
-		ev.addEventListener(new Stepper(diver, symbolizer, m, concreteValues));
+		ev.addEventListener(new Stepper(this, m));
 		ev.start();
 
 		log.finer("starting vm");
@@ -127,6 +130,27 @@ public class Dive {
 	 */
 	public String getSignature() {
 		return symbolizer.getSignature();
+	}
+
+	public Diver getDiver() {
+		return diver;
+	}
+
+	public Symbolizer getSymbolizer() {
+		return symbolizer;
+	}
+
+	public Map<String, Constant> getConcreteValues() {
+		return concreteValues;
+	}
+
+	public void setActualValue(String name, Expression expression) {
+		assert name != null;
+		actualValues.put(name, expression);
+	}
+
+	public Expression getActualValue(String name) {
+		return actualValues.get(name);
 	}
 
 }

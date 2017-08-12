@@ -41,7 +41,7 @@ public class DepthFirstExplorer extends AbstractExplorer {
 		super(diver);
 		this.log = diver.getLog();
 		this.solver = new Green("DEEPSEA");
-		properties.setProperty("green.log.level", "OFF");
+		// properties.setProperty("green.log.level", "OFF");
 		properties.setProperty("green.services", "model");
 		properties.setProperty("green.service.model", "(bounder (canonizer modeller))");
 		properties.setProperty("green.service.model.bounder", "za.ac.sun.cs.green.service.bounder.BounderService");				

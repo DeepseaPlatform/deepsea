@@ -35,7 +35,7 @@ import za.ac.sun.cs.green.expr.IntVariable;
 
 public class Stepper extends AbstractEventListener {
 
-    private final Diver diver;
+    private final Dive dive;
    
     private final Logger log;
 
@@ -51,14 +51,15 @@ public class Stepper extends AbstractEventListener {
 
 	private static final StringBuilder sb = new StringBuilder();
 
-	private final Map<String, Constant> concreteValues;
-
-	public Stepper(final Diver diver, Symbolizer symbolizer, final RequestManager mgr, Map<String, Constant> concreteValues) {
-		this.diver = diver;
-		this.log = diver.getLog();
+	public Stepper(final Dive dive, final RequestManager mgr) {
+		this.dive = dive;
+		this.log = dive.getDiver().getLog();
 		this.mgr = mgr;
-		this.symbolizer = symbolizer;
-		this.concreteValues = concreteValues;
+		this.symbolizer = dive.getSymbolizer();
+	}
+
+	public Dive getDive() {
+		return dive;
 	}
 
 	@Override
@@ -88,7 +89,7 @@ public class Stepper extends AbstractEventListener {
 				sb.append("] ").append(ins.toString());
 				log.finest(sb.toString());
 			}
-			symbolizer.execute(loc, ins);
+			symbolizer.execute(event, loc, ins);
 		}
 
 		// ---- Schedule the next StepRequest 
@@ -110,7 +111,7 @@ public class Stepper extends AbstractEventListener {
 		if (!visitedMethods.contains(fullKey)) {
 			visitedMethods.add(fullKey);
 			byte[] bytecodes = method.bytecodes();
-			Instruction.map(bytecodes, fullKey, instructionMap);
+			Instruction.map(this, bytecodes, fullKey, instructionMap);
 		}
 		if (symbolizer.inSymbolicMode()) {
 			try {
@@ -129,8 +130,9 @@ public class Stepper extends AbstractEventListener {
 				return false;
 			}
 		} else {
-			Trigger trigger = diver.findTrigger(method, className);
+			Trigger trigger = dive.getDiver().findTrigger(method, className);
 			if (trigger != null) {
+				Map<String, Constant> concreteValues = dive.getConcreteValues();
 				int n = trigger.getParameterCount();
 				symbolizer.enterSymbolicMode();
 				SymbolicFrame sframe = symbolizer.pushNewFrame();
@@ -146,39 +148,45 @@ public class Stepper extends AbstractEventListener {
 						String name = trigger.getParameterName(i);
 						Constant concrete = ((name == null) || (concreteValues == null)) ? null : concreteValues.get(name);
 						Expression expr = null;
+						Expression varValue = null;
 						if (type == Boolean.class) {
+							expr = new IntConstant(((BooleanValue) actualValue).intValue());
+							varValue = expr;
 							if (symbolic) {
 								expr = new IntVariable(trigger.getParameterName(i), 0, 1);
 								if ((concrete != null) && (concrete instanceof IntConstant)) {
 									boolean value = ((IntConstant) concrete).getValue() != 0;
 									frame.setValue(args.get(i), vm.mirrorOf(value));
+									varValue = concrete;
 								}
-							} else {
-								expr = new IntConstant(((BooleanValue) actualValue).intValue());
 							}
 						} else if (type == Integer.class) {
+							expr = new IntConstant(((IntegerValue) actualValue).intValue());
+							varValue = expr;
 							if (symbolic) {
 								expr = new IntVariable(trigger.getParameterName(i), 0, 99);
 								if ((concrete != null) && (concrete instanceof IntConstant)) {
 									int value = ((IntConstant) concrete).getValue();
 									frame.setValue(args.get(i), vm.mirrorOf(value));
+									varValue = concrete;
 								}
-							} else {
-								expr = new IntConstant(((IntegerValue) actualValue).intValue());
 							}
 						} else {
 							throw new Error("Unhandled symbolic type: " + type);
 						}
 						sframe.setLocal(i, expr);
+						if (name != null) {
+							dive.setActualValue(name, varValue);
+						}
 					}
-				} catch (IncompatibleThreadStateException e) {
-					e.printStackTrace();
-				} catch (AbsentInformationException e) {
-					e.printStackTrace();
-				} catch (InvalidTypeException e) {
-					e.printStackTrace();
-				} catch (ClassNotLoadedException e) {
-					e.printStackTrace();
+				} catch (IncompatibleThreadStateException x) {
+					x.printStackTrace();
+				} catch (AbsentInformationException x) {
+					x.printStackTrace();
+				} catch (InvalidTypeException x) {
+					x.printStackTrace();
+				} catch (ClassNotLoadedException x) {
+					x.printStackTrace();
 				}
 			}
 		}
