@@ -7,8 +7,8 @@
 <listEntry value="1"/>
 </listAttribute>
 <mapAttribute key="org.eclipse.debug.core.environmentVariables">
-<mapEntry key="DYLD_LIBRARY_PATH" value="/Users/jaco/Documents/WORKSPACE/green/lib"/>
-<mapEntry key="LD_LIBRARY_PATH" value="/Users/jaco/Documents/WORKSPACE/green/lib"/>
+<mapEntry key="DYLD_LIBRARY_PATH" value="${workspace_loc:green/lib}"/>
+<mapEntry key="LD_LIBRARY_PATH" value="${workspace_loc:green/lib}"/>
 </mapAttribute>
 <listAttribute key="org.eclipse.debug.ui.favoriteGroups">
 <listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
