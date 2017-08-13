@@ -223,6 +223,34 @@ public class Stepper extends AbstractEventListener {
 		return true;
 	}
 
+	public za.ac.sun.cs.deepsea.constantpool.Constant getConstant(ReferenceType clas, int index, byte tag) {
+		ConstantPool cp = cpMap.get(clas);
+		if (cp == null) {
+			try {
+				cp = new ConstantPool(clas.constantPoolCount(), clas.constantPool());
+			} catch (IOException x) {
+				x.printStackTrace();
+				return null;
+			}
+			cpMap.put(clas, cp);
+		}
+		return cp.getConstant(index, tag);
+	}
+
+	public za.ac.sun.cs.deepsea.constantpool.Constant getConstant(ReferenceType clas, int index) {
+		ConstantPool cp = cpMap.get(clas);
+		if (cp == null) {
+			try {
+				cp = new ConstantPool(clas.constantPoolCount(), clas.constantPool());
+			} catch (IOException x) {
+				x.printStackTrace();
+				return null;
+			}
+			cpMap.put(clas, cp);
+		}
+		return cp.getConstant(index);
+	}
+	
 	public int getArgumentCount(ReferenceType clas, int index) {
 		ConstantPool cp = cpMap.get(clas);
 		if (cp == null) {
