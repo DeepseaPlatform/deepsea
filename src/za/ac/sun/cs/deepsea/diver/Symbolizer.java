@@ -14,8 +14,8 @@ import za.ac.sun.cs.green.expr.Operation.Operator;
 
 public class Symbolizer {
 
-//	private final Diver diver;
-//	private final Logger log;
+	//	private final Diver diver;
+	//	private final Logger log;
 
 	private boolean inSymbolicMode;
 
@@ -28,12 +28,12 @@ public class Symbolizer {
 	private Expression pendingConjunct = null;
 
 	private Expression pendingExtraConjunct = null;
-	
+
 	private int pendingTarget = -1;
 
 	public Symbolizer(final Diver diver) {
-//		this.diver = diver;
-//		this.log = this.diver.getLog();
+		//		this.diver = diver;
+		//		this.log = this.diver.getLog();
 		inSymbolicMode = false;
 	}
 
