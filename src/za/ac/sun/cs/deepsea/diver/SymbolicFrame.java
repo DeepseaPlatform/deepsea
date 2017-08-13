@@ -28,4 +28,11 @@ public class SymbolicFrame {
 		locals.put(index, value);
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(locals.toString()).append('\n').append(stack.toString());
+		return sb.toString();
+	}
+
 }

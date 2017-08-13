@@ -1,5 +1,6 @@
 package za.ac.sun.cs.deepsea.diver;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -18,6 +19,7 @@ import com.sun.jdi.InvalidTypeException;
 import com.sun.jdi.LocalVariable;
 import com.sun.jdi.Location;
 import com.sun.jdi.Method;
+import com.sun.jdi.ReferenceType;
 import com.sun.jdi.StackFrame;
 import com.sun.jdi.ThreadReference;
 import com.sun.jdi.Value;
@@ -29,6 +31,9 @@ import com.sun.jdi.request.StepRequest;
 
 import za.ac.sun.cs.deepsea.agent.AbstractEventListener;
 import za.ac.sun.cs.deepsea.agent.RequestManager;
+import za.ac.sun.cs.deepsea.constantpool.ConstantMethodref;
+import za.ac.sun.cs.deepsea.constantpool.ConstantNameAndType;
+import za.ac.sun.cs.deepsea.constantpool.ConstantPool;
 import za.ac.sun.cs.deepsea.instructions.Instruction;
 import za.ac.sun.cs.green.expr.Constant;
 import za.ac.sun.cs.green.expr.Expression;
@@ -37,11 +42,11 @@ import za.ac.sun.cs.green.expr.IntVariable;
 
 public class Stepper extends AbstractEventListener {
 
-    private final Dive dive;
-   
-    private final Logger log;
+	private final Dive dive;
 
-    private final VirtualMachine vm;
+	private final Logger log;
+
+	private final VirtualMachine vm;
 
 	private final RequestManager mgr;
 
@@ -55,6 +60,8 @@ public class Stepper extends AbstractEventListener {
 
 	private static final StringBuilder sb = new StringBuilder();
 
+	private final Map<ReferenceType, ConstantPool> cpMap = new HashMap<>();
+
 	public Stepper(Dive dive, VirtualMachine vm, RequestManager mgr) {
 		this.dive = dive;
 		this.log = dive.getDiver().getLog();
@@ -65,6 +72,10 @@ public class Stepper extends AbstractEventListener {
 
 	public Dive getDive() {
 		return dive;
+	}
+
+	public RequestManager getRequestManager() {
+		return mgr;
 	}
 
 	@Override
@@ -120,7 +131,7 @@ public class Stepper extends AbstractEventListener {
 		}
 		if (symbolizer.inSymbolicMode()) {
 			try {
-				int n = method.arguments().size();
+				int n = method.argumentTypes().size();
 				SymbolicFrame frame = symbolizer.getTopFrame();
 				assert args.isEmpty();
 				for (int i = 0; i < n; i++) {
@@ -128,10 +139,10 @@ public class Stepper extends AbstractEventListener {
 				}
 				frame = symbolizer.pushNewFrame();
 				for (int i = 0; i < n; i++) {
-					frame.push(args.pop());
+					frame.setLocal(i, args.pop());
 				}
-			} catch (AbsentInformationException e) {
-				e.printStackTrace();
+			} catch (ClassNotLoadedException x) {
+				x.printStackTrace();
 				return false;
 			}
 		} else {
@@ -151,7 +162,8 @@ public class Stepper extends AbstractEventListener {
 						Object type = trigger.getParameterType(i);
 						boolean symbolic = trigger.isParameterSymbolic(i);
 						String name = trigger.getParameterName(i);
-						Constant concrete = ((name == null) || (concreteValues == null)) ? null : concreteValues.get(name);
+						Constant concrete = ((name == null) || (concreteValues == null)) ? null
+								: concreteValues.get(name);
 						Expression expr = null;
 						Expression varValue = null;
 						if (type == Boolean.class) {
@@ -198,9 +210,6 @@ public class Stepper extends AbstractEventListener {
 		return true;
 	}
 
-	
-	
-	
 	@Override
 	public boolean classPrepare(ClassPrepareEvent event) {
 		if (dive.getDiver().getTarget().equals(event.referenceType().name())) {
@@ -214,5 +223,88 @@ public class Stepper extends AbstractEventListener {
 		return true;
 	}
 
+	public int getArgumentCount(ReferenceType clas, int index) {
+		ConstantPool cp = cpMap.get(clas);
+		if (cp == null) {
+			try {
+				cp = new ConstantPool(clas.constantPoolCount(), clas.constantPool());
+			} catch (IOException x) {
+				x.printStackTrace();
+				return 0;
+			}
+			cpMap.put(clas, cp);
+		}
+		ConstantMethodref m = (ConstantMethodref) cp.getConstant(index,
+				za.ac.sun.cs.deepsea.constantpool.Constant.CONSTANT_Methodref);
+		String name = m.getClass(cp).replace('/', '.');
+		if (!mgr.isFiltered(name)) {
+			return 0;
+		}
+		ConstantNameAndType nt = (ConstantNameAndType) cp.getConstant(m.getNameAndTypeIndex(),
+				za.ac.sun.cs.deepsea.constantpool.Constant.CONSTANT_NameAndType);
+		return countArguments(nt.getSignature(cp));
+	}
+
+	public static int countArguments(String signature) {
+		int count = 0;
+		int i = 0;
+		if (signature.charAt(i++) != '(') {
+			return 0;
+		}
+		while (true) {
+			char ch = signature.charAt(i++);
+			if (ch == ')') {
+				return count;
+			} else if (ch == '[') {
+				// we can just ignore this
+			} else if ((ch == 'B') || (ch == 'C') || (ch == 'D') || (ch == 'F') || (ch == 'I') || (ch == 'J')
+					|| (ch == 'S') || (ch == 'Z')) {
+				count++;
+			} else if (ch == 'L') {
+				i = signature.indexOf(';', i);
+				if (i == -1) {
+					return 0; // missing ';'
+				}
+				i++;
+				count++;
+			} else {
+				return 0; // unknown character in signature 
+			}
+		}
+	}
+	
+	public String getReturnType(ReferenceType clas, int index) {
+		ConstantPool cp = cpMap.get(clas);
+		if (cp == null) {
+			try {
+				cp = new ConstantPool(clas.constantPoolCount(), clas.constantPool());
+			} catch (IOException x) {
+				x.printStackTrace();
+				return "?";
+			}
+			cpMap.put(clas, cp);
+		}
+		ConstantMethodref m = (ConstantMethodref) cp.getConstant(index,
+				za.ac.sun.cs.deepsea.constantpool.Constant.CONSTANT_Methodref);
+		String name = m.getClass(cp).replace('/', '.');
+		if (!mgr.isFiltered(name)) {
+			return "?";
+		}
+		ConstantNameAndType nt = (ConstantNameAndType) cp.getConstant(m.getNameAndTypeIndex(),
+				za.ac.sun.cs.deepsea.constantpool.Constant.CONSTANT_NameAndType);
+		return extractReturnType(nt.getSignature(cp));
+	}
+	
+	public static String extractReturnType(String signature) {
+		int i = 0;
+		if (signature.charAt(i++) != '(') {
+			return "?"; // missing '('
+		}
+		i = signature.indexOf(')', i);
+		if (i == -1) {
+			return "?"; // missing ')'
+		}
+		return signature.substring(i + 1);
+	}
 
 }

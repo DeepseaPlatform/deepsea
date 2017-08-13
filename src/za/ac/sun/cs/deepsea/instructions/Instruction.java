@@ -15,6 +15,8 @@ import za.ac.sun.cs.green.util.Configuration;
 
 public abstract class Instruction {
 
+	protected static int variableCount = 0;
+
 	protected static final StringBuilder sb = new StringBuilder();
 
 	protected final Stepper stepper;
