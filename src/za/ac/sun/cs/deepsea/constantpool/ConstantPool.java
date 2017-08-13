@@ -25,7 +25,7 @@ public class ConstantPool {
 	}
 
 	public Constant getConstant(int index, byte tag) {
-		Constant c = pool[index];
+		Constant c = getConstant(index);
 		if (c == null) {
 			throw new ClassFormatException("Constant pool at index " + index + " is null");
 		}
