@@ -54,27 +54,39 @@ public class RequestManager {
 		excludes.remove(exclude);
 	}
 
+	public boolean isFiltered(String name) {
+		for (String e : excludes) {
+			if (e.endsWith(".*")) {
+				if (name.startsWith(e.substring(0, e.length() - 2))) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+
 	public void filterExcludes(MethodEntryRequest eventRequest) {
-		for (String exclude : excludes) {
-			eventRequest.addClassExclusionFilter(exclude);
+		for (String e : excludes) {
+			eventRequest.addClassExclusionFilter(e);
 		}
 	}
 
 	public void filterExcludes(MethodExitRequest eventRequest) {
-		for (String exclude : excludes) {
-			eventRequest.addClassExclusionFilter(exclude);
+		for (String e : excludes) {
+			eventRequest.addClassExclusionFilter(e);
 		}
 	}
 	
 	public void filterExcludes(ClassPrepareRequest eventRequest) {
-		for (String exclude : excludes) {
-			eventRequest.addClassExclusionFilter(exclude);
+		for (String e : excludes) {
+			eventRequest.addClassExclusionFilter(e);
 		}
 	}
 	
 	public void filterExcludes(StepRequest eventRequest) {
-		for (String exclude : excludes) {
-			eventRequest.addClassExclusionFilter(exclude);
+		for (String e : excludes) {
+			eventRequest.addClassExclusionFilter(e);
 		}
 	}
 
