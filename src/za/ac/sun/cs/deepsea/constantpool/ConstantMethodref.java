@@ -19,7 +19,7 @@ public class ConstantMethodref extends Constant {
 		return classIndex;
 	}
 
-	public String getClass(final ConstantPool cp) {
+	public String getClass(ConstantPool cp) {
 		return cp.constantToString(classIndex, CONSTANT_Class);
 	}
 	
