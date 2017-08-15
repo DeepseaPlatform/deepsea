@@ -1,5 +1,6 @@
 package za.ac.sun.cs.deepsea.logging;
 
+import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -12,12 +13,16 @@ import java.util.logging.StreamHandler;
  */
 public class LogHandler extends StreamHandler {
 
+	private static final Formatter logFormatter = new LogFormatter();
+
+	private static final Formatter verboseFormatter = new VerboseFormatter();
+
 	/**
 	 * Constructs a {@link StreamHandler} that publishes log records to
 	 * {@code System.out} using {@link LogFormatter} to reformat the message.
 	 */
 	public LogHandler() {
-		super(System.out, new LogFormatter());
+		super(System.out, logFormatter);
 	}
 
 	/**
@@ -29,8 +34,24 @@ public class LogHandler extends StreamHandler {
 	 *            the log level
 	 */
 	public LogHandler(Level level) {
-		super(System.out, new LogFormatter());
+		super(System.out, logFormatter);
 		setLevel(level);
+	}
+
+	public void setVerbose(boolean isVerbose) {
+		if (isVerbose) {
+			setFormatter(verboseFormatter);
+		} else {
+			setFormatter(logFormatter);
+		}
+	}
+
+	public void setVerbose() {
+		setVerbose(true);
+	}
+
+	public void setTerse() {
+		setVerbose(false);
 	}
 
 	/**

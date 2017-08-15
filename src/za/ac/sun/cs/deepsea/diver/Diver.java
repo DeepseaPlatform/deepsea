@@ -29,6 +29,11 @@ public class Diver {
 	private final String name;
 
 	/**
+	 * The log handler associated with this {@link Diver} instance.
+	 */
+	private final LogHandler logHandler;
+	
+	/**
 	 * The log associated with this {@link Diver} instance.
 	 */
 	private final Logger log;
@@ -79,7 +84,8 @@ public class Diver {
 		this.log = Logger.getLogger(getClass().getCanonicalName() + "[" + name + "]");
 		log.setUseParentHandlers(false);
 		log.setLevel(Level.ALL);
-		log.addHandler(new LogHandler(Level.ALL));
+		logHandler = new LogHandler(Level.ALL);
+		log.addHandler(logHandler);
 		diveCounter = 0;
 	}
 
@@ -93,6 +99,15 @@ public class Diver {
 	}
 
 	/**
+	 * Return the {@link LogHandler} associated with this instance of {@link Diver}.
+	 * 
+	 * @return the log handler associated with this instance
+	 */
+	public LogHandler getLogHandler() {
+		return logHandler;
+	}
+	
+	/**
 	 * Return the {@link Logger} associated with this instance of {@link Diver}.
 	 * 
 	 * @return the log associated with this instance
@@ -100,7 +115,7 @@ public class Diver {
 	public Logger getLog() {
 		return log;
 	}
-
+	
 	/**
 	 * Returns the current value of the dive counter and increments it.
 	 * 

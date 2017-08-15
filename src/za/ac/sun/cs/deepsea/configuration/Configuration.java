@@ -120,7 +120,7 @@ public class Configuration {
 	 * routines of the {@link Diver} instance.
 	 */
 	public void apply() {
-		setLevel();
+		setLog();
 		setTarget();
 		setArgs();
 		setTriggers();
@@ -132,7 +132,7 @@ public class Configuration {
 	/**
 	 * Reads and sets the "{@code deepsea.log.level}" setting.
 	 */
-	private void setLevel() {
+	private void setLog() {
 		String p = properties.getProperty("deepsea.log.level");
 		if (p != null) {
 			try {
@@ -147,6 +147,7 @@ public class Configuration {
 				log.log(Level.SEVERE, "log level error", x);
 			}
 		}
+		diver.getLogHandler().setVerbose(getBooleanProperty(properties, "deepsea.log.verbose", false));
 	}
 
 	/**
