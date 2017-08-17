@@ -60,6 +60,8 @@ public class Stepper extends AbstractEventListener {
 
 	private static final StringBuilder sb = new StringBuilder();
 
+	private static final int SHOW_STACK_ENTRY_COUNT = 3;
+
 	private final Map<ReferenceType, ConstantPool> cpMap = new HashMap<>();
 
 	public Stepper(Dive dive, VirtualMachine vm, RequestManager mgr) {
@@ -101,11 +103,23 @@ public class Stepper extends AbstractEventListener {
 					sb.append("$$$ ");
 				}
 				sb.append('[').append(methodName);
-				sb.append("::").append(bci);
+				sb.append('@').append(bci);
 				sb.append("] ").append(ins.toString());
-				log.finest(sb.toString());
 			}
 			symbolizer.execute(event, loc, ins);
+			if (log.getLevel().intValue() < Level.FINEST.intValue()) {
+				if (SHOW_STACK_ENTRY_COUNT > 0) {
+					SymbolicFrame frame = symbolizer.getTopFrame();
+					if (frame != null) {
+						sb.append(" {");
+						for (int i = 0; i < SHOW_STACK_ENTRY_COUNT && i < frame.size(); i++) {
+							sb.append(' ').append(frame.peek(i));
+						}
+						sb.append(" }");
+					}
+				}
+				log.finest(sb.toString());
+			}
 		}
 
 		// ---- Schedule the next StepRequest 
