@@ -23,7 +23,7 @@ public class GOTO extends Instruction {
 	@Override
 	public String toString() {
 		sb.setLength(0);
-		sb.append("goto ").append(offset);
+		sb.append("goto -> ").append(position + offset);
 		return sb.toString();
 	}
 
