@@ -6,7 +6,7 @@ import com.sun.jdi.event.StepEvent;
 import za.ac.sun.cs.deepsea.diver.Stepper;
 import za.ac.sun.cs.deepsea.diver.SymbolicFrame;
 import za.ac.sun.cs.deepsea.diver.Symbolizer;
-import za.ac.sun.cs.green.expr.Operation;
+import za.ac.sun.cs.green.expr.IntConstant;
 
 public class NEW extends Instruction {
 
@@ -28,14 +28,15 @@ public class NEW extends Instruction {
 	
 	@Override
 	public void execute(StepEvent event, Location loc, Symbolizer symbolizer) {
+		int objectId = symbolizer.incrAndGetNewObjectId();
 		SymbolicFrame frame = symbolizer.getTopFrame();
-		frame.push(Operation.ZERO);
+		frame.push(new IntConstant(objectId));
 	}
 
 	@Override
 	public String toString() {
 		sb.setLength(0);
-		sb.append("new ").append(index);
+		sb.append("new #").append(index);
 		return sb.toString();
 	}
 

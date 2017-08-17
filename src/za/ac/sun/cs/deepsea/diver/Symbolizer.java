@@ -21,6 +21,8 @@ public class Symbolizer {
 
 	private final Stack<SymbolicFrame> frames = new Stack<>();
 
+	private int objectIdCount = 0;
+
 	private Expression pathCondition = Operation.TRUE;
 
 	private String signature = "";
@@ -105,6 +107,10 @@ public class Symbolizer {
 			}
 			ins.execute(event, loc, this);
 		}
+	}
+
+	public int incrAndGetNewObjectId() {
+		return ++objectIdCount;
 	}
 
 }
