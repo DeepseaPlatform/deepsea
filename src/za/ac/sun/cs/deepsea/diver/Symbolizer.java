@@ -9,6 +9,7 @@ import com.sun.jdi.event.StepEvent;
 
 import za.ac.sun.cs.deepsea.instructions.Instruction;
 import za.ac.sun.cs.green.expr.Expression;
+import za.ac.sun.cs.green.expr.IntVariable;
 import za.ac.sun.cs.green.expr.Operation;
 import za.ac.sun.cs.green.expr.Operation.Operator;
 
@@ -25,6 +26,8 @@ public class Symbolizer {
 
 	private int objectIdCount = 0;
 
+	private int newVariableCount = 0;
+	
 	private final Map<String, Expression> instanceData = new HashMap<>();
 
 	private Expression pathCondition = Operation.TRUE;
@@ -124,6 +127,16 @@ public class Symbolizer {
 	public void putField(int objectId, String fieldName, Expression value) {
 		String fullFieldName = objectId + ":::" + fieldName;
 		instanceData.put(fullFieldName, value);
+	}
+
+	public Expression getField(int objectId, String fieldName) {
+		String fullFieldName = objectId + ":::" + fieldName;
+		Expression value = instanceData.get(fullFieldName);
+		if (value == null) {
+			value = new IntVariable("$q" + newVariableCount++, 0, 999);
+			instanceData.put(fullFieldName, value);
+		}
+		return value;
 	}
 
 }

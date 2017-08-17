@@ -14,6 +14,8 @@ public class PUTFIELD extends Instruction {
 
 	private final int index;
 
+	private String fieldName = null;
+
 	public PUTFIELD(Stepper stepper, int position, int index) {
 		super(stepper, position, 181);
 		this.index = index;
@@ -30,9 +32,11 @@ public class PUTFIELD extends Instruction {
 	
 	@Override
 	public void execute(StepEvent event, Location loc, Symbolizer symbolizer) {
+		if (fieldName == null) {
+			ReferenceType clas = loc.declaringType();
+			fieldName = stepper.getFieldName(clas, index);
+		}
 		SymbolicFrame frame = symbolizer.getTopFrame();
-		ReferenceType clas = loc.declaringType();
-		String fieldName = stepper.getFieldName(clas, index);
 		Expression value = frame.pop();
 		int objectId = ((IntConstant) frame.pop()).getValue();
 		symbolizer.putField(objectId, fieldName, value);
@@ -42,6 +46,9 @@ public class PUTFIELD extends Instruction {
 	public String toString() {
 		sb.setLength(0);
 		sb.append("putfield #").append(index);
+		if (fieldName != null) {
+			sb.append(' ').append(fieldName);
+		}
 		return sb.toString();
 	}
 
