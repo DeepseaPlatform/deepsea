@@ -64,7 +64,11 @@ public class Symbolizer {
 	}
 
 	public SymbolicFrame getTopFrame() {
-		return frames.peek();
+		if (frames.isEmpty()) {
+			return null;
+		} else {
+			return frames.peek();
+		}
 	}
 
 	public Expression getPathCondition() {
