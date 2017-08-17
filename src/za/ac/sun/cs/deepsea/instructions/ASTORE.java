@@ -1,6 +1,11 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import com.sun.jdi.Location;
+import com.sun.jdi.event.StepEvent;
+
 import za.ac.sun.cs.deepsea.diver.Stepper;
+import za.ac.sun.cs.deepsea.diver.SymbolicFrame;
+import za.ac.sun.cs.deepsea.diver.Symbolizer;
 
 public class ASTORE extends Instruction {
 
@@ -27,6 +32,23 @@ public class ASTORE extends Instruction {
 	@Override
 	public int getSize() {
 		return size;
+	}
+
+	@Override
+	public void execute(StepEvent event, Location loc, Symbolizer symbolizer) {
+		SymbolicFrame frame = symbolizer.getTopFrame();
+		frame.setLocal(index, frame.pop());
+	}
+	
+	@Override
+	public String toString() {
+		sb.setLength(0);
+		if (size == 1) {
+			sb.append("astore_").append(index);
+		} else {
+			sb.append("astore ").append(index);
+		}
+		return sb.toString();
 	}
 
 }
