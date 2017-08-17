@@ -8,6 +8,7 @@ import com.sun.jdi.Location;
 import com.sun.jdi.event.StepEvent;
 
 import za.ac.sun.cs.deepsea.instructions.Instruction;
+import za.ac.sun.cs.green.expr.Constant;
 import za.ac.sun.cs.green.expr.Expression;
 import za.ac.sun.cs.green.expr.IntVariable;
 import za.ac.sun.cs.green.expr.Operation;
@@ -86,17 +87,36 @@ public class Symbolizer {
 		return signature;
 	}
 
+	private boolean isConstantConjunct(Expression conjunct) {
+		if (conjunct instanceof Operation) {
+			Operation operation = (Operation) conjunct;
+			int n = operation.getOperatandCount();
+			for (int i = 0; i < n; i++) {
+				if (!isConstantConjunct(operation.getOperand(i))) {
+					return false;
+				}
+			}
+			return true;
+		} else {
+			return (conjunct instanceof Constant); 
+		}
+	}
+
 	public void pushConjunct(Expression conjunct, int target) {
 		assert pendingConjunct == null;
-		pendingConjunct = conjunct;
-		pendingTarget = target;
+		if (!isConstantConjunct(conjunct)) {
+			pendingConjunct = conjunct;
+			pendingTarget = target;
+		}
 	}
 
 	public void pushExtraConjunct(Expression extraConjunct) {
-		if (pendingExtraConjunct == null) {
-			pendingExtraConjunct = extraConjunct;
-		} else {
-			pendingExtraConjunct = new Operation(Operator.AND, extraConjunct, pendingExtraConjunct);
+		if (!isConstantConjunct(extraConjunct)) {
+			if (pendingExtraConjunct == null) {
+				pendingExtraConjunct = extraConjunct;
+			} else {
+				pendingExtraConjunct = new Operation(Operator.AND, extraConjunct, pendingExtraConjunct);
+			}
 		}
 	}
 
