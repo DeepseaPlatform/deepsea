@@ -16,6 +16,10 @@ public class SymbolicFrame {
 		return stack.pop();
 	}
 
+	public Expression peek() {
+		return stack.peek();
+	}
+
 	public void push(Expression value) {
 		stack.push(value);
 	}
