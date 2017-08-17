@@ -20,8 +20,16 @@ public class SymbolicFrame {
 		return stack.peek();
 	}
 
+	public Expression peek(int index) {
+		return stack.get(index);
+	}
+
 	public void push(Expression value) {
 		stack.push(value);
+	}
+
+	public int size() {
+		return stack.size();
 	}
 
 	public Expression getLocal(int index) {
