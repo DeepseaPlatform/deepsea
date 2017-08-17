@@ -98,6 +98,7 @@ public class Stepper extends AbstractEventListener {
 				log.finest(sb.toString());
 			}
 		} else {
+			symbolizer.execute(event, loc, ins);
 			if (log.getLevel().intValue() < Level.FINEST.intValue()) {
 				sb.setLength(0);
 				if (symbolizer.inSymbolicMode()) {
@@ -106,15 +107,13 @@ public class Stepper extends AbstractEventListener {
 				sb.append('[').append(methodName);
 				sb.append('@').append(bci);
 				sb.append("] ").append(ins.toString());
-			}
-			symbolizer.execute(event, loc, ins);
-			if (log.getLevel().intValue() < Level.FINEST.intValue()) {
 				if (SHOW_STACK_ENTRY_COUNT > 0) {
 					SymbolicFrame frame = symbolizer.getTopFrame();
 					if (frame != null) {
 						sb.append(" {");
-						for (int i = 0; i < SHOW_STACK_ENTRY_COUNT && i < frame.size(); i++) {
-							sb.append(' ').append(frame.peek(i));
+						int k = frame.size();
+						for (int i = 0; i < SHOW_STACK_ENTRY_COUNT && k > 0; i++) {
+							sb.append(' ').append(frame.peek(--k));
 						}
 						sb.append(" }");
 					}
