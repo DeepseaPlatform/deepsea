@@ -14,6 +14,8 @@ public class INVOKEVIRTUAL extends Instruction {
 
 	private final int index;
 
+	private String methodName = null;
+
 	public INVOKEVIRTUAL(Stepper stepper, int position, int index) {
 		super(stepper, position, 182);
 		this.index = index;
@@ -30,6 +32,10 @@ public class INVOKEVIRTUAL extends Instruction {
 
 	@Override
 	public void execute(StepEvent event, Location loc, Symbolizer symbolizer) {
+		if (methodName == null) {
+			ReferenceType clas = loc.declaringType();
+			methodName = stepper.getMethodName(clas, index);
+		}
 		/*
 		 * First we throw away the arguments. We can do this, because
 		 * Stepper.getArgumentCount() will return 0 for "monitored" methods. For
@@ -65,6 +71,9 @@ public class INVOKEVIRTUAL extends Instruction {
 	public String toString() {
 		sb.setLength(0);
 		sb.append("invokevirtual #").append(index);
+		if (methodName != null) {
+			sb.append(' ').append(methodName);
+		}
 		return sb.toString();
 	}
 
