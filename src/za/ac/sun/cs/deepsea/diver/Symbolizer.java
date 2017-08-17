@@ -1,5 +1,7 @@
 package za.ac.sun.cs.deepsea.diver;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
 
 import com.sun.jdi.Location;
@@ -22,6 +24,8 @@ public class Symbolizer {
 	private final Stack<SymbolicFrame> frames = new Stack<>();
 
 	private int objectIdCount = 0;
+
+	private final Map<String, Expression> instanceData = new HashMap<>();
 
 	private Expression pathCondition = Operation.TRUE;
 
@@ -115,6 +119,11 @@ public class Symbolizer {
 
 	public int incrAndGetNewObjectId() {
 		return ++objectIdCount;
+	}
+
+	public void putField(int objectId, String fieldName, Expression value) {
+		String fullFieldName = objectId + ":::" + fieldName;
+		instanceData.put(fullFieldName, value);
 	}
 
 }

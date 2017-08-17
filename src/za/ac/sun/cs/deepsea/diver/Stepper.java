@@ -31,6 +31,7 @@ import com.sun.jdi.request.StepRequest;
 
 import za.ac.sun.cs.deepsea.agent.AbstractEventListener;
 import za.ac.sun.cs.deepsea.agent.RequestManager;
+import za.ac.sun.cs.deepsea.constantpool.ConstantFieldref;
 import za.ac.sun.cs.deepsea.constantpool.ConstantMethodref;
 import za.ac.sun.cs.deepsea.constantpool.ConstantNameAndType;
 import za.ac.sun.cs.deepsea.constantpool.ConstantPool;
@@ -350,6 +351,23 @@ public class Stepper extends AbstractEventListener {
 			return "?"; // missing ')'
 		}
 		return signature.substring(i + 1);
+	}
+
+	public String getFieldName(ReferenceType clas, int index) {
+		ConstantPool cp = cpMap.get(clas);
+		if (cp == null) {
+			try {
+				cp = new ConstantPool(clas.constantPoolCount(), clas.constantPool());
+			} catch (IOException x) {
+				x.printStackTrace();
+				return "?";
+			}
+			cpMap.put(clas, cp);
+		}
+		ConstantFieldref f = (ConstantFieldref) cp.getConstant(index, za.ac.sun.cs.deepsea.constantpool.Constant.CONSTANT_Fieldref);
+		ConstantNameAndType nt = (ConstantNameAndType) cp.getConstant(f.getNameAndTypeIndex(),
+				za.ac.sun.cs.deepsea.constantpool.Constant.CONSTANT_NameAndType);
+		return nt.getName(cp);
 	}
 
 }
