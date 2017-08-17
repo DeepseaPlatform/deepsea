@@ -146,6 +146,9 @@ public class Stepper extends AbstractEventListener {
 		if (symbolizer.inSymbolicMode()) {
 			try {
 				int n = method.argumentTypes().size();
+				if (!method.isStatic()) {
+					n++;
+				}
 				SymbolicFrame frame = symbolizer.getTopFrame();
 				assert args.isEmpty();
 				for (int i = 0; i < n; i++) {
@@ -280,7 +283,7 @@ public class Stepper extends AbstractEventListener {
 				za.ac.sun.cs.deepsea.constantpool.Constant.CONSTANT_Methodref);
 		String name = m.getClass(cp).replace('/', '.');
 		if (!mgr.isFiltered(name)) {
-			return 0;
+			return -1;
 		}
 		ConstantNameAndType nt = (ConstantNameAndType) cp.getConstant(m.getNameAndTypeIndex(),
 				za.ac.sun.cs.deepsea.constantpool.Constant.CONSTANT_NameAndType);

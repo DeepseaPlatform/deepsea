@@ -30,6 +30,13 @@ public class INVOKESTATIC extends Instruction {
 
 	@Override
 	public void execute(StepEvent event, Location loc, Symbolizer symbolizer) {
+		/*
+		 * First we throw away the arguments. We can do this, because
+		 * Stepper.getArgumentCount() will return 0 for "monitored" methods. For
+		 * these routines, the MethodEntryEvent will handle the actual transfer
+		 * of parameters. For unmonitored methods, the code below removes the
+		 * arguments passed to the code.
+		 */
 		SymbolicFrame frame = symbolizer.getTopFrame();
 		ReferenceType clas = loc.declaringType();
 		int argumentCount = stepper.getArgumentCount(clas, index);
@@ -38,6 +45,13 @@ public class INVOKESTATIC extends Instruction {
 				frame.pop();
 			}
 		}
+		/*
+		 * As above, Stepper.getReturnType() will return '?' for monitored
+		 * methods and we do not place any return value on the stack. Instead,
+		 * the RETURN (or IRETURN or whatever) instruction will put the return
+		 * value on the current stack. In other cases (unmonitored methods),
+		 * this code places an appropriate symbolic value or zero on the stack.
+		 */
 		String type = stepper.getReturnType(clas, index);
 		char typeCh = type.charAt(0);
 		if ((typeCh == 'I') || (typeCh == 'Z')) {
