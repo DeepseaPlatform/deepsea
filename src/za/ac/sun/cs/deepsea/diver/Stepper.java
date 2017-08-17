@@ -267,7 +267,7 @@ public class Stepper extends AbstractEventListener {
 		}
 		return cp.getConstant(index);
 	}
-	
+
 	public int getArgumentCount(ReferenceType clas, int index) {
 		ConstantPool cp = cpMap.get(clas);
 		if (cp == null) {
@@ -317,7 +317,7 @@ public class Stepper extends AbstractEventListener {
 			}
 		}
 	}
-	
+
 	public String getReturnType(ReferenceType clas, int index) {
 		ConstantPool cp = cpMap.get(clas);
 		if (cp == null) {
@@ -339,7 +339,7 @@ public class Stepper extends AbstractEventListener {
 				za.ac.sun.cs.deepsea.constantpool.Constant.CONSTANT_NameAndType);
 		return extractReturnType(nt.getSignature(cp));
 	}
-	
+
 	public static String extractReturnType(String signature) {
 		int i = 0;
 		if (signature.charAt(i++) != '(') {
@@ -363,8 +363,27 @@ public class Stepper extends AbstractEventListener {
 			}
 			cpMap.put(clas, cp);
 		}
-		ConstantFieldref f = (ConstantFieldref) cp.getConstant(index, za.ac.sun.cs.deepsea.constantpool.Constant.CONSTANT_Fieldref);
+		ConstantFieldref f = (ConstantFieldref) cp.getConstant(index,
+				za.ac.sun.cs.deepsea.constantpool.Constant.CONSTANT_Fieldref);
 		ConstantNameAndType nt = (ConstantNameAndType) cp.getConstant(f.getNameAndTypeIndex(),
+				za.ac.sun.cs.deepsea.constantpool.Constant.CONSTANT_NameAndType);
+		return nt.getName(cp);
+	}
+
+	public String getMethodName(ReferenceType clas, int index) {
+		ConstantPool cp = cpMap.get(clas);
+		if (cp == null) {
+			try {
+				cp = new ConstantPool(clas.constantPoolCount(), clas.constantPool());
+			} catch (IOException x) {
+				x.printStackTrace();
+				return "?";
+			}
+			cpMap.put(clas, cp);
+		}
+		ConstantMethodref m = (ConstantMethodref) cp.getConstant(index,
+				za.ac.sun.cs.deepsea.constantpool.Constant.CONSTANT_Methodref);
+		ConstantNameAndType nt = (ConstantNameAndType) cp.getConstant(m.getNameAndTypeIndex(),
 				za.ac.sun.cs.deepsea.constantpool.Constant.CONSTANT_NameAndType);
 		return nt.getName(cp);
 	}
