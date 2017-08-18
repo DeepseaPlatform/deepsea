@@ -382,33 +382,33 @@ public abstract class Instruction {
 		case 152:
 			return new DCMPG(stepper, offset);
 		case 153:
-			return new IFEQ(stepper, offset, operandU2);
+			return new IFEQ(stepper, offset, operandS2);
 		case 154:
-			return new IFNE(stepper, offset, operandU2);
+			return new IFNE(stepper, offset, operandS2);
 		case 155:
-			return new IFLT(stepper, offset, operandU2);
+			return new IFLT(stepper, offset, operandS2);
 		case 156:
-			return new IFGE(stepper, offset, operandU2);
+			return new IFGE(stepper, offset, operandS2);
 		case 157:
-			return new IFGT(stepper, offset, operandU2);
+			return new IFGT(stepper, offset, operandS2);
 		case 158:
-			return new IFLE(stepper, offset, operandU2);
+			return new IFLE(stepper, offset, operandS2);
 		case 159:
-			return new IF_ICMPEQ(stepper, offset, operandU2);
+			return new IF_ICMPEQ(stepper, offset, operandS2);
 		case 160:
-			return new IF_ICMPNE(stepper, offset, operandU2);
+			return new IF_ICMPNE(stepper, offset, operandS2);
 		case 161:
-			return new IF_ICMPLT(stepper, offset, operandU2);
+			return new IF_ICMPLT(stepper, offset, operandS2);
 		case 162:
-			return new IF_ICMPGE(stepper, offset, operandU2);
+			return new IF_ICMPGE(stepper, offset, operandS2);
 		case 163:
-			return new IF_ICMPGT(stepper, offset, operandU2);
+			return new IF_ICMPGT(stepper, offset, operandS2);
 		case 164:
-			return new IF_ICMPLE(stepper, offset, operandU2);
+			return new IF_ICMPLE(stepper, offset, operandS2);
 		case 165:
-			return new IF_ACMPEQ(stepper, offset, operandU2);
+			return new IF_ACMPEQ(stepper, offset, operandS2);
 		case 166:
-			return new IF_ACMPNE(stepper, offset, operandU2);
+			return new IF_ACMPNE(stepper, offset, operandS2);
 		case 167:
 			return new GOTO(stepper, offset, operandU2);
 		case 168:
@@ -472,9 +472,9 @@ public abstract class Instruction {
 		case 197:
 			return new MULTIANEWARRAY(stepper, offset, operandU2, operand3U1);
 		case 198:
-			return new IFNULL(stepper, offset, operandU2);
+			return new IFNULL(stepper, offset, operandS2);
 		case 199:
-			return new IFNONNULL(stepper, offset, operandU2);
+			return new IFNONNULL(stepper, offset, operandS2);
 		case 200:
 			return new GOTO_W(stepper, offset, operandS4);
 		case 201:
