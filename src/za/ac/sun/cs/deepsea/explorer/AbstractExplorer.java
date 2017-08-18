@@ -23,6 +23,7 @@ public abstract class AbstractExplorer implements Explorer {
 	 */
 	public AbstractExplorer(Diver diver) {
 		this.diver = diver;
+		diver.addReporter(this);
 	}
 
 }

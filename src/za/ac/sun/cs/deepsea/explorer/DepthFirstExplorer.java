@@ -1,5 +1,6 @@
 package za.ac.sun.cs.deepsea.explorer;
 
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -50,6 +51,11 @@ public class DepthFirstExplorer extends AbstractExplorer {
 		// props.setProperty("green.service.model.modeller", "za.ac.sun.cs.green.service.choco3.ModelChoco3Service");
 		Configuration config = new Configuration(solver, properties);
 		config.configure();
+	}
+
+	@Override
+	public String getName() {
+		return "DepthFirstExplorer";
 	}
 
 	@Override
@@ -111,8 +117,8 @@ public class DepthFirstExplorer extends AbstractExplorer {
 	}
 
 	@Override
-	public void report() {
-		log.info("#explored: " + pathCounter);
+	public void report(PrintWriter out) {
+		out.println("# paths explored: " + pathCounter);
 	}
 	
 }

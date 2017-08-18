@@ -12,10 +12,17 @@ import za.ac.sun.cs.green.expr.Constant;
  * 
  * @author Jaco Geldenhuys (geld@sun.ac.za)
  */
-public interface Explorer {
+public interface Explorer extends Reporter {
 
 	/**
-	 * Proposes new concrete values in response to a newly discovered path
+	 * Return the name of this explorer.
+	 * 
+	 * @return the name of the explorer
+	 */
+	public String getName();
+
+	/**
+	 * Propose new concrete values in response to a newly discovered path
 	 * condition.
 	 * 
 	 * DEEPSEA will create a singleton instance of this class. The "constrained"
@@ -40,10 +47,5 @@ public interface Explorer {
 	 * @return a mapping from variables names to values, or {@code null}
 	 */
 	public Map<String, Constant> refine(Dive dive);
-
-	/**
-	 * Produce a report at the end of a session. 
-	 */
-	public void report();
 
 }

@@ -1,16 +1,20 @@
 package za.ac.sun.cs.deepsea.diver;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-//import java.util.Map;
-//import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.sun.jdi.Method;
 
 import za.ac.sun.cs.deepsea.explorer.Explorer;
+import za.ac.sun.cs.deepsea.explorer.Reporter;
 import za.ac.sun.cs.deepsea.logging.LogHandler;
 import za.ac.sun.cs.green.expr.Constant;
 
@@ -21,7 +25,7 @@ import za.ac.sun.cs.green.expr.Constant;
  * 
  * @author Jaco Geldenhuys (geld@sun.ac.za)
  */
-public class Diver {
+public class Diver implements Reporter {
 
 	/**
 	 * The name of this instance of {@link Diver}.
@@ -32,7 +36,7 @@ public class Diver {
 	 * The log handler associated with this {@link Diver} instance.
 	 */
 	private final LogHandler logHandler;
-	
+
 	/**
 	 * The log associated with this {@link Diver} instance.
 	 */
@@ -72,6 +76,8 @@ public class Diver {
 	 */
 	private Explorer explorer;
 
+	private List<Reporter> reporters = new LinkedList<>();
+
 	/**
 	 * Constructs a {@link Diver} instance. Such an instance represents one
 	 * "session" of DEEPSEA.
@@ -87,6 +93,7 @@ public class Diver {
 		logHandler = new LogHandler(Level.ALL);
 		log.addHandler(logHandler);
 		diveCounter = 0;
+		addReporter(this);
 	}
 
 	/**
@@ -99,14 +106,15 @@ public class Diver {
 	}
 
 	/**
-	 * Return the {@link LogHandler} associated with this instance of {@link Diver}.
+	 * Return the {@link LogHandler} associated with this instance of
+	 * {@link Diver}.
 	 * 
 	 * @return the log handler associated with this instance
 	 */
 	public LogHandler getLogHandler() {
 		return logHandler;
 	}
-	
+
 	/**
 	 * Return the {@link Logger} associated with this instance of {@link Diver}.
 	 * 
@@ -115,7 +123,7 @@ public class Diver {
 	public Logger getLog() {
 		return log;
 	}
-	
+
 	/**
 	 * Returns the current value of the dive counter and increments it.
 	 * 
@@ -156,6 +164,10 @@ public class Diver {
 	 */
 	public void setArgs(String args) {
 		this.args = args;
+	}
+
+	public void addReporter(Reporter reporter) {
+		reporters.add(0, reporter);
 	}
 
 	/**
@@ -222,21 +234,75 @@ public class Diver {
 	}
 
 	/**
+	 * Time when work started.
+	 */
+	private Calendar started;
+
+	/**
+	 * Time when work stopped.
+	 */
+	private Calendar stopped;
+
+	/**
 	 * Run the diver.
 	 */
 	public void start() {
 		if (explorer == null) {
 			log.severe("No explorer specified -- terminating");
 		} else {
+			started = Calendar.getInstance();
 			Map<String, Constant> concreteValues = null;
 			do {
 				Dive d = new Dive(this, concreteValues);
 				d.dive();
 				concreteValues = explorer.refine(d);
 			} while (concreteValues != null);
-			explorer.report();
+			stopped = Calendar.getInstance();
+			/*
+			 * Give each reporter a chance to report. Note that reporters are
+			 * called on in the *reverse* order of their registration.
+			 */
+			for (Reporter reporter : reporters) {
+				report(reporter);
+			}
 		}
-		log.info("DONE");
 	}
 
+	public void report(PrintWriter out) {
+		out.println("Started: " + dateFormat.format(started.getTime()));
+		out.println("Stopped: " + dateFormat.format(stopped.getTime()));
+		out.println("~~~ DONE ~~~");
+	}
+
+	/**
+	 * Line separator
+	 */
+	static final String LS = System.getProperty("line.separator");
+
+	/**
+	 * Private date formatter, used for reports.
+	 */
+	private static final DateFormat dateFormat = new SimpleDateFormat("EEE d MMM yyyy HH:mm:ss");
+
+	/**
+	 * Generate and log the exporer's report.
+	 * 
+	 * @param reporter
+	 * 
+	 * @param started
+	 *            time when the diver was started
+	 */
+	private void report(Reporter reporter) {
+		log.info("");
+		log.info("======================================================================");
+		log.info("== " + reporter.getName());
+		final StringWriter reportWriter = new StringWriter();
+		reporter.report(new PrintWriter(reportWriter));
+		String[] reportLines = reportWriter.toString().split(LS);
+		for (String line : reportLines) {
+			log.info(line);
+		}
+	}
+
+	
 }
