@@ -61,7 +61,7 @@ public class Stepper extends AbstractEventListener {
 
 	private static final StringBuilder sb = new StringBuilder();
 
-	private static final int SHOW_STACK_ENTRY_COUNT = 3;
+	private static final int SHOW_STACK_ENTRY_COUNT = 4;
 
 	private final Map<ReferenceType, ConstantPool> cpMap = new HashMap<>();
 
@@ -114,6 +114,9 @@ public class Stepper extends AbstractEventListener {
 						int k = frame.size();
 						for (int i = 0; i < SHOW_STACK_ENTRY_COUNT && k > 0; i++) {
 							sb.append(' ').append(frame.peek(--k));
+						}
+						if ((SHOW_STACK_ENTRY_COUNT > 0) && (k > 0)) {
+							sb.append(" ...");
 						}
 						sb.append(" }");
 					}
