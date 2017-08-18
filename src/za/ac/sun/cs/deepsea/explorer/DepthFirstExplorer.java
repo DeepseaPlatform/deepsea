@@ -31,6 +31,8 @@ public class DepthFirstExplorer extends AbstractExplorer {
 
 	private final Set<String> visitedSignatures = new HashSet<>();
 
+	private final Set<String> infeasibleSignatures = new HashSet<>();
+	
 	private int pathCounter = 0;
 
 	/**
@@ -62,13 +64,32 @@ public class DepthFirstExplorer extends AbstractExplorer {
 	public Map<String, Constant> refine(Dive dive) {
 		pathCounter++;
 		String signature = dive.getSignature();
+		Expression pathCondition = dive.getPathCondition();
 		if (!visitedSignatures.add(signature)) {
 			log.severe("revisit of signature \"" + signature + "\"");
-			return null;
+//			return null;
+			
+			log.severe("truncating...");
+			while ((signature.length() > 0) && (visitedSignatures.contains(signature) || infeasibleSignatures.contains(signature))) {
+				signature = signature.substring(1);
+				assert pathCondition instanceof Operation;
+				Operation pc = (Operation) pathCondition;
+				assert pc.getOperator() == Operator.AND;
+				pathCondition = pc.getOperand(1);
+			}
+			
+			/* TODO the following replace for the previous line didn't work:
+			log.severe("truncating...");
+			signature = signature.substring(1);
+			assert pathCondition instanceof Operation;
+			Operation pc = (Operation) pathCondition;
+			assert pc.getOperator() == Operator.AND;
+			pathCondition = pc.getOperand(1);
+			*/
+		} else {
+			log.finest("path signature: " + signature);
+			log.fine("path condition: " + pathCondition);
 		}
-		log.finest("path signature: " + signature);
-		Expression pathCondition = dive.getPathCondition();
-		log.fine("path condition: " + pathCondition);
 		while (signature.length() > 0) {
 			// flip the first char ('0' <-> '1') of signature
 			char firstSignature = (signature.charAt(0) == '0') ? '1' : '0';
@@ -99,6 +120,7 @@ public class DepthFirstExplorer extends AbstractExplorer {
 					signature = restSignature;
 					pathCondition = pc.getOperand(1);
 					log.finest("no model");
+					infeasibleSignatures.add(signature);
 				} else {
 					// translate model
 					Map<String, Constant> newModel = new HashMap<>();
