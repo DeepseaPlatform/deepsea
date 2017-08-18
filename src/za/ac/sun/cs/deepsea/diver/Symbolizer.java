@@ -1,7 +1,9 @@
 package za.ac.sun.cs.deepsea.diver;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 import com.sun.jdi.Location;
@@ -40,6 +42,8 @@ public class Symbolizer {
 	private Expression pendingExtraConjunct = null;
 
 	private int pendingTarget = -1;
+
+	private Set<String> conjunctSet = new HashSet<>();
 
 	public Symbolizer(final Diver diver) {
 		//		this.diver = diver;
@@ -104,7 +108,7 @@ public class Symbolizer {
 
 	public void pushConjunct(Expression conjunct, int target) {
 		assert pendingConjunct == null;
-		if (!isConstantConjunct(conjunct)) {
+		if (!isConstantConjunct(conjunct) && conjunctSet.add(conjunct.toString())) {
 			pendingConjunct = conjunct;
 			pendingTarget = target;
 		}
