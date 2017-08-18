@@ -35,6 +35,10 @@ public class DepthFirstExplorer extends AbstractExplorer {
 	
 	private int pathCounter = 0;
 
+	private int revisitCounter = 0;
+	
+	private int unSatCounter = 0;
+	
 	/**
 	 * Constructs an instance of the depth-first explorer, given the associated diver.
 	 * 
@@ -67,6 +71,7 @@ public class DepthFirstExplorer extends AbstractExplorer {
 		Expression pathCondition = dive.getPathCondition();
 		if (!visitedSignatures.add(signature)) {
 			log.severe("revisit of signature \"" + signature + "\"");
+			revisitCounter++;
 //			return null;
 			
 			log.severe("truncating...");
@@ -121,6 +126,7 @@ public class DepthFirstExplorer extends AbstractExplorer {
 					pathCondition = pc.getOperand(1);
 					log.finest("no model");
 					infeasibleSignatures.add(signature);
+					unSatCounter++;
 				} else {
 					// translate model
 					Map<String, Constant> newModel = new HashMap<>();
@@ -141,6 +147,9 @@ public class DepthFirstExplorer extends AbstractExplorer {
 	@Override
 	public void report(PrintWriter out) {
 		out.println("# paths explored: " + pathCounter);
+		out.println("# paths revisited: " + revisitCounter);
+		out.println("# unique paths: " + pathCounter + "-" + revisitCounter + "=" + (pathCounter - revisitCounter));
+		out.println("# UNSAT path conditions: " + unSatCounter);
 	}
 	
 }
