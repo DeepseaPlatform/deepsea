@@ -7,22 +7,32 @@ import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
 /**
- * Customized log message formatting.
+ * Customized verbose log message formatting.
+ * In the normal run of things, users should not have to instantiate this class themselves.
  * 
  * @author Jaco Geldenhuys (geld@sun.ac.za)
  */
 public class VerboseFormatter extends Formatter {
 
 	/**
-	 * A private instance used for formatting timestamps.
+	 * A private {@link Date} instance used for formatting timestamps.
 	 */
 	private static Date date = new Date();
 
 	/**
-	 * 
+	 * The format string passed to {@link String#format(String, Object...)}.
+	 * This string contains a lot more detail that its counterpart in
+	 * {@link LogFormatter}.
 	 */
 	private String format = "[%1$tY%1$tm%1$td-%1$tH:%1$tM:%1$tS %2$s %4$s] %5$s%6$s%n";
 
+	/**
+	 * Constructs an instance of a {@link VerboseFormatter}.
+	 */
+	public VerboseFormatter() {
+		super();
+	}
+	
 	/**
 	 * Formats the given log record and return the formatted string.
 	 * 

@@ -13,13 +13,21 @@ import java.util.logging.StreamHandler;
  */
 public class LogHandler extends StreamHandler {
 
+	/**
+	 * The terse formatter used by this {@link LogHandler}.
+	 * Note that it is static and therefore shared by all instances.
+	 */
 	private static final Formatter logFormatter = new LogFormatter();
 
+	/**
+	 * The verbose formatter used by this {@link LogHandler}.
+	 * Note that it is static and therefore shared by all instances.
+	 */
 	private static final Formatter verboseFormatter = new VerboseFormatter();
 
 	/**
 	 * Constructs a {@link StreamHandler} that publishes log records to
-	 * {@code System.out} using {@link LogFormatter} to reformat the message.
+	 * {@link System#out} using {@link LogFormatter} to reformat the message.
 	 */
 	public LogHandler() {
 		super(System.out, logFormatter);
@@ -27,7 +35,7 @@ public class LogHandler extends StreamHandler {
 
 	/**
 	 * Constructs a {@link StreamHandler} that publishes log records to
-	 * {@code System.out} using {@link LogFormatter} to reformat the message,
+	 * {@link System#out} using {@link LogFormatter} to reformat the message,
 	 * and setting the handler's level to {@code level}.
 	 * 
 	 * @param level
@@ -38,6 +46,11 @@ public class LogHandler extends StreamHandler {
 		setLevel(level);
 	}
 
+	/**
+	 * Switches to either the verbose of the terse formatter, based on the parameter.
+	 * 
+	 * @param isVerbose flag to select verbose ({@code true}) or terse ({@code false}) formatter
+	 */
 	public void setVerbose(boolean isVerbose) {
 		if (isVerbose) {
 			setFormatter(verboseFormatter);
@@ -46,17 +59,23 @@ public class LogHandler extends StreamHandler {
 		}
 	}
 
+	/**
+	 * Switches to the verbose formatter.
+	 */
 	public void setVerbose() {
 		setVerbose(true);
 	}
 
+	/**
+	 * Switches to the terse formatter.
+	 */
 	public void setTerse() {
 		setVerbose(false);
 	}
 
 	/**
 	 * Forces any data that may have been buffered to the underlying output
-	 * device, but does <i>not</i> close {@code System.out}.
+	 * device, but does <i>not</i> close {@link System#out}.
 	 */
 	@Override
 	public void close() {
