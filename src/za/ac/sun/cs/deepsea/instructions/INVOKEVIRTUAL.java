@@ -31,7 +31,8 @@ public class INVOKEVIRTUAL extends Instruction {
 	}
 
 	@Override
-	public void execute(StepEvent event, Location loc, Symbolizer symbolizer) {
+	public void execute(StepEvent event, Symbolizer symbolizer) {
+		Location loc = event.location();
 		if (methodName == null) {
 			ReferenceType clas = loc.declaringType();
 			methodName = stepper.getMethodName(clas, index);

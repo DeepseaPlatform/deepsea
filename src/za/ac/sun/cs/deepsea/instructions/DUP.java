@@ -1,6 +1,5 @@
 package za.ac.sun.cs.deepsea.instructions;
 
-import com.sun.jdi.Location;
 import com.sun.jdi.event.StepEvent;
 
 import za.ac.sun.cs.deepsea.diver.Stepper;
@@ -14,7 +13,7 @@ public class DUP extends Instruction {
 	}
 
 	@Override
-	public void execute(StepEvent event, Location loc, Symbolizer symbolizer) {
+	public void execute(StepEvent event, Symbolizer symbolizer) {
 		SymbolicFrame frame = symbolizer.getTopFrame();
 		frame.push(frame.peek());
 	}

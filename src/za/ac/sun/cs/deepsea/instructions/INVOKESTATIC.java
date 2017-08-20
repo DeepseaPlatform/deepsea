@@ -1,6 +1,5 @@
 package za.ac.sun.cs.deepsea.instructions;
 
-import com.sun.jdi.Location;
 import com.sun.jdi.ReferenceType;
 import com.sun.jdi.event.StepEvent;
 
@@ -29,7 +28,7 @@ public class INVOKESTATIC extends Instruction {
 	}
 
 	@Override
-	public void execute(StepEvent event, Location loc, Symbolizer symbolizer) {
+	public void execute(StepEvent event, Symbolizer symbolizer) {
 		/*
 		 * First we throw away the arguments. We can do this, because
 		 * Stepper.getArgumentCount() will return 0 for "monitored" methods. For
@@ -38,7 +37,7 @@ public class INVOKESTATIC extends Instruction {
 		 * arguments passed to the code.
 		 */
 		SymbolicFrame frame = symbolizer.getTopFrame();
-		ReferenceType clas = loc.declaringType();
+		ReferenceType clas = event.location().declaringType();
 		int argumentCount = stepper.getArgumentCount(clas, index);
 		if (argumentCount > 0) {
 			while (argumentCount-- > 0) {

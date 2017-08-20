@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import com.sun.jdi.Location;
 import com.sun.jdi.event.StepEvent;
 
 import za.ac.sun.cs.deepsea.diver.Stepper;
@@ -17,39 +16,105 @@ import za.ac.sun.cs.green.expr.Operation;
 import za.ac.sun.cs.green.expr.Operation.Operator;
 import za.ac.sun.cs.green.util.Configuration;
 
+/**
+ * Superclass of all symbolic JVM bytecode instructions.
+ * 
+ * @author Jaco Geldenhuys (geld@sun.ac.za)
+ */
 public abstract class Instruction {
+
+	/**
+	 * A {@link StringBuilder} used exclusively for constructing log messages.
+	 */
+	protected static final StringBuilder sb = new StringBuilder();
 
 	protected static int variableCount = 0;
 
-	protected static final StringBuilder sb = new StringBuilder();
-
+	/**
+	 * The instance of {@link Stepper} that created this instruction and "in"
+	 * which the instruction will execute.
+	 */
 	protected final Stepper stepper;
 
+	/**
+	 * The position (offset) of this instruction in the bytecode of the
+	 * containing method.
+	 */
 	protected final int position;
-	
+
+	/**
+	 * The opcode for the instruction.
+	 */
 	protected final int opcode;
-	
+
+	/**
+	 * Constructs a new instruction. The method simply stores the parameters
+	 * internally.
+	 * 
+	 * @param stepper
+	 *            the {@link Stepper} associated with this instruction
+	 * @param position
+	 *            offset of instruction in its method's bytecode
+	 * @param opcode
+	 *            the instruction's opcode
+	 */
 	public Instruction(Stepper stepper, int position, int opcode) {
 		this.stepper = stepper;
 		this.position = position;
 		this.opcode = opcode;
 	}
 
+	/**
+	 * Returns the offset of the instruciton in its method's bytecode.
+	 * 
+	 * @return the offset of the instruction in its method's bytecode
+	 */
 	public int getPosition() {
 		return position;
 	}
-	
+
+	/**
+	 * Returns the opcode of the instruction.
+	 * 
+	 * @return the opcode of the instruction
+	 */
 	public int getOpcode() {
 		return opcode;
 	}
 
+	/**
+	 * Returns the size (number of bytecodes) that the instruction spans. This
+	 * version of the method returns the constant {@code 1}, but longer
+	 * instructions will override this value.
+	 * 
+	 * @return the size of the instructions (in bytecodes)
+	 */
 	public int getSize() {
 		return 1;
 	}
 
-	public void execute(StepEvent event, Location loc, Symbolizer symbolizer) {
+	/**
+	 * Responds to the {@link StepEvent} by executing the instruction. This
+	 * version of the method does nothing, but those instructions that influence
+	 * the symbolic state will override this method.
+	 * 
+	 * @param event
+	 *            the triggering event
+	 * @param symbolizer
+	 *            the symbolic state
+	 */
+	public void execute(StepEvent event, Symbolizer symbolizer) {
 	}
 
+	/**
+	 * Returns a string that represents the instruction. The default is to
+	 * return just the opcode and the size of the instruction, but specific
+	 * instructions override this method to produce more user-friendly
+	 * information.
+	 * 
+	 * @return a string representation of the instruction
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 		sb.setLength(0);
@@ -58,6 +123,18 @@ public abstract class Instruction {
 		return sb.toString();
 	}
 
+	/**
+	 * Creates a new instruction by decoding the bytecode stored at position
+	 * {@code offset} in the array {@code bytecodes}.
+	 * 
+	 * @param stepper
+	 *            the {@link Stepper} to associate with the new instruction
+	 * @param offset
+	 *            the position of the instruction in the method's bytecode
+	 * @param bytecodes
+	 *            the method's byte
+	 * @return the decoded instruction
+	 */
 	public static Instruction createInstruction(Stepper stepper, int offset, byte[] bytecodes) {
 		int u0 = bytecodes[offset] & 0xFF;
 		int u1 = (offset + 1 < bytecodes.length) ? (bytecodes[offset + 1] & 0xFF) : 0;
@@ -493,6 +570,9 @@ public abstract class Instruction {
 		}
 	}
 
+	/**
+	 * An instance of the Green solver used to detect nonlinear expression.
+	 */
 	private static Green solver = null;
 
 	private static final Map<IntVariable, Expression> substitutions = new HashMap<>();
@@ -504,7 +584,8 @@ public abstract class Instruction {
 			properties.setProperty("green.log.level", "OFF");
 			properties.setProperty("green.services", "simplify");
 			properties.setProperty("green.service.simplify", "canonizer)");
-			properties.setProperty("green.service.simplify.canonizer", "za.ac.sun.cs.green.service.canonizer.SATLeafCanonizerService");				
+			properties.setProperty("green.service.simplify.canonizer",
+					"za.ac.sun.cs.green.service.canonizer.SATLeafCanonizerService");
 			Configuration config = new Configuration(solver, properties);
 			config.configure();
 		}
@@ -515,7 +596,7 @@ public abstract class Instruction {
 		substitutions.clear();
 		return approximateNonlinearExpression0(expression);
 	}
-	
+
 	public Expression approximateNonlinearExpression0(Expression expression) {
 		if (expression instanceof IntVariable) {
 			IntVariable variable = (IntVariable) expression;

@@ -1,6 +1,5 @@
 package za.ac.sun.cs.deepsea.instructions;
 
-import com.sun.jdi.Location;
 import com.sun.jdi.ReferenceType;
 import com.sun.jdi.event.StepEvent;
 
@@ -31,9 +30,9 @@ public class LDC extends Instruction {
 	}
 
 	@Override
-	public void execute(StepEvent event, Location loc, Symbolizer symbolizer) {
+	public void execute(StepEvent event, Symbolizer symbolizer) {
 		SymbolicFrame frame = symbolizer.getTopFrame();
-		ReferenceType clas = loc.declaringType();
+		ReferenceType clas = event.location().declaringType();
 		Constant constant = stepper.getConstant(clas, index);
 		if (constant instanceof ConstantInteger) {
 			int value = ((ConstantInteger) constant).getValue();

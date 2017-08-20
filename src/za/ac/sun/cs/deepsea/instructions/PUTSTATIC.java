@@ -1,6 +1,5 @@
 package za.ac.sun.cs.deepsea.instructions;
 
-import com.sun.jdi.Location;
 import com.sun.jdi.event.StepEvent;
 
 import za.ac.sun.cs.deepsea.diver.Stepper;
@@ -26,9 +25,10 @@ public class PUTSTATIC extends Instruction {
 	}
 	
 	@Override
-	public void execute(StepEvent event, Location loc, Symbolizer symbolizer) {
+	public void execute(StepEvent event, Symbolizer symbolizer) {
 		SymbolicFrame frame = symbolizer.getTopFrame();
 		frame.pop();
+		// TODO FIX!!
 	}
 	
 	@Override

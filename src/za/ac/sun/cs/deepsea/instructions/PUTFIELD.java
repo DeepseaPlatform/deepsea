@@ -1,6 +1,5 @@
 package za.ac.sun.cs.deepsea.instructions;
 
-import com.sun.jdi.Location;
 import com.sun.jdi.ReferenceType;
 import com.sun.jdi.event.StepEvent;
 
@@ -31,9 +30,9 @@ public class PUTFIELD extends Instruction {
 	}
 	
 	@Override
-	public void execute(StepEvent event, Location loc, Symbolizer symbolizer) {
+	public void execute(StepEvent event, Symbolizer symbolizer) {
 		if (fieldName == null) {
-			ReferenceType clas = loc.declaringType();
+			ReferenceType clas = event.location().declaringType();
 			fieldName = stepper.getFieldName(clas, index);
 		}
 		SymbolicFrame frame = symbolizer.getTopFrame();
