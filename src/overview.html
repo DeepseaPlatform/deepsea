@@ -1,5 +1,51 @@
 <body>
 
-<p>Hello, world</p>
+	<p>Deep Symbolic Execution Agent (DEEPSEA) is a program analysis
+		tool.</p>
+
+	<p>With these tools it monitors the execution of a Java program. As
+		the program executes concretely, DEEPSEA collects information to
+		describe the execution trace symbolically. At the end of the
+		execution, the path is modified and the
+		[Green](http://www.green.green) library is used to find a model for
+		the modified path condition.</p>
+
+<h2>Installation</h2>
+
+<p>To install DEEPSEA, simply import the project in Eclipse.  If you are using another IDE, you may have to import it or manually tweak the settings.</p>
+
+<p>You will have to make sure that the build path is set correctly.  It must include:</p>
+
+<ul>
+<li><code>/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home/lib/tools.jar</code></li>
+</ul>
+
+
+You may have to *tweak* the location of the library.
+
+Create a run configuration for DEEPSEA:
+ 
+  * In the "Arguments" tab, set the "Working directory" (at the bottom of the panel) to "Other" and fill in
+     
+        ${workspace_loc:deepsea/bin}
+
+<h2>Usage</h2>
+
+To use DEEPSEA:
+
+ 1. Highlight a target program properties file (either in an editor window or in the Eclipse navigator).
+ 2. Launch the DEEPSEA run configuration.
+
+The <a href="configuration.html">Configuration file</a> page describes the settings.
+
+<h2>Authors</h2>
+
+  * [Jaco Geldenhuys](mailto://geld@sun.ac.za)
+  * [Willem Visser](mailto://wvisser@sun.ac.za)
+
+### Contributors
+
+  * Someone
+  * Someone else
 
 </body>
