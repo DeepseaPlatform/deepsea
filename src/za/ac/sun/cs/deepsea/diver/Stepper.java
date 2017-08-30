@@ -283,13 +283,13 @@ public class Stepper extends AbstractEventListener {
 			cpMap.put(clas, cp);
 		}
 		ConstantMethodref m = (ConstantMethodref) cp.getConstant(index,
-				za.ac.sun.cs.deepsea.constantpool.Constant.CONSTANT_Methodref);
+				za.ac.sun.cs.deepsea.constantpool.Constants.CONSTANT_Methodref);
 		String name = m.getClass(cp).replace('/', '.');
 		if (!mgr.isFiltered(name)) {
 			return -1;
 		}
 		ConstantNameAndType nt = (ConstantNameAndType) cp.getConstant(m.getNameAndTypeIndex(),
-				za.ac.sun.cs.deepsea.constantpool.Constant.CONSTANT_NameAndType);
+				za.ac.sun.cs.deepsea.constantpool.Constants.CONSTANT_NameAndType);
 		return countArguments(nt.getSignature(cp));
 	}
 
@@ -333,13 +333,13 @@ public class Stepper extends AbstractEventListener {
 			cpMap.put(clas, cp);
 		}
 		ConstantMethodref m = (ConstantMethodref) cp.getConstant(index,
-				za.ac.sun.cs.deepsea.constantpool.Constant.CONSTANT_Methodref);
+				za.ac.sun.cs.deepsea.constantpool.Constants.CONSTANT_Methodref);
 		String name = m.getClass(cp).replace('/', '.');
 		if (!mgr.isFiltered(name)) {
 			return "?";
 		}
 		ConstantNameAndType nt = (ConstantNameAndType) cp.getConstant(m.getNameAndTypeIndex(),
-				za.ac.sun.cs.deepsea.constantpool.Constant.CONSTANT_NameAndType);
+				za.ac.sun.cs.deepsea.constantpool.Constants.CONSTANT_NameAndType);
 		return extractReturnType(nt.getSignature(cp));
 	}
 
@@ -367,9 +367,9 @@ public class Stepper extends AbstractEventListener {
 			cpMap.put(clas, cp);
 		}
 		ConstantFieldref f = (ConstantFieldref) cp.getConstant(index,
-				za.ac.sun.cs.deepsea.constantpool.Constant.CONSTANT_Fieldref);
+				za.ac.sun.cs.deepsea.constantpool.Constants.CONSTANT_Fieldref);
 		ConstantNameAndType nt = (ConstantNameAndType) cp.getConstant(f.getNameAndTypeIndex(),
-				za.ac.sun.cs.deepsea.constantpool.Constant.CONSTANT_NameAndType);
+				za.ac.sun.cs.deepsea.constantpool.Constants.CONSTANT_NameAndType);
 		return nt.getName(cp);
 	}
 
@@ -385,9 +385,9 @@ public class Stepper extends AbstractEventListener {
 			cpMap.put(clas, cp);
 		}
 		ConstantMethodref m = (ConstantMethodref) cp.getConstant(index,
-				za.ac.sun.cs.deepsea.constantpool.Constant.CONSTANT_Methodref);
+				za.ac.sun.cs.deepsea.constantpool.Constants.CONSTANT_Methodref);
 		ConstantNameAndType nt = (ConstantNameAndType) cp.getConstant(m.getNameAndTypeIndex(),
-				za.ac.sun.cs.deepsea.constantpool.Constant.CONSTANT_NameAndType);
+				za.ac.sun.cs.deepsea.constantpool.Constants.CONSTANT_NameAndType);
 		return nt.getName(cp);
 	}
 

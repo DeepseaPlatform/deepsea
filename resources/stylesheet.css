@@ -67,9 +67,9 @@ sup {
 	font-size: 8px;
 }
 
-/*
-Document title and Copyright styles
-*/
+/*------------------------------------------------------------------------------
+ * Document title and Copyright styles
+ *----------------------------------------------------------------------------*/
 
 .clear {
 	clear: both;
@@ -105,9 +105,11 @@ Document title and Copyright styles
 	width: 5em;
 	font-weight: bold;
 }
-/*
-Navigation bar styles
-*/
+
+/*------------------------------------------------------------------------------
+ * Navigation bar styles
+ *----------------------------------------------------------------------------*/
+
 .bar {
 	background-color: #4D7A97;
 	color: #FFFFFF;
@@ -254,9 +256,10 @@ ul.subNavList li {
 	font-size: 13px;
 }
 
-/*
-Heading styles
-*/
+/*------------------------------------------------------------------------------
+ * Heading styles
+ *----------------------------------------------------------------------------*/
+
 div.details ul.blockList ul.blockList ul.blockList li.blockList h4, div.details ul.blockList ul.blockList ul.blockListLast li.blockList h4
 	{
 	background-color: #dee3e9;
@@ -339,9 +342,11 @@ ul.blockList li.blockList h2 {
 	font-size: 1.1em;
 	display: inline;
 }
-/*
-List styles
-*/
+
+/*------------------------------------------------------------------------------
+ * List styles
+ *----------------------------------------------------------------------------*/
+
 ul.horizontal li {
 	display: inline;
 	font-size: 0.9em;
@@ -619,11 +624,6 @@ ul.blockList ul.blockList ul.blockList li.blockList h3 {
 }
 
 div.block {
-	/*
-    font-size:14px;
-    font-family:'DejaVu Serif', Georgia, "Times New Roman", Times, serif;
-    */
-	
 }
 
 td.colLast div {
@@ -633,9 +633,11 @@ td.colLast div {
 td.colLast a {
 	padding-bottom: 3px;
 }
-/*
-Formatting effect styles
-*/
+
+/*------------------------------------------------------------------------------
+ * Formatting effect styles
+ *----------------------------------------------------------------------------*/
+
 .sourceLineNo {
 	color: green;
 	padding: 0 30px 0 0;

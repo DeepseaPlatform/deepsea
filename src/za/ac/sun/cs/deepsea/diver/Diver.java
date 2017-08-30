@@ -13,8 +13,8 @@ import java.util.logging.Logger;
 
 import com.sun.jdi.Method;
 
+import za.ac.sun.cs.deepsea.Reporter;
 import za.ac.sun.cs.deepsea.explorer.Explorer;
-import za.ac.sun.cs.deepsea.explorer.Reporter;
 import za.ac.sun.cs.deepsea.logging.LogHandler;
 import za.ac.sun.cs.green.expr.Constant;
 
@@ -271,6 +271,20 @@ public class Diver implements Reporter {
 	public void report(PrintWriter out) {
 		out.println("Started: " + dateFormat.format(started.getTime()));
 		out.println("Stopped: " + dateFormat.format(stopped.getTime()));
+		long diff = stopped.getTimeInMillis() - started.getTimeInMillis();
+		long milli = diff % 1000;
+		long sec = (diff / 1000) % 60;
+		long min = (diff / 60000) % 60;
+		long hour = diff / 3600000;
+		if (hour > 0) {
+			out.printf("Duration: %d:%02d:%02d.%03d hrs\n", hour, min, sec, milli);
+		} else if (min > 0) {
+			out.printf("Duration: %d:%02d.%03d min\n", min, sec, milli);
+		} else if (sec > 0) {
+			out.printf("Duration: %d.%03d sec\n", sec, milli);
+		} else {
+			out.printf("Duration: %d ms\n", milli);
+		}
 		out.println("~~~ DONE ~~~");
 	}
 
@@ -288,9 +302,6 @@ public class Diver implements Reporter {
 	 * Generate and log the exporer's report.
 	 * 
 	 * @param reporter
-	 * 
-	 * @param started
-	 *            time when the diver was started
 	 */
 	private void report(Reporter reporter) {
 		log.info("");

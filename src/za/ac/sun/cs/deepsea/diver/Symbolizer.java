@@ -140,7 +140,7 @@ public class Symbolizer {
 				pendingConjunct = null;
 				pendingExtraConjunct = null;
 			}
-			ins.execute(event, loc, this);
+			ins.execute(event, this);
 		}
 	}
 

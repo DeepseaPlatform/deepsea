@@ -9,11 +9,6 @@ abstract public class AbstractReader {
 
 	protected boolean isStopping = false;
 
-	/**
-	 * Constructor
-	 * 
-	 * @param name
-	 */
 	public AbstractReader() {
 	}
 

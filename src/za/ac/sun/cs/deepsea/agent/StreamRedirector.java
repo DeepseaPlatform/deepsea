@@ -15,16 +15,6 @@ public class StreamRedirector extends Thread {
 
 	private static final int BUFFER_SIZE = 2048;
 
-	/**
-	 * Set up for copy.
-	 * 
-	 * @param name
-	 *            Name of the thread
-	 * @param in
-	 *            Stream to copy from
-	 * @param out
-	 *            Stream to copy to
-	 */
 	public StreamRedirector(InputStream in, OutputStream out, boolean produceOutput) {
 		super();
 		InputStream interruptibleInputStream = Channels.newInputStream(Channels.newChannel(in));

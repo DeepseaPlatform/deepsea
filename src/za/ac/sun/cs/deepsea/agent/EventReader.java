@@ -38,12 +38,6 @@ public class EventReader extends AbstractReader {
 
 	private List<EventListener> eventListeners = new LinkedList<>();
 
-	/**
-	 * Constructor
-	 * 
-	 * @param name
-	 * @param queue
-	 */
 	public EventReader(final Diver diver, EventQueue queue) {
 		super();
 		this.log = diver.getLog();
