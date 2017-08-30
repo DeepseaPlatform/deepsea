@@ -1,10 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project default="greet">
-	
-	<target name="greet">
+<project default="build" name="deepsea">
+
+	<!-- ======================================================================
+SETTINGS
+=========================================================================== -->
+
+	<loadproperties srcFile="build.properties"/>
+	<property name="output.dir" value="bin"/>
+	<property name="junit.dir" value="${output.dir}/junit"/>
+	<property name="debug.level" value="source,lines,vars"/>
+	<path id="deepsea.srcpath">
+		<pathelement location="src"/>
+		<!-- <pathelement location="test"/> -->
+	</path>
+
+	<!-- ======================================================================
+TARGET init
+=========================================================================== -->
+
+	<target name="init">
+	</target>
+
+	<!-- ======================================================================
+TARGET build
+=========================================================================== -->
+
+	<target name="build" depends="init">
+		<!--
+		<javac debug="true" debuglevel="${debug.level}" destdir="${output.dir}" sourcepath="${deepsea.srcpath}" source="${source}" target="${target}" bootclasspath="${bootpath}" includeantruntime="false">
+		-->
+		<javac debug="true" debuglevel="${debug.level}" destdir="${output.dir}" sourcepath="${deepsea.srcpath}" includeantruntime="false">
+			<src path="src"/>
+			<classpath refid="deepsea.classpath"/>
+		</javac>
+		<!--
+		<javac debug="true" debuglevel="${debug.level}" destdir="${output.dir}" sourcepath="${deepsea.srcpath}" includeantruntime="false">
+			<src path="test"/>
+			<classpath refid="deepsea.classpath"/>
+		</javac>
+		-->
+	</target>
+
+
+	<!-- ======================================================================
+TARGET test
+THIS IS BROKEN !!!  Why?  Because there are no unit tests yet.
+=========================================================================== -->
+
+	<target name="test">
 		<echo>----------------------------------------------------------------------</echo>
-		<echo>B U I L D</echo>
+		<echo>TESTS</echo>
 		<echo>----------------------------------------------------------------------</echo>
+		<mkdir dir="${junit.dir}"/>
+		<junit fork="yes" printsummary="withOutAndErr">
+			<formatter type="xml"/>
+			<test name="za.ac.sun.cs.green.EntireSuite" todir="${junit.dir}"/>
+			<env key="DYLD_LIBRARY_PATH" value="lib"/>
+			<env key="LD_LIBRARY_PATH" value="lib"/>
+			<sysproperty key="java.library.path" value="${z3lib}:${cvc3lib}"/>
+			<classpath refid="green.classpath"/>
+		</junit>
+		<junitreport todir="${junit.dir}">
+			<fileset dir="${junit.dir}">
+				<include name="TEST-*.xml"/>
+			</fileset>
+			<report format="frames" todir="${junit.dir}"/>
+		</junitreport>
 	</target>
 
 </project>
