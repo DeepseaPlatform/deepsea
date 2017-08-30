@@ -25,7 +25,7 @@ TARGET init
 =========================================================================== -->
 
 	<target name="init">
-		<echo>${java.home}</echo>
+		<!-- <echo>${java.home}</echo> -->
 		<mkdir dir="${output.dir}"/>
 	</target>
 
