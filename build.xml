@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project default="build" name="deepsea">
 
-	<!-- ======================================================================
+<!-- ======================================================================
 SETTINGS
 =========================================================================== -->
 
-	<loadproperties srcFile="build.properties"/>
+	<!-- <loadproperties srcFile="build.properties"/> -->
 	<property name="output.dir" value="bin"/>
 	<property name="junit.dir" value="${output.dir}/junit"/>
 	<property name="debug.level" value="source,lines,vars"/>
@@ -13,22 +13,42 @@ SETTINGS
 		<pathelement location="src"/>
 		<!-- <pathelement location="test"/> -->
 	</path>
+	<property name="deepsea.srcpath" refid="deepsea.srcpath"/>
+	<path id="deepsea.classpath">
+		<pathelement location="${output.dir}"/>
+		<pathelement location="lib/green.jar"/>
+		<pathelement location="${java.home}/../lib/tools.jar"/>
+	</path>
 
-	<!-- ======================================================================
+<!-- ======================================================================
 TARGET init
 =========================================================================== -->
 
 	<target name="init">
+		<echo>${java.home}</echo>
+		<mkdir dir="${output.dir}"/>
 	</target>
 
-	<!-- ======================================================================
+<!-- ======================================================================
+TARGET clean
+=========================================================================== -->
+
+	<target name="clean">
+		<echo>----------------------------------------------------------------------</echo>
+		<echo>CLEAN</echo>
+		<echo>----------------------------------------------------------------------</echo>
+		<delete dir="${junit.dir}"/>
+		<delete dir="${output.dir}"/>
+	</target>
+
+<!-- ======================================================================
 TARGET build
 =========================================================================== -->
 
 	<target name="build" depends="init">
-		<!--
-		<javac debug="true" debuglevel="${debug.level}" destdir="${output.dir}" sourcepath="${deepsea.srcpath}" source="${source}" target="${target}" bootclasspath="${bootpath}" includeantruntime="false">
-		-->
+		<echo>----------------------------------------------------------------------</echo>
+		<echo>BUILD</echo>
+		<echo>----------------------------------------------------------------------</echo>
 		<javac debug="true" debuglevel="${debug.level}" destdir="${output.dir}" sourcepath="${deepsea.srcpath}" includeantruntime="false">
 			<src path="src"/>
 			<classpath refid="deepsea.classpath"/>
@@ -41,16 +61,16 @@ TARGET build
 		-->
 	</target>
 
-
-	<!-- ======================================================================
+<!-- ======================================================================
 TARGET test
 THIS IS BROKEN !!!  Why?  Because there are no unit tests yet.
 =========================================================================== -->
 
-	<target name="test">
+	<target name="test" depends="build">
 		<echo>----------------------------------------------------------------------</echo>
 		<echo>TESTS</echo>
 		<echo>----------------------------------------------------------------------</echo>
+		<!--
 		<mkdir dir="${junit.dir}"/>
 		<junit fork="yes" printsummary="withOutAndErr">
 			<formatter type="xml"/>
@@ -66,6 +86,7 @@ THIS IS BROKEN !!!  Why?  Because there are no unit tests yet.
 			</fileset>
 			<report format="frames" todir="${junit.dir}"/>
 		</junitreport>
+		-->
 	</target>
 
 </project>
