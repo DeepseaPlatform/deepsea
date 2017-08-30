@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="greet">
+	
+	<target name="greet">
+		<echo>----------------------------------------------------------------------</echo>
+		<echo>B U I L D</echo>
+		<echo>----------------------------------------------------------------------</echo>
+	</target>
+
+</project>
