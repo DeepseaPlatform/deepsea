@@ -6,3 +6,4 @@ test:
   image: junit:alpine
   script:
     - ant
+    
