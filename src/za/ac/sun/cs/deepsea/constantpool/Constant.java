@@ -3,80 +3,81 @@ package za.ac.sun.cs.deepsea.constantpool;
 import java.io.DataInput;
 import java.io.IOException;
 
+/**
+ * Base class for the representation of an entry in the constant pool.
+ * 
+ * @author Jaco Geldenhuys (geld@sun.ac.za)
+ */
 public abstract class Constant {
 
-	public static final byte CONSTANT_Utf8 = 1;
-
-	public static final byte CONSTANT_Integer = 3;
-
-	public static final byte CONSTANT_Float = 4;
-
-	public static final byte CONSTANT_Long = 5;
-
-	public static final byte CONSTANT_Double = 6;
-
-	public static final byte CONSTANT_Class = 7;
-
-	public static final byte CONSTANT_Fieldref = 9;
-
-	public static final byte CONSTANT_String = 8;
-
-	public static final byte CONSTANT_Methodref = 10;
-
-	public static final byte CONSTANT_InterfaceMethodref = 11;
-
-	public static final byte CONSTANT_NameAndType = 12;
-
-	public static final byte CONSTANT_MethodHandle = 15;
-
-	public static final byte CONSTANT_MethodType = 16;
-
-	public static final byte CONSTANT_InvokeDynamic = 18;
-
+	/**
+	 * The constant tag.
+	 */
 	private final byte tag;
 
+	/**
+	 * Constructs a constant by setting its {@code tag} field.
+	 * 
+	 * @param tag
+	 *            the tag in the constant pool
+	 */
 	protected Constant(byte tag) {
 		this.tag = tag;
 	}
 
+	/**
+	 * Returns the tag of this constant.
+	 * 
+	 * @return the tag of this constant
+	 */
+	public byte getTag() {
+		return tag;
+	}
+
+	/**
+	 * Utility method that reads, interprets, and constructs one constant pool
+	 * entry.
+	 * 
+	 * @param input
+	 *            the input stream of bytes that iterate over the constant pool
+	 * @return the new constant as constructed from the byte stream
+	 * @throws IOException
+	 *             if the input stream cannot be read
+	 */
 	public static Constant readConstant(DataInput input) throws IOException {
 		byte b = input.readByte();
 		switch (b) {
-		case CONSTANT_Class:
+		case Constants.CONSTANT_Class:
 			return new ConstantClass(input);
-		case CONSTANT_Fieldref:
+		case Constants.CONSTANT_Fieldref:
 			return new ConstantFieldref(input);
-		case CONSTANT_Methodref:
+		case Constants.CONSTANT_Methodref:
 			return new ConstantMethodref(input);
-		case CONSTANT_InterfaceMethodref:
+		case Constants.CONSTANT_InterfaceMethodref:
 			return new ConstantInterfaceMethodref(input);
-		case CONSTANT_String:
+		case Constants.CONSTANT_String:
 			return new ConstantString(input);
-		case CONSTANT_Integer:
+		case Constants.CONSTANT_Integer:
 			return new ConstantInteger(input);
-		case CONSTANT_Float:
+		case Constants.CONSTANT_Float:
 			return new ConstantFloat(input);
-		case CONSTANT_Long:
+		case Constants.CONSTANT_Long:
 			return new ConstantLong(input);
-		case CONSTANT_Double:
+		case Constants.CONSTANT_Double:
 			return new ConstantDouble(input);
-		case CONSTANT_NameAndType:
+		case Constants.CONSTANT_NameAndType:
 			return new ConstantNameAndType(input);
-		case CONSTANT_Utf8:
+		case Constants.CONSTANT_Utf8:
 			return new ConstantUtf8(input);
-		case CONSTANT_MethodHandle:
+		case Constants.CONSTANT_MethodHandle:
 			return new ConstantMethodHandle(input);
-		case CONSTANT_MethodType:
+		case Constants.CONSTANT_MethodType:
 			return new ConstantMethodType(input);
-		case CONSTANT_InvokeDynamic:
+		case Constants.CONSTANT_InvokeDynamic:
 			return new ConstantInvokeDynamic(input);
 		default:
 			throw new ConstantPool.ClassFormatException("Invalid byte tag in constant pool: " + b);
 		}
-	}
-
-	public final byte getTag() {
-		return tag;
 	}
 
 }
