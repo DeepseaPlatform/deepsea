@@ -5,5 +5,5 @@ test:
   stage: test
   image: localhost:5000/junitalpine
   script:
-    - ant
-    
+    - ant test
+
