@@ -201,7 +201,10 @@ public class Stepper extends AbstractEventListener {
 							expr = new IntConstant(((IntegerValue) actualValue).intValue());
 							varValue = expr;
 							if (symbolic) {
-								expr = new IntVariable(trigger.getParameterName(i), 0, 99);
+								String var = trigger.getParameterName(i);
+								int min = dive.getDiver().getMinBound(var);
+								int max = dive.getDiver().getMaxBound(var);
+								expr = new IntVariable(var, min, max);
 								if ((concrete != null) && (concrete instanceof IntConstant)) {
 									int value = ((IntConstant) concrete).getValue();
 									frame.setValue(args.get(i), vm.mirrorOf(value));

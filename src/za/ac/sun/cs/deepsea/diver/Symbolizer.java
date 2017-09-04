@@ -157,6 +157,7 @@ public class Symbolizer {
 		String fullFieldName = objectId + ":::" + fieldName;
 		Expression value = instanceData.get(fullFieldName);
 		if (value == null) {
+			// TODO create bounds on fields
 			value = new IntVariable("$q" + newVariableCount++, 0, 999);
 			instanceData.put(fullFieldName, value);
 		}

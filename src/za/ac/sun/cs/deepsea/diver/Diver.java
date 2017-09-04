@@ -5,6 +5,7 @@ import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,16 @@ import za.ac.sun.cs.green.expr.Constant;
  */
 public class Diver implements Reporter {
 
+	/**
+	 * The minimum value that integer variables can assume by default.
+	 */
+	private static final int DEFAULT_MIN_INT_VALUE = 0;
+
+	/**
+	 * The maximum value that integer variables can assume by default.
+	 */
+	private static final int DEFAULT_MAX_INT_VALUE = 99;
+	
 	/**
 	 * The name of this instance of {@link Diver}.
 	 */
@@ -63,8 +74,18 @@ public class Diver implements Reporter {
 	 * dive to symbolic mode. The trigger also describes which arguments are
 	 * treated symbolically, and which arguments stay concrete.
 	 */
-	private List<Trigger> triggers = new LinkedList<>();
+	private final List<Trigger> triggers = new LinkedList<>();
 
+	/**
+	 * Maps variable names to lower bounds. 
+	 */
+	private final Map<String, Integer> minBounds = new HashMap<>();
+
+	/**
+	 * Maps variable names to upper bounds. 
+	 */
+	private final Map<String, Integer> maxBounds = new HashMap<>();
+	
 	/**
 	 * Whether or not the output of the target program should be displayed
 	 * ({@code true}) or suppressed ({@code false}).
@@ -197,8 +218,53 @@ public class Diver implements Reporter {
 	}
 
 	/**
-	 * @return
+	 * Sets the minimum value of a variable.
+	 * 
+	 * @param variable the variable name
+	 * @param min the minimum value
 	 */
+	public void setMinBound(String variable, int min) {
+		minBounds.put(variable, min);
+	}
+
+	/**
+	 * Returns the minimum value associated with a variable.
+	 * 
+	 * @param variable the variable name
+	 * @return the minimum value that the integer variable can assume
+	 */
+	public int getMinBound(String variable) {
+		Integer min = minBounds.get(variable);
+		if (min == null) {
+			min = DEFAULT_MIN_INT_VALUE;
+		}
+		return min;
+	}
+
+	/**
+	 * Sets the maximum value of a variable.
+	 * 
+	 * @param variable the variable name
+	 * @param max the maximum value
+	 */
+	public void setMaxBound(String variable, int max) {
+		maxBounds.put(variable, max);
+	}
+
+	/**
+	 * Returns the maximum value associated with a variable.
+	 * 
+	 * @param variable the variable name
+	 * @return the maximum value that the integer variable can assume
+	 */
+	public int getMaxBound(String variable) {
+		Integer max = maxBounds.get(variable);
+		if (max == null) {
+			max = DEFAULT_MAX_INT_VALUE;
+		}
+		return max;
+	}
+
 	/**
 	 * @return
 	 */
@@ -314,6 +380,6 @@ public class Diver implements Reporter {
 			log.info(line);
 		}
 	}
-
+	
 	
 }

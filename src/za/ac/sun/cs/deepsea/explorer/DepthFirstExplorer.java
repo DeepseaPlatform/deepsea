@@ -257,6 +257,7 @@ public class DepthFirstExplorer extends AbstractExplorer {
 	@Override
 	public Map<String, Constant> refine(Dive dive) {
 		pathCounter++;
+		if (pathCounter > 10) { System.exit(1); }
 		String signature = dive.getSignature();
 		Expression pathCondition = dive.getPathCondition();
 		if (!visitedSignatures.add(signature)) {
@@ -276,7 +277,7 @@ public class DepthFirstExplorer extends AbstractExplorer {
 				pathCondition = pc.getOperand(1);
 			}
 		}
-		log.finest("path signature: " + signature);
+		log.fine("path signature: " + signature);
 		log.fine("path condition: " + pathCondition);
 		while (signature.length() > 0) {
 			/*

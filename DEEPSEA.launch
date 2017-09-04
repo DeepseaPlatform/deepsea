@@ -10,6 +10,7 @@
 <mapEntry key="DYLD_LIBRARY_PATH" value="${workspace_loc:green/lib}"/>
 <mapEntry key="LD_LIBRARY_PATH" value="${workspace_loc:green/lib}"/>
 </mapAttribute>
+<stringAttribute key="org.eclipse.debug.ui.ATTR_CAPTURE_IN_FILE" value="/tmp/deepsea.log"/>
 <listAttribute key="org.eclipse.debug.ui.favoriteGroups">
 <listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
 </listAttribute>

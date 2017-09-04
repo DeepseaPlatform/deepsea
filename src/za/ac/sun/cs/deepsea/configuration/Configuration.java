@@ -84,6 +84,28 @@ public class Configuration {
 	}
 
 	/**
+	 * Reads an integer property from a {@link Properties} file.
+	 * 
+	 * @param properties
+	 *            the {@link Properties} instance to read from
+	 * @param key
+	 *            the property key
+	 * @return the integer value associated with the key (or {@code null} if the
+	 *         key is absent or not an integer)
+	 */
+	public static Integer getIntegerProperty(Properties properties, String key) {
+		String s = properties.getProperty(key);
+		if (s != null) {
+			try {
+				return Integer.parseInt(s);
+			} catch (NumberFormatException x) {
+				// ignore
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * Reads a boolean property from a {@link Properties} file.
 	 * 
 	 * @param properties
@@ -124,6 +146,7 @@ public class Configuration {
 		setTarget();
 		setArgs();
 		setTriggers();
+		setBounds();
 		setProduceOutput();
 		setExplorer();
 		dump();
@@ -259,6 +282,39 @@ public class Configuration {
 	}
 
 	/**
+	 * Reads and set the variable bounds when specified with the
+	 * "{@code deepsea.bounds...}" settings.
+	 */
+	private void setBounds() {
+		for (Object key : properties.keySet()) {
+			String k = (String) key;
+			if (k.startsWith("deepsea.bounds.")) {
+				String var = k.substring("deepsea.bounds.".length());
+				if (var.endsWith(".min")) {
+					Integer min = getIntegerProperty(properties, k);
+					if (min != null) {
+						diver.setMinBound(var.substring(0, var.length() - 4), min);
+					}
+				} else if (var.endsWith(".max")) {
+					Integer max = getIntegerProperty(properties, k);
+					if (max != null) {
+						diver.setMaxBound(var.substring(0, var.length() - 4), max);
+					}
+				} else {
+					String[] bounds = properties.getProperty(k).split("\\.\\.");
+					assert bounds.length >= 2;
+					try {
+						diver.setMinBound(var, Integer.parseInt(bounds[0].trim()));
+						diver.setMaxBound(var, Integer.parseInt(bounds[1].trim()));
+					} catch (NumberFormatException x) {
+						log.warning("Bounds in \"" + k + "\" is malformed and ignored");
+					}
+				}
+			}
+		}
+	}
+
+	/**
 	 * Reads and sets the "{@code deepsea.produceoutput}" setting.
 	 */
 	private void setProduceOutput() {
@@ -320,7 +376,8 @@ public class Configuration {
 	/**
 	 * Tries to load the class with the given name.
 	 * 
-	 * @param className name of the class to load
+	 * @param className
+	 *            name of the class to load
 	 * @return the {@link Class} instance that corresponds to the loaded class
 	 */
 	private Class<?> loadClass(String className) {
