@@ -11,6 +11,3 @@ cache:
 build:
   script:
     - ./gradlew build
-test:
-  script:
-    - ./gradlew check
