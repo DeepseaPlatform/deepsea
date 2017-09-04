@@ -1,9 +1,16 @@
-stages:
-  - test
-
-test:
-  stage: test
-  image: localhost:5000/junitalpine
+image: localhost:5000/openjdk-8-jdk-alpine
+before_script:
+  - echo `pwd`
+  - export GRADLE_USER_HOME=`pwd`/.gradle
+  - rm -f  .gradle/caches/modules-2/modules-2.lock
+  - rm -fr .gradle/caches/*/plugin-resolution/
+cache:
+  paths:
+    - .gradle/wrapper
+    - .gradle/caches
+build:
   script:
-    - ant test
-
+    - ./gradlew build
+test:
+  script:
+    - ./gradlew check
