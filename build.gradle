@@ -1,0 +1,12 @@
+apply plugin: 'java-library'
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+	compile files("${System.properties['java.home']}/../lib/tools.jar")
+	compile files("lib/green.jar")
+    testImplementation 'junit:junit:4.12'
+}
+

@@ -1,6 +1,6 @@
-package simple;
+package examples.simple;
 
-public class MaxChoice {
+public class MaxChoice3 {
 
 	public static void main(String[] args) {
 		int result = compute(3, 4, 5);
@@ -8,7 +8,7 @@ public class MaxChoice {
 	}
 
 	private static int compute(int x, int y, int z) {
-		if (max(x, y) < z) {
+		if (Math.max(x, y) < z) {
 			if (x + y > 5) {
 				return x;
 			} else {
@@ -20,14 +20,6 @@ public class MaxChoice {
 			} else {
 				return x + y + z;
 			}
-		}
-	}
-
-	private static int max(int x, int y) {
-		if (x + 1 > y + 2) {
-			return x - 1;
-		} else {
-			return y;
 		}
 	}
 

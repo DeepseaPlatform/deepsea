@@ -1,4 +1,4 @@
-package spf;
+package examples.spf;
 //import gov.nasa.jpf.symbc.Debug;
 
 //

@@ -1,4 +1,4 @@
-package simple;
+package examples.simple;
 
 public class MaxChoice2 {
 

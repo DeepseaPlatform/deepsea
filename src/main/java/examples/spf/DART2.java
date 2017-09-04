@@ -1,9 +1,9 @@
-package spf;
+package examples.spf;
 
-public class DART {
+public class DART2 {
 
 	public static void test(int x, int y) {
-		if (x*x*x > 0){
+		if (x*x > 0){
 			if(x>0 && y==10)
 				abort();
 		} else {
@@ -17,7 +17,7 @@ public class DART {
 	}
 	
 	public static void main(String[] args) {
-		test(2,9);
+		test(2,10);
 	}
 	
 }
