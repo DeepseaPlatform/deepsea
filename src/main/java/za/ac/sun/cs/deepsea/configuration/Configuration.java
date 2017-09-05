@@ -6,13 +6,12 @@ import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.logging.log4j.Level;
+//import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 
 import za.ac.sun.cs.deepsea.diver.Diver;
 import za.ac.sun.cs.deepsea.diver.Trigger;
 import za.ac.sun.cs.deepsea.explorer.Explorer;
-import za.ac.sun.cs.deepsea.logging.LogHandler;
 
 /**
  * A {@link Configuration} takes an instance of {@link Properties} and processes
@@ -156,20 +155,20 @@ public class Configuration {
 	 * Reads and sets the "{@code deepsea.log.level}" setting.
 	 */
 	private void setLog() {
-		String p = properties.getProperty("deepsea.log.level");
-		if (p != null) {
-			try {
-				Level l = Level.toLevel(p);
+//		String p = properties.getProperty("deepsea.log.level");
+//		if (p != null) {
+//			try {
+//				Level l = Level.toLevel(p);
 //				log.setLevel(l);
 //				for (Handler h : log.getHandlers()) {
 //					if (h instanceof LogHandler) {
 //						h.setLevel(l);
 //					}
 //				}
-			} catch (IllegalArgumentException x) {
-				log.fatal("log level error", x);
-			}
-		}
+//			} catch (IllegalArgumentException x) {
+//				log.fatal("log level error", x);
+//			}
+//		}
 //		diver.getLogHandler().setVerbose(getBooleanProperty(properties, "deepsea.log.verbose", false));
 	}
 

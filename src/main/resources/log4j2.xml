@@ -1,15 +1,29 @@
-<Configuration status="debug">
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
     <Appenders>
+	    	<Console name="Console" target="SYSTEM_OUT">
+	    		<PatternLayout pattern="%-5level %msg%n"/>
+	    	</Console>
+    </Appenders>
+    <Loggers>
+    		<Logger name="za.ac.sun.cs.deepsea.diver.Diver" level="TRACE" additivity="false">
+    			<AppenderRef ref="Console"/>
+    		</Logger>
+    		<Root level="ERROR">
+    			<AppenderRef ref="Console"/>
+    		</Root>
+    </Loggers>
+</Configuration>
+    	<!--
         <File name="file-log" fileName="/tmp/logging.out" append="false">
             <PatternLayout>
-                <!-- <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %C - %msg%n</pattern> -->
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %C - %msg%n</pattern>
                 <pattern>[%C] - %msg%n</pattern>
             </PatternLayout>
         </File>
-    </Appenders>
     <Loggers>
         <Logger name="com.anishek" level="info" additivity="false">
             <appender-ref ref="file-log" level="info"/>
         </Logger>
     </Loggers>
-</Configuration>
+    	-->
