@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN">
+	<CustomLevels>
+		<CustomLevel name="CONF" intLevel="350"/>
+	</CustomLevels>
     <Appenders>
 	    	<Console name="ConsoleLog" target="SYSTEM_OUT">
 	    		<PatternLayout pattern="%-5level %msg%n"/>
 	    	</Console>
 		<File name="FileLog" fileName="/tmp/deepsea.log" append="false">
-			<PatternLayout pattern="%highlight{%d{HH:mm:ss.SSS} [%-8.8t] %-5level %-16.16logger{2} - %msg%n}{TRACE=green,DEBUG=blue,INFO=blue,WARN=black,ERROR=red,FATAL=red}"/>
+			<PatternLayout pattern="%highlight{%d{HH:mm:ss.SSS} [%-8.8t] %-5level %-16.16logger{2} - %msg%n}{CONF=magenta,TRACE=green,DEBUG=blue,INFO=blue,WARN=black,ERROR=red,FATAL=red}"/>
 		</File>
 	</Appenders>
 	<Loggers>

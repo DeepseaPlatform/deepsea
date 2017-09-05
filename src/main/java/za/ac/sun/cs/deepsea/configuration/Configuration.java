@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 
 import za.ac.sun.cs.deepsea.diver.Diver;
@@ -376,9 +377,10 @@ public class Configuration {
 	 */
 	private void dump() {
 		if (getBooleanProperty(properties, "deepsea.config.dump", false)) {
+			final Level CONF = Level.forName("CONF", 350);
 			SortedSet<Object> sortedKeys = new TreeSet<>(properties.keySet());
 			for (Object k : sortedKeys) {
-				log.info(k.toString() + " = " + properties.getProperty(k.toString()));
+				log.log(CONF, k.toString() + " = " + properties.getProperty(k.toString()));
 			}
 		}
 	}
