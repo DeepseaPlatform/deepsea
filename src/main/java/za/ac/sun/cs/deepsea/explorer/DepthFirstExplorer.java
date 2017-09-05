@@ -258,7 +258,9 @@ public class DepthFirstExplorer extends AbstractExplorer {
 	@Override
 	public Map<String, Constant> refine(Dive dive) {
 		pathCounter++;
-		if (pathCounter > 10) { System.exit(1); }
+		if (pathCounter > 10) {
+			System.exit(1);
+		}
 		String signature = dive.getSignature();
 		Expression pathCondition = dive.getPathCondition();
 		if (!visitedSignatures.add(signature)) {
@@ -307,7 +309,7 @@ public class DepthFirstExplorer extends AbstractExplorer {
 				assert pathCondition instanceof Operation;
 				Operation pc = (Operation) pathCondition;
 				assert pc.getOperator() == Operator.AND;
-				Expression firstPC = new Operation(Operator.NOT, pc.getOperand(0));
+				Expression firstPC = negate(pc.getOperand(0));
 				Expression restPC = pc.getOperand(1);
 				pathCondition = new Operation(Operator.AND, firstPC, restPC);
 				log.debug("trying <" + candidateSignature + "> " + pathCondition);
@@ -336,6 +338,40 @@ public class DepthFirstExplorer extends AbstractExplorer {
 		}
 		log.debug("all signatures explored");
 		return null;
+	}
+
+	/**
+	 * Negates an expression without adding too many {@code NOT} operators. If
+	 * the expression is already of the form "{@code NOT x}", then this method
+	 * simply returns "{@code x}".
+	 * 
+	 * @param expression
+	 *            the expression to negate
+	 * @return the negation of the expression
+	 */
+	private Expression negate(Expression expression) {
+		if (expression instanceof Operation) {
+			Operation operation = (Operation) expression;
+			switch (operation.getOperator()) {
+			case NOT:
+				return operation.getOperand(0);
+			case EQ:
+				return new Operation(Operator.NE, operation.getOperand(0), operation.getOperand(1));
+			case NE:
+				return new Operation(Operator.EQ, operation.getOperand(0), operation.getOperand(1));
+			case LT:
+				return new Operation(Operator.GE, operation.getOperand(0), operation.getOperand(1));
+			case LE:
+				return new Operation(Operator.GT, operation.getOperand(0), operation.getOperand(1));
+			case GT:
+				return new Operation(Operator.LE, operation.getOperand(0), operation.getOperand(1));
+			case GE:
+				return new Operation(Operator.LT, operation.getOperand(0), operation.getOperand(1));
+			default:
+				break;
+			}
+		}
+		return new Operation(Operator.NOT, expression);
 	}
 
 	/**
