@@ -278,8 +278,8 @@ public class DepthFirstExplorer extends AbstractExplorer {
 				pathCondition = pc.getOperand(1);
 			}
 		}
-		log.debug("path signature: " + signature);
-		log.debug("path condition: " + pathCondition);
+		log.info("path signature: " + signature);
+		log.info("path condition: " + pathCondition);
 		while (signature.length() > 0) {
 			/*
 			 * Flip the first char ('0' <-> '1') of signature.
