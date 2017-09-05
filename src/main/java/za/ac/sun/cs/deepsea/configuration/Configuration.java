@@ -5,8 +5,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
-//import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 
 import za.ac.sun.cs.deepsea.diver.Diver;
@@ -141,7 +142,6 @@ public class Configuration {
 	 * routines of the {@link Diver} instance.
 	 */
 	public void apply() {
-		setLog();
 		setTarget();
 		setArgs();
 		setTriggers();
@@ -149,27 +149,6 @@ public class Configuration {
 		setProduceOutput();
 		setExplorer();
 		dump();
-	}
-
-	/**
-	 * Reads and sets the "{@code deepsea.log.level}" setting.
-	 */
-	private void setLog() {
-//		String p = properties.getProperty("deepsea.log.level");
-//		if (p != null) {
-//			try {
-//				Level l = Level.toLevel(p);
-//				log.setLevel(l);
-//				for (Handler h : log.getHandlers()) {
-//					if (h instanceof LogHandler) {
-//						h.setLevel(l);
-//					}
-//				}
-//			} catch (IllegalArgumentException x) {
-//				log.fatal("log level error", x);
-//			}
-//		}
-//		diver.getLogHandler().setVerbose(getBooleanProperty(properties, "deepsea.log.verbose", false));
 	}
 
 	/**
@@ -396,9 +375,10 @@ public class Configuration {
 	 * Dumps all the settings in the {@link Properties} file to the log.
 	 */
 	private void dump() {
-		if (getBooleanProperty(properties, "deepsea.log.dump", false)) {
-			for (Object k : properties.keySet()) {
-				log.info(k.toString() + " =  " + properties.getProperty(k.toString()));
+		if (getBooleanProperty(properties, "deepsea.config.dump", false)) {
+			SortedSet<Object> sortedKeys = new TreeSet<>(properties.keySet());
+			for (Object k : sortedKeys) {
+				log.info(k.toString() + " = " + properties.getProperty(k.toString()));
 			}
 		}
 	}
