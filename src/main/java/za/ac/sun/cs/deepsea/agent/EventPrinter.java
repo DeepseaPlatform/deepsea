@@ -1,6 +1,6 @@
 package za.ac.sun.cs.deepsea.agent;
 
-import java.util.logging.Logger;
+import org.apache.logging.log4j.Logger;
 
 import com.sun.jdi.event.AccessWatchpointEvent;
 import com.sun.jdi.event.BreakpointEvent;
@@ -28,79 +28,79 @@ public class EventPrinter extends AbstractEventListener {
 
 	@Override
 	public boolean accessWatchpoint(AccessWatchpointEvent event) {
-		log.fine(event.toString());
+		log.trace(event.toString());
 		return true;
 	}
 
 	@Override
 	public boolean breakpoint(BreakpointEvent event) {
-		log.fine(event.toString());
+		log.trace(event.toString());
 		return true;
 	}
 
 	@Override
 	public boolean classPrepare(ClassPrepareEvent event) {
-		log.fine(event.toString());
+		log.trace(event.toString());
 		return true;
 	}
 
 	@Override
 	public boolean classUnload(ClassUnloadEvent event) {
-		log.fine(event.toString());
+		log.trace(event.toString());
 		return true;
 	}
 
 	@Override
 	public boolean exception(ExceptionEvent event) {
-		log.fine(event.toString());
+		log.trace(event.toString());
 		return true;
 	}
 
 	@Override
 	public boolean methodEntry(MethodEntryEvent event) {
-		log.fine(event.toString());
+		log.trace(event.toString());
 		return true;
 	}
 
 	@Override
 	public boolean methodExit(MethodExitEvent event) {
-		log.fine(event.toString());
+		log.trace(event.toString());
 		return true;
 	}
 
 	@Override
 	public boolean modificationWatchpoint(ModificationWatchpointEvent event) {
-		log.fine(event.toString());
+		log.trace(event.toString());
 		return true;
 	}
 
 	@Override
 	public boolean step(StepEvent event) {
-		log.fine(event.toString());
+		log.trace(event.toString());
 		return true;
 	}
 
 	@Override
 	public boolean threadDeath(ThreadDeathEvent event) {
-		log.fine(event.toString());
+		log.trace(event.toString());
 		return true;
 	}
 
 	@Override
 	public boolean threadStart(ThreadStartEvent event) {
-		log.fine(event.toString());
+		log.trace(event.toString());
 		return true;
 	}
 
 	@Override
 	public boolean vmDeath(VMDeathEvent event) {
-		log.fine(event.toString());
+		log.trace(event.toString());
 		return true;
 	}
 
 	@Override
 	public boolean vmDisconnect(VMDisconnectEvent event) {
-		log.fine(event.toString());
+		log.trace(event.toString());
 		return true;
 	}
 

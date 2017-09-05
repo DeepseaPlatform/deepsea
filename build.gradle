@@ -1,4 +1,20 @@
 apply plugin: 'java-library'
+apply plugin: 'application'
+
+version = '1.0'
+mainClassName = 'za.ac.sun.cs.deepsea.DEEPSEA'
+
+task fatjar(type: Jar) {
+	from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+	manifest {
+		attributes 'Implementation-Title': 'DEEPSEA',
+			'Implementation-Version': version,
+			'Built-By': System.getProperty('user.name'),
+			'Built-Date': new Date(),
+			'Built-JDK': System.getProperty('java.version'),
+			'Main-Class': mainClassName
+	}
+}
 
 repositories {
     jcenter()
@@ -7,6 +23,8 @@ repositories {
 dependencies {
 	compile files("${System.properties['java.home']}/../lib/tools.jar")
 	compile files("lib/green.jar")
+	compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.9.0'
+	compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.9.0'
     testImplementation 'junit:junit:4.12'
+    runtimeOnly 
 }
-

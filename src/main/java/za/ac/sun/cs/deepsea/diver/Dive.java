@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
+
+import org.apache.logging.log4j.Logger;
 
 import com.sun.jdi.VirtualMachine;
 
@@ -54,13 +55,13 @@ public class Dive {
 	}
 
 	public void dive() {
-		log.fine("----- starting dive " + diver.getName() + "." + id + " -----");
+		log.info("----- starting dive " + diver.getName() + "." + id + " -----");
 
-		log.finer("launching vm");
+		log.trace("launching vm");
 		VirtualMachine vm = VMConnectLauncher.launchTarget(new String[] { diver.getTarget(), diver.getArgs() });
-		log.finest("target vm details:\n" + vm.description());
+		log.trace("target vm details:\n" + vm.description());
 
-		log.finer("redirecting output");
+		log.trace("redirecting output");
 		Process pr = vm.process();
 		InputStream es = pr.getErrorStream();
 		InputStream is = pr.getInputStream();
@@ -69,7 +70,7 @@ public class Dive {
 		er.start();
 		or.start();
 
-		log.finer("issuing monitor requests");
+		log.trace("issuing monitor requests");
 		RequestManager m = new RequestManager(diver, vm.eventRequestManager());
 		m.addExclude("java.*", "javax.*", "sun.*", "com.sun.*");
 		m.createClassPrepareRequest(r -> m.filterExcludes(r));
@@ -80,15 +81,15 @@ public class Dive {
 //			r.addCountFilter(1);
 //		});
 
-		log.finer("setting up event monitoring");
+		log.trace("setting up event monitoring");
 		EventReader ev = new EventReader(diver, vm.eventQueue());
 		ev.addEventListener(new Stepper(this, vm, m));
 		ev.start();
 
-		log.finer("starting vm");
+		log.trace("starting vm");
 		vm.resume();
 
-		log.finer("waiting for completion");
+		log.trace("waiting for completion");
 		while (!ev.isStopping()) {
 			try {
 				Thread.sleep(100);
@@ -97,7 +98,7 @@ public class Dive {
 			}
 		}
 
-		log.finer("shutting down event monitoring");
+		log.trace("shutting down event monitoring");
 		ev.stop();
 		er.interrupt();
 		or.interrupt();

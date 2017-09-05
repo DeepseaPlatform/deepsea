@@ -16,8 +16,6 @@ import za.ac.sun.cs.green.expr.IntVariable;
 import za.ac.sun.cs.green.expr.Operation;
 import za.ac.sun.cs.green.expr.Operation.Operator;
 
-//import java.util.logging.Logger;
-
 public class Symbolizer {
 
 	//	private final Diver diver;

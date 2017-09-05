@@ -2,7 +2,8 @@ package za.ac.sun.cs.deepsea.agent;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
+
+import org.apache.logging.log4j.Logger;
 
 import com.sun.jdi.VMDisconnectedException;
 import com.sun.jdi.event.AccessWatchpointEvent;
@@ -121,7 +122,7 @@ public class EventReader extends AbstractReader {
 				}
 			} catch (InterruptedException e) {
 				if (!isStopping) {
-					log.finest("Event reader loop was interrupted");
+					log.debug("Event reader loop was interrupted");
 					return;
 				}
 			} catch (VMDisconnectedException e) {

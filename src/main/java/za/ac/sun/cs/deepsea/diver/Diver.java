@@ -9,14 +9,14 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.sun.jdi.Method;
 
 import za.ac.sun.cs.deepsea.Reporter;
 import za.ac.sun.cs.deepsea.explorer.Explorer;
-import za.ac.sun.cs.deepsea.logging.LogHandler;
 import za.ac.sun.cs.green.expr.Constant;
 
 /**
@@ -46,7 +46,7 @@ public class Diver implements Reporter {
 	/**
 	 * The log handler associated with this {@link Diver} instance.
 	 */
-	private final LogHandler logHandler;
+	// private final LogHandler logHandler;
 
 	/**
 	 * The log associated with this {@link Diver} instance.
@@ -108,11 +108,12 @@ public class Diver implements Reporter {
 	 */
 	public Diver(final String name) {
 		this.name = name;
-		this.log = Logger.getLogger(getClass().getCanonicalName() + "[" + name + "]");
-		log.setUseParentHandlers(false);
-		log.setLevel(Level.ALL);
-		logHandler = new LogHandler(Level.ALL);
-		log.addHandler(logHandler);
+		this.log = LogManager.getLogger(Diver.class);
+		//this.log = Logger.getLogger(getClass().getCanonicalName() + "[" + name + "]");
+		// log.setUseParentHandlers(false);
+		// log.setLevel(Level.ALL);
+		// logHandler = new LogHandler(Level.ALL);
+		// log.addHandler(logHandler);
 		diveCounter = 0;
 		addReporter(this);
 	}
@@ -132,9 +133,9 @@ public class Diver implements Reporter {
 	 * 
 	 * @return the log handler associated with this instance
 	 */
-	public LogHandler getLogHandler() {
-		return logHandler;
-	}
+//	public LogHandler getLogHandler() {
+//		return logHandler;
+//	}
 
 	/**
 	 * Return the {@link Logger} associated with this instance of {@link Diver}.
@@ -314,7 +315,7 @@ public class Diver implements Reporter {
 	 */
 	public void start() {
 		if (explorer == null) {
-			log.severe("No explorer specified -- terminating");
+			log.fatal("No explorer specified -- terminating");
 		} else {
 			started = Calendar.getInstance();
 			Map<String, Constant> concreteValues = null;

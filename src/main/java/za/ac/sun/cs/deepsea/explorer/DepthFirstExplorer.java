@@ -6,7 +6,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.logging.Logger;
+
+import org.apache.logging.log4j.Logger;
 
 import za.ac.sun.cs.deepsea.diver.Dive;
 import za.ac.sun.cs.deepsea.diver.Diver;
@@ -266,7 +267,7 @@ public class DepthFirstExplorer extends AbstractExplorer {
 			 * conjuncts one by one, until we get a path condition that we have
 			 * not visited before and that we have not classified as unfeasible.
 			 */
-			log.finest("revisit of signature \"" + signature + "\", truncating");
+			log.debug("revisit of signature \"" + signature + "\", truncating");
 			revisitCounter++;
 			while ((signature.length() > 0)
 					&& (visitedSignatures.contains(signature) || infeasibleSignatures.contains(signature))) {
@@ -277,8 +278,8 @@ public class DepthFirstExplorer extends AbstractExplorer {
 				pathCondition = pc.getOperand(1);
 			}
 		}
-		log.fine("path signature: " + signature);
-		log.fine("path condition: " + pathCondition);
+		log.debug("path signature: " + signature);
+		log.debug("path condition: " + pathCondition);
 		while (signature.length() > 0) {
 			/*
 			 * Flip the first char ('0' <-> '1') of signature.
@@ -300,7 +301,7 @@ public class DepthFirstExplorer extends AbstractExplorer {
 				Operation pc = (Operation) pathCondition;
 				assert pc.getOperator() == Operator.AND;
 				pathCondition = pc.getOperand(1);
-				log.finest("dropping first conjunct -> " + pathCondition);
+				log.debug("dropping first conjunct -> " + pathCondition);
 			} else {
 				// negate first conjunct of path condition and check if it has a model
 				assert pathCondition instanceof Operation;
@@ -309,7 +310,7 @@ public class DepthFirstExplorer extends AbstractExplorer {
 				Expression firstPC = new Operation(Operator.NOT, pc.getOperand(0));
 				Expression restPC = pc.getOperand(1);
 				pathCondition = new Operation(Operator.AND, firstPC, restPC);
-				log.finest("trying <" + candidateSignature + "> " + pathCondition);
+				log.debug("trying <" + candidateSignature + "> " + pathCondition);
 				Instance instance = new Instance(solver, null, pathCondition);
 				@SuppressWarnings("unchecked")
 				Map<IntVariable, Object> model = (Map<IntVariable, Object>) instance.request("model");
@@ -317,7 +318,7 @@ public class DepthFirstExplorer extends AbstractExplorer {
 					// again drop the first conjunct
 					signature = restSignature;
 					pathCondition = pc.getOperand(1);
-					log.finest("no model");
+					log.debug("no model");
 					infeasibleSignatures.add(signature);
 					unSatCounter++;
 				} else {
@@ -328,12 +329,12 @@ public class DepthFirstExplorer extends AbstractExplorer {
 						Constant value = new IntConstant((Integer) model.get(variable));
 						newModel.put(name, value);
 					}
-					log.finest("new model: " + newModel);
+					log.debug("new model: " + newModel);
 					return newModel;
 				}
 			}
 		}
-		log.finest("all signatures explored");
+		log.debug("all signatures explored");
 		return null;
 	}
 

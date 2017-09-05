@@ -5,9 +5,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 
 import za.ac.sun.cs.deepsea.diver.Diver;
 import za.ac.sun.cs.deepsea.diver.Trigger;
@@ -159,18 +159,18 @@ public class Configuration {
 		String p = properties.getProperty("deepsea.log.level");
 		if (p != null) {
 			try {
-				Level l = Level.parse(p);
-				log.setLevel(l);
-				for (Handler h : log.getHandlers()) {
-					if (h instanceof LogHandler) {
-						h.setLevel(l);
-					}
-				}
+				Level l = Level.toLevel(p);
+//				log.setLevel(l);
+//				for (Handler h : log.getHandlers()) {
+//					if (h instanceof LogHandler) {
+//						h.setLevel(l);
+//					}
+//				}
 			} catch (IllegalArgumentException x) {
-				log.log(Level.SEVERE, "log level error", x);
+				log.fatal("log level error", x);
 			}
 		}
-		diver.getLogHandler().setVerbose(getBooleanProperty(properties, "deepsea.log.verbose", false));
+//		diver.getLogHandler().setVerbose(getBooleanProperty(properties, "deepsea.log.verbose", false));
 	}
 
 	/**
@@ -243,7 +243,7 @@ public class Configuration {
 						sb.setLength(0);
 						sb.append("ignored trigger with duplicates, ");
 						sb.append('"').append(triggerDesc).append('"');
-						log.warning(sb.toString());
+						log.warn(sb.toString());
 						return;
 					}
 					names.add(name);
@@ -260,7 +260,7 @@ public class Configuration {
 			sb.setLength(0);
 			sb.append("ignored non-symbolic trigger ");
 			sb.append('"').append(triggerDesc).append('"');
-			log.warning(sb.toString());
+			log.warn(sb.toString());
 		}
 	}
 
@@ -307,7 +307,7 @@ public class Configuration {
 						diver.setMinBound(var, Integer.parseInt(bounds[0].trim()));
 						diver.setMaxBound(var, Integer.parseInt(bounds[1].trim()));
 					} catch (NumberFormatException x) {
-						log.warning("Bounds in \"" + k + "\" is malformed and ignored");
+						log.warn("Bounds in \"" + k + "\" is malformed and ignored");
 					}
 				}
 			}
@@ -357,18 +357,18 @@ public class Configuration {
 				constructor = classx.getConstructor(Diver.class, Properties.class);
 				return constructor.newInstance(diver, properties);
 			} catch (NoSuchMethodException x) {
-				log.log(Level.SEVERE, "constructor not found: " + objectName, x);
+				log.fatal("constructor not found: " + objectName, x);
 			}
 		} catch (SecurityException x) {
-			log.log(Level.SEVERE, "constructor not found: " + objectName, x);
+			log.fatal("constructor not found: " + objectName, x);
 		} catch (IllegalArgumentException x) {
-			log.log(Level.SEVERE, "constructor error: " + objectName, x);
+			log.fatal("constructor error: " + objectName, x);
 		} catch (InstantiationException x) {
-			log.log(Level.SEVERE, "constructor error: " + objectName, x);
+			log.fatal("constructor error: " + objectName, x);
 		} catch (IllegalAccessException x) {
-			log.log(Level.SEVERE, "constructor error: " + objectName, x);
+			log.fatal("constructor error: " + objectName, x);
 		} catch (InvocationTargetException x) {
-			log.log(Level.SEVERE, "constructor error: " + objectName, x);
+			log.fatal("constructor error: " + objectName, x);
 		}
 		return null;
 	}
@@ -385,9 +385,9 @@ public class Configuration {
 			try {
 				return loader.loadClass(className);
 			} catch (ClassNotFoundException x) {
-				log.log(Level.SEVERE, "class not found: " + className, x);
+				log.fatal("class not found: " + className, x);
 			} catch (ExceptionInInitializerError x) {
-				log.log(Level.SEVERE, "class not found: " + className, x);
+				log.fatal("class not found: " + className, x);
 			}
 		}
 		return null;
@@ -399,7 +399,7 @@ public class Configuration {
 	private void dump() {
 		if (getBooleanProperty(properties, "deepsea.log.dump", false)) {
 			for (Object k : properties.keySet()) {
-				log.config(k.toString() + " =  " + properties.getProperty(k.toString()));
+				log.info(k.toString() + " =  " + properties.getProperty(k.toString()));
 			}
 		}
 	}
