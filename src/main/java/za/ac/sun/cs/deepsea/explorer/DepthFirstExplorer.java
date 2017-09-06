@@ -258,9 +258,6 @@ public class DepthFirstExplorer extends AbstractExplorer {
 	@Override
 	public Map<String, Constant> refine(Dive dive) {
 		pathCounter++;
-		if (pathCounter > 10) {
-			System.exit(1);
-		}
 		String signature = dive.getSignature();
 		Expression pathCondition = dive.getPathCondition();
 		if (!visitedSignatures.add(signature)) {
