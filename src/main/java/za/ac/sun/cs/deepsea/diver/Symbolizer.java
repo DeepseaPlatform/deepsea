@@ -161,5 +161,38 @@ public class Symbolizer {
 		}
 		return value;
 	}
+	
+	/*
+	 * Arrays are just objects and thus we just return a new objectId
+	 */
+	
+	public int createArray() {
+		return incrAndGetNewObjectId();
+	}
+	
+	/*
+	 * We will treat arrays just like objects with fields, where each index is handled like a field
+	 */
+	public void addArrayValue(int arrayId, int index, Expression value) {
+		/*
+		String arrayIndexName = arrayId + ":::" + index;
+		instanceData.put(arrayIndexName, value);
+		*/
+		putField(arrayId,""+index,value);
+	}
+	
+	public Expression getArrayValue(int arrayId, int index) {
+		return getField(arrayId,""+index);
+		/*
+		String arrayIndexName = arrayId + ":::" + index;
+		Expression value = instanceData.get(arrayIndexName);
+		if (value == null) {
+			// TODO create bounds on fields
+			value = new IntVariable("$q" + newVariableCount++, 0, 999);
+			instanceData.put(arrayIndexName, value);
+		}
+		return value;
+		*/
+	}
 
 }
