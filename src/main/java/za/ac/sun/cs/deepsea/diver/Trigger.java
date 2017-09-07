@@ -6,6 +6,8 @@ import java.util.Set;
 
 import com.sun.jdi.Method;
 
+import za.ac.sun.cs.deepsea.diver.Stepper.IntArray;
+
 public class Trigger {
 
 	private final String name;
@@ -82,6 +84,7 @@ public class Trigger {
 			if (parameterType[i] == null) { continue; }
 			if ((parameterType[i] == Boolean.class) && type.equals("boolean")) { continue; }
 			if ((parameterType[i] == Integer.class) && type.equals("int")) { continue; }
+			if ((parameterType[i] instanceof IntArray) && type.equals("int[]")) { continue; }
 			return false;
 		}
 		return true;

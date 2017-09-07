@@ -232,16 +232,27 @@ public class Diver implements Reporter {
 	 * Returns the minimum value associated with a variable.
 	 * 
 	 * @param variable the variable name
+	 * @param defaultValue the value to return if there is no bound available
 	 * @return the minimum value that the integer variable can assume
 	 */
-	public int getMinBound(String variable) {
+	public int getMinBound(String variable, int defaultValue) {
 		Integer min = minBounds.get(variable);
 		if (min == null) {
-			min = DEFAULT_MIN_INT_VALUE;
+			min = defaultValue;
 		}
 		return min;
 	}
 
+	/**
+	 * Returns the minimum value associated with a variable.
+	 * 
+	 * @param variable the variable name
+	 * @return the minimum value that the integer variable can assume
+	 */
+	public int getMinBound(String variable) {
+		return getMinBound(variable, DEFAULT_MIN_INT_VALUE);
+	}
+	
 	/**
 	 * Sets the maximum value of a variable.
 	 * 
@@ -256,14 +267,25 @@ public class Diver implements Reporter {
 	 * Returns the maximum value associated with a variable.
 	 * 
 	 * @param variable the variable name
+	 * @param defaultValue the value to return if there is no bound available
+	 * @return the maximum value that the integer variable can assume
+	 */
+	public int getMaxBound(String variable, int defaultValue) {
+		Integer max = maxBounds.get(variable);
+		if (max == null) {
+			max = defaultValue;
+		}
+		return max;
+	}
+	
+	/**
+	 * Returns the maximum value associated with a variable.
+	 * 
+	 * @param variable the variable name
 	 * @return the maximum value that the integer variable can assume
 	 */
 	public int getMaxBound(String variable) {
-		Integer max = maxBounds.get(variable);
-		if (max == null) {
-			max = DEFAULT_MAX_INT_VALUE;
-		}
-		return max;
+		return getMaxBound(variable, DEFAULT_MAX_INT_VALUE);
 	}
 
 	/**

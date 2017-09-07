@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 
 import com.sun.jdi.AbsentInformationException;
+import com.sun.jdi.ArrayReference;
 import com.sun.jdi.BooleanValue;
 import com.sun.jdi.ClassNotLoadedException;
 import com.sun.jdi.IncompatibleThreadStateException;
@@ -43,6 +44,20 @@ import za.ac.sun.cs.green.expr.IntConstant;
 import za.ac.sun.cs.green.expr.IntVariable;
 
 public class Stepper extends AbstractEventListener {
+
+	public static class IntArray {
+
+		private final int length;
+		
+		public IntArray(int length) {
+			this.length = length;
+		}
+
+		public int getLength() {
+			return length;
+		}
+
+	}
 
 	private final Dive dive;
 
@@ -173,18 +188,15 @@ public class Stepper extends AbstractEventListener {
 					List<Value> actualValues = frame.getArgumentValues();
 					List<LocalVariable> args = method.arguments();
 					for (int i = 0; i < n; i++) {
-						Value actualValue = actualValues.get(i);
 						Object type = trigger.getParameterType(i);
 						boolean symbolic = trigger.isParameterSymbolic(i);
 						String name = trigger.getParameterName(i);
-						Constant concrete = ((name == null) || (concreteValues == null)) ? null
-								: concreteValues.get(name);
-						Expression expr = null;
-						Expression varValue = null;
 						if (type == Boolean.class) {
-							expr = new IntConstant(((BooleanValue) actualValue).intValue());
-							varValue = expr;
+							Value actualValue = actualValues.get(i);
+							Expression expr = new IntConstant(((BooleanValue) actualValue).intValue());
+							Expression varValue = expr;
 							if (symbolic) {
+								Constant concrete = ((name == null) || (concreteValues == null)) ? null : concreteValues.get(name);
 								expr = new IntVariable(trigger.getParameterName(i), 0, 1);
 								if ((concrete != null) && (concrete instanceof IntConstant)) {
 									boolean value = ((IntConstant) concrete).getValue() != 0;
@@ -192,26 +204,59 @@ public class Stepper extends AbstractEventListener {
 									varValue = concrete;
 								}
 							}
+							sframe.setLocal(i, expr);
+							dive.setActualValue(name, varValue);
 						} else if (type == Integer.class) {
-							expr = new IntConstant(((IntegerValue) actualValue).intValue());
-							varValue = expr;
+							Value actualValue = actualValues.get(i);
+							Expression expr = new IntConstant(((IntegerValue) actualValue).intValue());
+							Expression varValue = expr;
 							if (symbolic) {
-								String var = trigger.getParameterName(i);
-								int min = dive.getDiver().getMinBound(var);
-								int max = dive.getDiver().getMaxBound(var);
-								expr = new IntVariable(var, min, max);
+								Constant concrete = ((name == null) || (concreteValues == null)) ? null : concreteValues.get(name);
+								int min = dive.getDiver().getMinBound(name);
+								int max = dive.getDiver().getMaxBound(name);
+								expr = new IntVariable(name, min, max);
 								if ((concrete != null) && (concrete instanceof IntConstant)) {
 									int value = ((IntConstant) concrete).getValue();
 									frame.setValue(args.get(i), vm.mirrorOf(value));
 									varValue = concrete;
 								}
 							}
+							sframe.setLocal(i, expr);
+							dive.setActualValue(name, varValue);
+						} else if (type instanceof IntArray) {
+							Value actualValue = actualValues.get(i);
+							assert actualValue instanceof ArrayReference;
+							ArrayReference actualArray = (ArrayReference) actualValue;
+							int arrayLength = actualArray.length();
+							int arrayId = symbolizer.incrAndGetNewObjectId();
+							Expression expr = new IntConstant(arrayId);
+							if (symbolic) {
+								for (int j = 0; j < arrayLength; j++) {
+									String entryName = name + "$" + j;
+									Constant concrete = ((entryName == null) || (concreteValues == null)) ? null : concreteValues.get(entryName);
+									int min = dive.getDiver().getMinBound(entryName, dive.getDiver().getMinBound(name));
+									int max = dive.getDiver().getMaxBound(entryName, dive.getDiver().getMaxBound(name));
+									Expression entryExpr = new IntVariable(entryName, min, max);
+									if ((concrete != null) && (concrete instanceof IntConstant)) {
+										int value = ((IntConstant) concrete).getValue();
+										actualArray.setValue(j, vm.mirrorOf(value));
+										IntConstant valueExpr = new IntConstant(value);
+										dive.setActualValue(entryName, valueExpr);
+									} else {
+										dive.setActualValue(entryName, entryExpr);
+									}
+									symbolizer.putField(arrayId, "" + j, entryExpr);
+								}
+							} else {
+								for (int j = 0; j < arrayLength; j++) {
+									IntConstant value = new IntConstant(((IntegerValue) actualArray.getValue(j)).intValue());
+									symbolizer.putField(arrayId, "" + j, value);
+									dive.setActualValue(name + "$" + j, value);
+								}
+							}
+							sframe.setLocal(i, expr);
 						} else {
 							throw new Error("Unhandled symbolic type: " + type);
-						}
-						sframe.setLocal(i, expr);
-						if (name != null) {
-							dive.setActualValue(name, varValue);
 						}
 					}
 				} catch (IncompatibleThreadStateException x) {

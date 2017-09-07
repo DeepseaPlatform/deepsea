@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 
 import za.ac.sun.cs.deepsea.diver.Diver;
+import za.ac.sun.cs.deepsea.diver.Stepper;
 import za.ac.sun.cs.deepsea.diver.Trigger;
 import za.ac.sun.cs.deepsea.explorer.Explorer;
 
@@ -251,7 +252,14 @@ public class Configuration {
 	 * @return the corresponding Java class of the type
 	 */
 	private Object parseType(String type) {
-		if (type.equals("int")) {
+		if (type.startsWith("int[")) {
+			int closeBracket = type.indexOf(']');
+			int len = 0;
+			if (closeBracket > 4) {
+				len = Integer.parseInt(type.substring(4, closeBracket));
+			}
+			return new Stepper.IntArray(len);
+		} else if (type.equals("int")) {
 			return Integer.class;
 		} else if (type.equals("boolean")) {
 			return Boolean.class;
