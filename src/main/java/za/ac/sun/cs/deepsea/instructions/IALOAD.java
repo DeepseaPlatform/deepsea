@@ -1,6 +1,5 @@
 package za.ac.sun.cs.deepsea.instructions;
 
-import com.sun.jdi.ReferenceType;
 import com.sun.jdi.event.StepEvent;
 
 import za.ac.sun.cs.deepsea.diver.Stepper;
