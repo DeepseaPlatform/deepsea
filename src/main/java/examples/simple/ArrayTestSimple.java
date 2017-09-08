@@ -1,4 +1,4 @@
-package examples.spf;
+package examples.simple;
 
 public class ArrayTestSimple {
 
