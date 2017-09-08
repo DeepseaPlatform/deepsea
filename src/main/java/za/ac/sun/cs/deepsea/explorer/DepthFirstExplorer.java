@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.Logger;
 
@@ -71,6 +72,11 @@ public class DepthFirstExplorer extends AbstractExplorer {
 	private final Set<String> infeasibleSignatures = new HashSet<>();
 
 	/**
+	 * Models that have been generated (and explored) before.
+	 */
+	private final Set<String> visitedModels = new HashSet<>();
+	
+	/**
 	 * A count of the number of paths explored.
 	 */
 	private int pathCounter = 0;
@@ -117,7 +123,7 @@ public class DepthFirstExplorer extends AbstractExplorer {
 	public String getName() {
 		return "DepthFirstExplorer";
 	}
-
+	
 	/**
 	 * Proposes new concrete values in response to a newly discovered path
 	 * condition. This method attempts to work in a depth-first fashion, but
@@ -255,11 +261,7 @@ public class DepthFirstExplorer extends AbstractExplorer {
 	 * @see za.ac.sun.cs.deepsea.explorer.Explorer#refine(za.ac.sun.cs.deepsea.diver.
 	 *      Dive)
 	 */
-	@Override
-	public Map<String, Constant> refine(Dive dive) {
-		pathCounter++;
-		String signature = dive.getSignature();
-		Expression pathCondition = dive.getPathCondition();
+	public Map<String, Constant> refine(String signature, Expression pathCondition) {
 		if (!visitedSignatures.add(signature)) {
 			/*
 			 * If we are revisiting this path, we truncate it by removing
@@ -328,13 +330,30 @@ public class DepthFirstExplorer extends AbstractExplorer {
 						Constant value = new IntConstant((Integer) model.get(variable));
 						newModel.put(name, value);
 					}
-					log.debug("new model: " + newModel);
-					return newModel;
+					String modelString = newModel.entrySet().stream()
+							.filter(p -> !p.getKey().startsWith("$"))
+							.collect(Collectors.toMap(p -> p.getKey(),  p -> p.getValue())).toString();
+					log.debug("new model: {}", modelString);
+					if (visitedModels.add(modelString)) {
+						return newModel;
+					} else {
+						log.debug("model {} has been visited before, recurring", modelString);
+						return refine(candidateSignature, pathCondition);
+					}
 				}
 			}
 		}
 		log.debug("all signatures explored");
 		return null;
+	}
+
+	/**
+	 * Proposes new concrete values in response to a newly discovered path
+	 * condition. 	 */
+	@Override
+	public Map<String, Constant> refine(Dive dive) {
+		pathCounter++;
+		return refine(dive.getSignature(), dive.getPathCondition());
 	}
 
 	/**

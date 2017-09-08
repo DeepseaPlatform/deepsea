@@ -7,7 +7,7 @@ public class MaxChoice4 {
 		System.out.println(result);
 	}
 
-	private static int compute2(int x, int y, int z) {
+	public static int compute2(int x, int y, int z) {
 		if (Math.max(x, y) < 5) {
 			if (x + y > 10) {
 				return -1; // this is "reachable" since we think we can solve to get us here, but we cannot
@@ -23,7 +23,7 @@ public class MaxChoice4 {
 		}
 	}
 
-	private static int summaryMax(int x, int y) {
+	public static int summaryMax(int x, int y) {
 		if (x > y) return x;
 		else return y;
 		/*
@@ -32,7 +32,7 @@ public class MaxChoice4 {
 		 */
 	}
 	
-	private static int compute(int x, int y, int z) {
+	public static int compute(int x, int y, int z) {
 		if (summaryMax(x,y) < 5) {
 			if (x + y > 10) {
 				return -1; // now just plain unreachable (x+y>10 && ((x > y) && ret = x) \/ ((x <= y) && ret = y) && ret < 5 is unsat
