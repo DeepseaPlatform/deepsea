@@ -384,9 +384,21 @@ public class DepthFirstExplorer extends AbstractExplorer {
 	@Override
 	public void report(PrintWriter out) {
 		out.println("# paths explored: " + pathCounter);
-		out.println("# paths revisited: " + revisitCounter);
-		out.println("# unique paths: " + pathCounter + "-" + revisitCounter + "=" + (pathCounter - revisitCounter));
-		out.println("# UNSAT path conditions: " + unSatCounter);
+		if (pathCounter <= 1) {
+			out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+			out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+			out.println("!!!!                                                    !!!!");
+			out.println("!!!!   FEWER THAN TWO PATHS EXPLORED...                 !!!!");
+			out.println("!!!!                                                    !!!!");
+			out.println("!!!!   CHECK THAT THE TRIGGERS ARE CORRECT              !!!!");
+			out.println("!!!!                                                    !!!!");
+			out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+			out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+		} else {
+			out.println("# paths revisited: " + revisitCounter);
+			out.println("# unique paths: " + pathCounter + "-" + revisitCounter + "=" + (pathCounter - revisitCounter));
+			out.println("# UNSAT path conditions: " + unSatCounter);
+		}
 	}
 
 }
