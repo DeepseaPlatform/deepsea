@@ -1,21 +1,5 @@
 apply plugin: 'java-library'
 apply plugin: 'application'
-apply plugin: 'eclipse'
-
-version = '1.0'
-mainClassName = 'za.ac.sun.cs.deepsea.DEEPSEA'
-
-task fatjar(type: Jar) {
-	from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-	manifest {
-		attributes 'Implementation-Title': 'DEEPSEA',
-			'Implementation-Version': version,
-			'Built-By': System.getProperty('user.name'),
-			'Built-Date': new Date(),
-			'Built-JDK': System.getProperty('java.version'),
-			'Main-Class': mainClassName
-	}
-}
 
 repositories {
     jcenter()
