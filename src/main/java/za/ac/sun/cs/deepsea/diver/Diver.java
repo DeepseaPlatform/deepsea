@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -99,6 +100,8 @@ public class Diver implements Reporter {
 
 	private List<Reporter> reporters = new LinkedList<>();
 
+	private List<String> configSettings = null;
+
 	/**
 	 * Constructs a {@link Diver} instance. Such an instance represents one
 	 * "session" of DEEPSEA.
@@ -186,6 +189,10 @@ public class Diver implements Reporter {
 	 */
 	public void setArgs(String args) {
 		this.args = args;
+	}
+
+	public void setConfigSettings(List<String> configSettings) {
+		this.configSettings = configSettings;
 	}
 
 	public void addReporter(Reporter reporter) {
@@ -339,6 +346,12 @@ public class Diver implements Reporter {
 		if (explorer == null) {
 			log.fatal("No explorer specified -- terminating");
 		} else {
+			if (configSettings != null) {
+				final Level CONF = Level.forName("CONF", 350);
+				for (String setting : configSettings) {
+					log.log(CONF, setting);
+				}
+			}
 			started = Calendar.getInstance();
 			Map<String, Constant> concreteValues = null;
 			do {
@@ -374,7 +387,6 @@ public class Diver implements Reporter {
 		} else {
 			out.printf("Duration: %d ms\n", milli);
 		}
-		out.println("~~~ DONE ~~~");
 	}
 
 	/**
@@ -393,9 +405,13 @@ public class Diver implements Reporter {
 	 * @param reporter
 	 */
 	private void report(Reporter reporter) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("== ").append(reporter.getName()).append(' ');
+		while (sb.length() < 70) {
+			sb.append('=');
+		}
 		log.info("");
-		log.info("======================================================================");
-		log.info("== " + reporter.getName());
+		log.info(sb.toString());
 		final StringWriter reportWriter = new StringWriter();
 		reporter.report(new PrintWriter(reportWriter));
 		String[] reportLines = reportWriter.toString().split(LS);

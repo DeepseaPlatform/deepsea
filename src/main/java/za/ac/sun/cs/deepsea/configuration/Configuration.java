@@ -2,13 +2,14 @@ package za.ac.sun.cs.deepsea.configuration;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 
 import za.ac.sun.cs.deepsea.diver.Diver;
@@ -385,11 +386,12 @@ public class Configuration {
 	 */
 	private void dump() {
 		if (getBooleanProperty(properties, "deepsea.config.dump", false)) {
-			final Level CONF = Level.forName("CONF", 350);
+			List<String> configSettings = new ArrayList<>();
 			SortedSet<Object> sortedKeys = new TreeSet<>(properties.keySet());
 			for (Object k : sortedKeys) {
-				log.log(CONF, k.toString() + " = " + properties.getProperty(k.toString()));
+				configSettings.add(k.toString() + " = " + properties.getProperty(k.toString()));
 			}
+			diver.setConfigSettings(configSettings);
 		}
 	}
 

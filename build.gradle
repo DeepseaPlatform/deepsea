@@ -14,3 +14,20 @@ dependencies {
 	compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.9.0'
     testImplementation 'junit:junit:4.12'
 }
+
+// Task to update the version information.
+// Not the best solution, but it works.
+// Refresh your Eclipse project to see the latest version.
+task generateVersion {
+	doFirst {
+		def stdout = new ByteArrayOutputStream()
+		exec {
+			commandLine 'git', 'describe', '--tags', '--abbrev=0'
+			standardOutput = stdout
+		}
+		def version = stdout.toString().trim()
+		def versionFile = new File("$projectDir/src/main/resources/VERSION")
+		versionFile.text = """$version"""
+	}
+}
+compileJava.dependsOn generateVersion
