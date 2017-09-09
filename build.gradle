@@ -1,6 +1,8 @@
 apply plugin: 'java-library'
 apply plugin: 'application'
 
+mainClassName = 'za.ac.sun.cs.deepsea.DEEPSEA'
+
 repositories {
     jcenter()
 }
