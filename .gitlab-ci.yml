@@ -1,4 +1,4 @@
-image: localhost:5000/openjdk-8-jdk-alpine
+image: localhost:5000/git-jdk-alpine
 before_script:
   - echo `pwd`
   - export GRADLE_USER_HOME=`pwd`/.gradle
