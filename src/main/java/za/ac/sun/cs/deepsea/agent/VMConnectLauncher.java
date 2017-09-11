@@ -18,6 +18,11 @@ public class VMConnectLauncher {
 	public static VirtualMachine launchTarget(final String[] args) {
 		LaunchingConnector connector = findLaunchingConnector(CONNECTOR);
 		Map<String, Connector.Argument> arguments = connector.defaultArguments();
+		/* Was useful during debugging of issue #22. */
+//		for (String key : arguments.keySet()) {
+//			String val = ((Connector.Argument) arguments.get(key)).toString();
+//			System.out.println(">>> " + key + " == " + val);
+//		}
 		Connector.Argument mainArg = (Connector.Argument) arguments.get("main");
 		if (mainArg == null) {
 			throw new Error("Bad launching connector");
