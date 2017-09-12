@@ -11,4 +11,8 @@ cache:
     - .gradle/caches
 build:
   script:
-    - ./gradlew build
+    - ./gradlew build javadoc
+  artifacts:
+    paths:
+      - build/docs/javadoc
+    expire_in: 1 week
