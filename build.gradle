@@ -13,20 +13,16 @@ dependencies {
 	compile files("lib/green.jar")
 	compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.9.0'
 	compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.9.0'
+    compile 'org.apfloat:apfloat:1.8.2'
     testImplementation 'junit:junit:4.12'
 }
 
-//javadoc {
-//	source = sourceSets.main.allJava
-//	println options
-//	// javadoc   -subpackages za -d /tmp/dsdocs -notree -noindex -nohelp -nonavbar src
-//	include 'za'
-//	exclude 'org.apfloat'
-//	options.noTree true
-//	options.noIndex true
-//	options.noHelp true
-//	options.noNavBar true
-//}
+javadoc {
+	options.noTree true
+	options.noIndex true
+	options.noHelp true
+	options.noNavBar true
+}
 
 // Task to update the version information.
 // Not the best solution, but it works.
