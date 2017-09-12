@@ -21,8 +21,9 @@ public class ConstantInvokeDynamic extends Constant {
 
 	/**
 	 * TODO
-	 * @param input
-	 * @throws IOException
+	 * 
+	 * @param input TODO
+	 * @throws IOException TODO
 	 */
 	public ConstantInvokeDynamic(DataInput input) throws IOException {
 		super(Constants.CONSTANT_InvokeDynamic);
@@ -32,7 +33,8 @@ public class ConstantInvokeDynamic extends Constant {
 
 	/**
 	 * TODO
-	 * @return
+	 * 
+	 * @return TODO
 	 */
 	public int getBootstrapMethodAttrIndex() {
 		return bootstrapMethodAttrIndex;
@@ -40,7 +42,8 @@ public class ConstantInvokeDynamic extends Constant {
 
 	/**
 	 * TODO
-	 * @return
+	 * 
+	 * @return TODO
 	 */
 	public int getNameAndTypeIndex() {
 		return nameAndTypeIndex;

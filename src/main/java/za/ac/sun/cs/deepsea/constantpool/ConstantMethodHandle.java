@@ -21,8 +21,9 @@ public class ConstantMethodHandle extends Constant {
 
 	/**
 	 * TODO
-	 * @param input
-	 * @throws IOException
+	 * 
+	 * @param input TODO
+	 * @throws IOException TODO
 	 */
 	public ConstantMethodHandle(DataInput input) throws IOException {
 		super(Constants.CONSTANT_MethodHandle);
@@ -32,7 +33,8 @@ public class ConstantMethodHandle extends Constant {
 
 	/**
 	 * TODO
-	 * @return
+	 * 
+	 * @return TODO
 	 */
 	public int getReferenceKind() {
 		return referenceKind;
@@ -40,7 +42,8 @@ public class ConstantMethodHandle extends Constant {
 
 	/**
 	 * TODO
-	 * @return
+	 * 
+	 * @return TODO
 	 */
 	public int getReferenceIndex() {
 		return referenceIndex;

@@ -98,8 +98,14 @@ public class Diver implements Reporter {
 	 */
 	private Explorer explorer;
 
+	/**
+	 * TODO
+	 */
 	private List<Reporter> reporters = new LinkedList<>();
 
+	/**
+	 * TODO
+	 */
 	private List<String> configSettings = null;
 
 	/**
@@ -178,29 +184,40 @@ public class Diver implements Reporter {
 	}
 
 	/**
-	 * @return
+	 * TODO
+	 * @return TODO
 	 */
 	public String getArgs() {
 		return args;
 	}
 
 	/**
-	 * @param args
+	 * TODO
+	 * @param args TODO
 	 */
 	public void setArgs(String args) {
 		this.args = args;
 	}
 
+	/**
+	 * TODO
+	 * @param configSettings TODO
+	 */
 	public void setConfigSettings(List<String> configSettings) {
 		this.configSettings = configSettings;
 	}
 
+	/**
+	 * TODO
+	 * @param reporter TODO
+	 */
 	public void addReporter(Reporter reporter) {
 		reporters.add(0, reporter);
 	}
 
 	/**
-	 * @param trigger
+	 * TODO
+	 * @param trigger TODO
 	 */
 	public void addTrigger(Trigger trigger) {
 		triggers.add(trigger);
@@ -296,14 +313,16 @@ public class Diver implements Reporter {
 	}
 
 	/**
-	 * @return
+	 * TODO
+	 * @return TODO
 	 */
 	public boolean isProducingOutput() {
 		return produceOutput;
 	}
 
 	/**
-	 * @param produceOutput
+	 * TODO
+	 * @param produceOutput TODO
 	 */
 	public void produceOutput(boolean produceOutput) {
 		this.produceOutput = produceOutput;
@@ -370,6 +389,12 @@ public class Diver implements Reporter {
 		}
 	}
 
+	/**
+	 * TODO
+	 * 
+	 * @param out
+	 *            the destination to which the report must be written
+	 */
 	public void report(PrintWriter out) {
 		out.println("Started: " + dateFormat.format(started.getTime()));
 		out.println("Stopped: " + dateFormat.format(stopped.getTime()));
@@ -402,7 +427,7 @@ public class Diver implements Reporter {
 	/**
 	 * Generate and log the exporer's report.
 	 * 
-	 * @param reporter
+	 * @param reporter TODO
 	 */
 	private void report(Reporter reporter) {
 		StringBuilder sb = new StringBuilder();

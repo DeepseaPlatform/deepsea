@@ -16,35 +16,46 @@ import za.ac.sun.cs.deepsea.agent.VMConnectLauncher;
 import za.ac.sun.cs.green.expr.Constant;
 import za.ac.sun.cs.green.expr.Expression;
 
+/**
+ * TODO
+ */
 public class Dive {
 
 	/**
-	 * 
+	 * TODO 
 	 */
 	private final Diver diver;
 
 	/**
-	 * 
+	 * TODO
 	 */
 	private final Logger log;
 
 	/**
-	 * 
+	 * TODO
 	 */
 	private final int id;
 
 	/**
-	 * 
+	 * TODO
 	 */
 	private final Symbolizer symbolizer;
 
+	/**
+	 * TODO
+	 */
 	private final Map<String, Constant> concreteValues;
 
+	/**
+	 * TODO
+	 */
 	private final Map<String, Expression> actualValues = new HashMap<>();
 
 	/**
-	 * @param diver
-	 * @param concreteValues
+	 * TODO
+	 * 
+	 * @param diver TODO
+	 * @param concreteValues  TODO
 	 */
 	public Dive(Diver diver, Map<String, Constant> concreteValues) {
 		this.diver = diver;
@@ -54,6 +65,9 @@ public class Dive {
 		this.concreteValues = concreteValues;
 	}
 
+	/**
+	 * TODO
+	 */
 	public void dive() {
 		log.info("----- starting dive " + diver.getName() + "." + id + " -----");
 
@@ -132,23 +146,50 @@ public class Dive {
 		return symbolizer.getSignature();
 	}
 
+	/**
+	 * TODO
+	 * 
+	 * @return TODO
+	 */
 	public Diver getDiver() {
 		return diver;
 	}
 
+	/**
+	 * TODO
+	 * 
+	 * @return TODO
+	 */
 	public Symbolizer getSymbolizer() {
 		return symbolizer;
 	}
 
+	/**
+	 * TODO
+	 * 
+	 * @return TODO
+	 */
 	public Map<String, Constant> getConcreteValues() {
 		return concreteValues;
 	}
 
+	/**
+	 * TODO
+	 * 
+	 * @param name TODO
+	 * @param expression TODO
+	 */
 	public void setActualValue(String name, Expression expression) {
 		assert name != null;
 		actualValues.put(name, expression);
 	}
 
+	/**
+	 * TODO
+	 * 
+	 * @param name TODO
+	 * @return TODO
+	 */
 	public Expression getActualValue(String name) {
 		return actualValues.get(name);
 	}

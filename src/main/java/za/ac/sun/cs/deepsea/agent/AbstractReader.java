@@ -45,6 +45,8 @@ abstract public class AbstractReader {
 
 	/**
 	 * Check if the reader is stopping.
+	 * 
+	 * @return TODO
 	 */
 	public boolean isStopping() {
 		return isStopping;

@@ -16,8 +16,9 @@ public class ConstantMethodType extends Constant {
 
 	/**
 	 * TODO
-	 * @param input
-	 * @throws IOException
+	 * 
+	 * @param input TODO
+	 * @throws IOException TODO
 	 */
 	public ConstantMethodType(DataInput input) throws IOException {
 		super(Constants.CONSTANT_MethodType);
@@ -26,7 +27,8 @@ public class ConstantMethodType extends Constant {
 
 	/**
 	 * TODO
-	 * @return
+	 * 
+	 * @return TODO
 	 */
 	public int getDescriptorIndex() {
 		return descriptorIndex;

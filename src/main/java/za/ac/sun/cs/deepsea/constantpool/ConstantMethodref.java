@@ -21,8 +21,9 @@ public class ConstantMethodref extends Constant {
 
 	/**
 	 * TODO
-	 * @param input
-	 * @throws IOException
+	 * 
+	 * @param input TODO
+	 * @throws IOException TODO
 	 */
 	public ConstantMethodref(DataInput input) throws IOException {
 		super(Constants.CONSTANT_Methodref);
@@ -32,7 +33,8 @@ public class ConstantMethodref extends Constant {
 
 	/**
 	 * TODO
-	 * @return
+	 * 
+	 * @return TODO
 	 */
 	public int getClassIndex() {
 		return classIndex;
@@ -40,8 +42,9 @@ public class ConstantMethodref extends Constant {
 
 	/**
 	 * TODO
-	 * @param cp
-	 * @return
+	 * 
+	 * @param cp TODO
+	 * @return TODO
 	 */
 	public String getClass(ConstantPool cp) {
 		return cp.constantToString(classIndex, Constants.CONSTANT_Class);
@@ -49,7 +52,8 @@ public class ConstantMethodref extends Constant {
 	
 	/**
 	 * TODO
-	 * @return
+	 * 
+	 * @return TODO
 	 */
 	public int getNameAndTypeIndex() {
 		return nameAndTypeIndex;

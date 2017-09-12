@@ -8,8 +8,6 @@ import java.io.InputStream;
 
 /**
  * TODO
- * 
- * @author Jaco Geldenhuys (geld@sun.ac.za)
  */
 public class ConstantPool {
 
@@ -21,9 +19,9 @@ public class ConstantPool {
 	/**
 	 * TODO
 	 * 
-	 * @param poolCount
-	 * @param poolBytes
-	 * @throws IOException
+	 * @param poolCount TODO
+	 * @param poolBytes TODO
+	 * @throws IOException TODO
 	 */
 	public ConstantPool(int poolCount, byte[] poolBytes) throws IOException {
 		InputStream is = new ByteArrayInputStream(poolBytes);
@@ -42,9 +40,9 @@ public class ConstantPool {
 	/**
 	 * TODO
 	 * 
-	 * @param index
-	 * @param tag
-	 * @return
+	 * @param index TODO
+	 * @param tag TODO
+	 * @return TODO
 	 */
 	public Constant getConstant(int index, byte tag) {
 		Constant c = getConstant(index);
@@ -61,8 +59,8 @@ public class ConstantPool {
 	/**
 	 * TODO
 	 * 
-	 * @param index
-	 * @return
+	 * @param index TODO
+	 * @return TODO
 	 */
 	public Constant getConstant(final int index) {
 		if (index >= pool.length || index < 0) {
@@ -75,9 +73,9 @@ public class ConstantPool {
 	/**
 	 * TODO
 	 * 
-	 * @param index
-	 * @param tag
-	 * @return
+	 * @param index TODO
+	 * @param tag TODO
+	 * @return TODO
 	 */
 	public String constantToString(int index, byte tag) {
 		return constantToString(getConstant(index, tag));
@@ -86,8 +84,8 @@ public class ConstantPool {
 	/**
 	 * TODO
 	 * 
-	 * @param c
-	 * @return
+	 * @param c TODO
+	 * @return TODO
 	 */
 	private String constantToString(Constant c) {
 		int i;
@@ -149,8 +147,8 @@ public class ConstantPool {
 	/**
 	 * TODO
 	 * 
-	 * @param index
-	 * @return
+	 * @param index TODO
+	 * @return TODO
 	 */
 	public static String getMethodHandleName(final int index) {
 		return METHODHANDLE_NAMES[index];
@@ -159,8 +157,8 @@ public class ConstantPool {
 	/**
 	 * TODO
 	 * 
-	 * @param str
-	 * @return
+	 * @param str TODO
+	 * @return TODO
 	 */
 	private static String escape(String str) {
 		int len = str.length();
@@ -193,10 +191,10 @@ public class ConstantPool {
 	/**
 	 * TODO
 	 * 
-	 * @param str
-	 * @param prefix
-	 * @param chopit
-	 * @return
+	 * @param str TODO
+	 * @param prefix TODO
+	 * @param chopit TODO
+	 * @return TODO
 	 */
 	private static String compactClassName(String str, String prefix, boolean chopit) {
 		final int len = prefix.length();
@@ -212,9 +210,9 @@ public class ConstantPool {
 	/**
 	 * TODO
 	 * 
-	 * @param str
-	 * @param chopit
-	 * @return
+	 * @param str TODO
+	 * @param chopit TODO
+	 * @return TODO
 	 */
 	private static String compactClassName(String str, boolean chopit) {
 		return compactClassName(str, "java.lang.", chopit);
@@ -222,8 +220,6 @@ public class ConstantPool {
 
 	/**
 	 * TODO
-	 * 
-	 * @author Jaco Geldenhuys (geld@sun.ac.za)
 	 */
 	@SuppressWarnings("serial")
 	public static class ClassFormatException extends RuntimeException {
@@ -238,7 +234,7 @@ public class ConstantPool {
 		/**
 		 * TODO
 		 * 
-		 * @param s
+		 * @param s TODO
 		 */
 		public ClassFormatException(final String s) {
 			super(s);
@@ -247,8 +243,8 @@ public class ConstantPool {
 		/**
 		 * TODO
 		 * 
-		 * @param message
-		 * @param cause
+		 * @param message TODO
+		 * @param cause TODO
 		 */
 		public ClassFormatException(final String message, final Throwable cause) {
 			super(message, cause);

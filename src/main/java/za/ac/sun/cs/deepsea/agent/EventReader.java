@@ -48,7 +48,7 @@ public class EventReader extends AbstractReader {
 	/**
 	 * Registers the given event listener.
 	 * 
-	 * @param listener
+	 * @param listener TODO
 	 */
 	public synchronized void addEventListener(EventListener listener) {
 		eventListeners.add(listener);
@@ -135,7 +135,7 @@ public class EventReader extends AbstractReader {
 	/**
 	 * De-registers the given event listener.
 	 * 
-	 * @param listener
+	 * @param listener TODO
 	 */
 	public synchronized void removeEventListener(EventListener listener) {
 		eventListeners.remove(listener);

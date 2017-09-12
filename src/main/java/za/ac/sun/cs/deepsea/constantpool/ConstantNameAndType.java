@@ -50,8 +50,9 @@ public class ConstantNameAndType extends Constant {
 
 	/**
 	 * TODO
-	 * @param cp
-	 * @return
+	 * 
+	 * @param cp TODO
+	 * @return TODO
 	 */
 	public String getName(final ConstantPool cp) {
 		return cp.constantToString(nameIndex, Constants.CONSTANT_Utf8);
@@ -69,8 +70,9 @@ public class ConstantNameAndType extends Constant {
 
 	/**
 	 * TODO
-	 * @param cp
-	 * @return
+	 * 
+	 * @param cp TODO
+	 * @return TODO
 	 */
 	public String getSignature(final ConstantPool cp) {
 		return cp.constantToString(signatureIndex, Constants.CONSTANT_Utf8);

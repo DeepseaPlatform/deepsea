@@ -23,7 +23,7 @@ public interface EventListener {
 	 * Handles an access watchpoint event. Returns whether the VM should be
 	 * resumed if it was interrupted.
 	 * 
-	 * @param event
+	 * @param event TODO
 	 * @return whether the VM should be resumed if it was interrupted.
 	 */
 	public boolean accessWatchpoint(AccessWatchpointEvent event);
@@ -32,7 +32,7 @@ public interface EventListener {
 	 * Handles a breakpoint event. Returns whether the VM should be resumed if
 	 * it was interrupted.
 	 * 
-	 * @param event
+	 * @param event TODO
 	 * @return whether the VM should be resumed if it was interrupted.
 	 */
 	public boolean breakpoint(BreakpointEvent event);
@@ -41,7 +41,7 @@ public interface EventListener {
 	 * Handles a class prepare event. Returns whether the VM should be resumed
 	 * if it was interrupted.
 	 * 
-	 * @param event
+	 * @param event TODO
 	 * @return whether the VM should be resumed if it was interrupted.
 	 */
 	public boolean classPrepare(ClassPrepareEvent event);
@@ -50,7 +50,7 @@ public interface EventListener {
 	 * Handles a class unload event. Returns whether the VM should be resumed if
 	 * it was interrupted.
 	 * 
-	 * @param event
+	 * @param event TODO
 	 * @return whether the VM should be resumed if it was interrupted.
 	 */
 	public boolean classUnload(ClassUnloadEvent event);
@@ -59,7 +59,7 @@ public interface EventListener {
 	 * Handles an exception event. Returns whether the VM should be resumed if
 	 * it was interrupted.
 	 * 
-	 * @param event
+	 * @param event TODO
 	 * @return whether the VM should be resumed if it was interrupted.
 	 */
 	public boolean exception(ExceptionEvent event);
@@ -67,7 +67,7 @@ public interface EventListener {
 	/**
 	 * Handles a method entry event
 	 * 
-	 * @param event
+	 * @param event TODO
 	 * @return whether the VM should be resumed if it was interrupted.
 	 */
 	public boolean methodEntry(MethodEntryEvent event);
@@ -75,7 +75,7 @@ public interface EventListener {
 	/**
 	 * Handles a method exit event
 	 * 
-	 * @param event
+	 * @param event TODO
 	 * @return whether the VM should be resumed if it was interrupted.
 	 */
 	public boolean methodExit(MethodExitEvent event);
@@ -84,7 +84,7 @@ public interface EventListener {
 	 * Handles a modification watchpoint event. Returns whether the VM should be
 	 * resumed if it was interrupted.
 	 * 
-	 * @param event
+	 * @param event TODO
 	 * @return whether the VM should be resumed if it was interrupted.
 	 */
 	public boolean modificationWatchpoint(ModificationWatchpointEvent event);
@@ -93,7 +93,7 @@ public interface EventListener {
 	 * Handles a step event. Returns whether the VM should be resumed if it was
 	 * interrupted.
 	 * 
-	 * @param event
+	 * @param event TODO
 	 * @return whether the VM should be resumed if it was interrupted.
 	 */
 	public boolean step(StepEvent event);
@@ -102,7 +102,7 @@ public interface EventListener {
 	 * Handles a thread death event. Returns whether the VM should be resumed if
 	 * it was interrupted.
 	 * 
-	 * @param event
+	 * @param event TODO
 	 * @return whether the VM should be resumed if it was interrupted.
 	 */
 	public boolean threadDeath(ThreadDeathEvent event);
@@ -111,7 +111,7 @@ public interface EventListener {
 	 * Handles a thread start event. Returns whether the VM should be resumed if
 	 * it was interrupted.
 	 * 
-	 * @param event
+	 * @param event TODO
 	 * @return whether the VM should be resumed if it was interrupted.
 	 */
 	public boolean threadStart(ThreadStartEvent event);
@@ -120,7 +120,7 @@ public interface EventListener {
 	 * Handles a vm death event. Returns whether the VM should be resumed if it
 	 * was interrupted.
 	 * 
-	 * @param event
+	 * @param event TODO
 	 * @return whether the VM should be resumed if it was interrupted.
 	 */
 	public boolean vmDeath(VMDeathEvent event);
@@ -129,7 +129,7 @@ public interface EventListener {
 	 * Handles a vm disconnect event. Returns whether the VM should be resumed
 	 * if it was interrupted.
 	 * 
-	 * @param event
+	 * @param event TODO
 	 * @return whether the VM should be resumed if it was interrupted.
 	 */
 	public boolean vmDisconnect(VMDisconnectEvent event);

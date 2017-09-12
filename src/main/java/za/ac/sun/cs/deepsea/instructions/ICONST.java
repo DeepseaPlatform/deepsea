@@ -46,6 +46,8 @@ public class ICONST extends Instruction {
 	 *            the {@link Stepper} associated with this instruction
 	 * @param position
 	 *            offset of instruction in its method's bytecode
+	 * @param value
+	 *            TODO
 	 */
 	public ICONST(Stepper stepper, int position, int value) {
 		super(stepper, position, 3);
@@ -55,7 +57,7 @@ public class ICONST extends Instruction {
 	/**
 	 * Returns the value that this instruction pushes onto the stack.
 	 * 
-	 * @return
+	 * @return TODO
 	 */
 	public int getValue() {
 		return value;

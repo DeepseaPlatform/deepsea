@@ -31,8 +31,8 @@ public class EventWaiter implements EventListener {
 	 * Creates a new EventWaiter for the given request. Sets whether it should
 	 * let the VM go after it got the event.
 	 * 
-	 * @param request
-	 * @param shouldGo
+	 * @param request TODO
+	 * @param shouldGo TODO
 	 */
 	public EventWaiter(final EventRequest request, final boolean shouldGo) {
 		this.request = request;
@@ -40,6 +40,9 @@ public class EventWaiter implements EventListener {
 	}
 
 	/**
+	 * TODO
+	 *
+	 * @param event TODO
 	 * @see za.ac.sun.cs.deepsea.agent.EventListener#accessWatchpoint(com.sun.jdi.event.AccessWatchpointEvent)
 	 */
 	public boolean accessWatchpoint(AccessWatchpointEvent event) {
@@ -47,6 +50,9 @@ public class EventWaiter implements EventListener {
 	}
 
 	/**
+	 * TODO
+	 *
+	 * @param event TODO
 	 * @see za.ac.sun.cs.deepsea.agent.EventListener#methodEntry(com.sun.jdi.event.MethodEntryEvent)
 	 */
 	public boolean methodEntry(MethodEntryEvent event) {
@@ -54,6 +60,9 @@ public class EventWaiter implements EventListener {
 	}
 
 	/**
+	 * TODO
+	 *
+	 * @param event TODO
 	 * @see za.ac.sun.cs.deepsea.agent.EventListener#methodExit(com.sun.jdi.event.MethodExitEvent)
 	 */
 	public boolean methodExit(MethodExitEvent event) {
@@ -61,6 +70,9 @@ public class EventWaiter implements EventListener {
 	}
 
 	/**
+	 * TODO
+	 *
+	 * @param event TODO
 	 * @see za.ac.sun.cs.deepsea.agent.EventListener#breakpoint(com.sun.jdi.event.BreakpointEvent)
 	 */
 	public boolean breakpoint(BreakpointEvent event) {
@@ -68,6 +80,9 @@ public class EventWaiter implements EventListener {
 	}
 
 	/**
+	 * TODO
+	 *
+	 * @param event TODO
 	 * @see za.ac.sun.cs.deepsea.agent.EventListener#classPrepare(com.sun.jdi.event.ClassPrepareEvent)
 	 */
 	public boolean classPrepare(ClassPrepareEvent event) {
@@ -75,6 +90,9 @@ public class EventWaiter implements EventListener {
 	}
 
 	/**
+	 * TODO
+	 *
+	 * @param event TODO
 	 * @see za.ac.sun.cs.deepsea.agent.EventListener#classUnload(com.sun.jdi.event.ClassUnloadEvent)
 	 */
 	public boolean classUnload(ClassUnloadEvent event) {
@@ -82,6 +100,9 @@ public class EventWaiter implements EventListener {
 	}
 
 	/**
+	 * TODO
+	 *
+	 * @param event TODO
 	 * @see za.ac.sun.cs.deepsea.agent.EventListener#exception(com.sun.jdi.event.ExceptionEvent)
 	 */
 	public boolean exception(ExceptionEvent event) {
@@ -91,6 +112,9 @@ public class EventWaiter implements EventListener {
 	/**
 	 * Handles an incoming event. Returns whether the VM should be resumed if it
 	 * was suspended.
+	 * 
+	 * @param event TODO
+	 * @return TODO
 	 */
 	protected boolean handleEvent(Event event) {
 		if ((event.request() != null) && (event.request().equals(request))) {
@@ -101,6 +125,9 @@ public class EventWaiter implements EventListener {
 	}
 
 	/**
+	 * TODO
+	 *
+	 * @param event TODO
 	 * @see za.ac.sun.cs.deepsea.agent.EventListener#modificationWatchpoint(com.sun.jdi.event.ModificationWatchpointEvent)
 	 */
 	public boolean modificationWatchpoint(ModificationWatchpointEvent event) {
@@ -109,6 +136,8 @@ public class EventWaiter implements EventListener {
 
 	/**
 	 * Notify any object that is waiting for an event.
+	 *
+	 * @param event TODO
 	 */
 	synchronized protected void notifyEvent(Event event) {
 		notify();
@@ -116,6 +145,9 @@ public class EventWaiter implements EventListener {
 	}
 
 	/**
+	 * TODO
+	 *
+	 * @param event TODO
 	 * @see za.ac.sun.cs.deepsea.agent.EventListener#step(com.sun.jdi.event.StepEvent)
 	 */
 	public boolean step(StepEvent event) {
@@ -123,6 +155,9 @@ public class EventWaiter implements EventListener {
 	}
 
 	/**
+	 * TODO
+	 *
+	 * @param event TODO
 	 * @see za.ac.sun.cs.deepsea.agent.EventListener#threadDeath(com.sun.jdi.event.ThreadDeathEvent)
 	 */
 	public boolean threadDeath(ThreadDeathEvent event) {
@@ -130,6 +165,9 @@ public class EventWaiter implements EventListener {
 	}
 
 	/**
+	 * TODO
+	 *
+	 * @param event TODO
 	 * @see za.ac.sun.cs.deepsea.agent.EventListener#threadStart(com.sun.jdi.event.ThreadStartEvent)
 	 */
 	public boolean threadStart(ThreadStartEvent event) {
@@ -137,6 +175,9 @@ public class EventWaiter implements EventListener {
 	}
 
 	/**
+	 * TODO
+	 *
+	 * @param event TODO
 	 * @see za.ac.sun.cs.deepsea.agent.EventListener#vmDeath(com.sun.jdi.event.VMDeathEvent)
 	 */
 	public boolean vmDeath(VMDeathEvent event) {
@@ -148,6 +189,9 @@ public class EventWaiter implements EventListener {
 	}
 
 	/**
+	 * TODO
+	 *
+	 * @param event TODO
 	 * @see za.ac.sun.cs.deepsea.agent.EventListener#vmDisconnect(com.sun.jdi.event.VMDisconnectEvent)
 	 */
 	public boolean vmDisconnect(VMDisconnectEvent event) {
@@ -158,7 +202,7 @@ public class EventWaiter implements EventListener {
 	 * Waits for the first event corresponding to this waiter's request.
 	 * 
 	 * @return if the vm should be restarted
-	 * @throws InterruptedException
+	 * @throws InterruptedException TODO
 	 */
 	synchronized public Event waitEvent() throws InterruptedException {
 		if (prevEvent == null) { // No event as yet
@@ -173,9 +217,9 @@ public class EventWaiter implements EventListener {
 	 * Waits for the first event corresponding to this waiter's request for the
 	 * given time (in ms). If it times out, return null.
 	 * 
-	 * @param time
+	 * @param time TODO
 	 * @return if the vm should be restarted or not
-	 * @throws InterruptedException
+	 * @throws InterruptedException TODO
 	 */
 	synchronized public Event waitEvent(long time) throws InterruptedException {
 		if (prevEvent == null) { // No event as yet

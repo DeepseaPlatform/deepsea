@@ -99,6 +99,8 @@ public class DepthFirstExplorer extends AbstractExplorer {
 	 * 
 	 * @param diver
 	 *            the associated diver
+	 * @param properties
+	 *            TODO
 	 */
 	public DepthFirstExplorer(Diver diver, Properties properties) {
 		super(diver);
@@ -255,11 +257,9 @@ public class DepthFirstExplorer extends AbstractExplorer {
 	 * 
 	 * </ol>
 	 * 
-	 * @param dive
-	 *            the newly completed dive
+	 * @param signature TODO
+	 * @param pathCondition TODO
 	 * @return a mapping from variables names to values, or {@code null}
-	 * @see za.ac.sun.cs.deepsea.explorer.Explorer#refine(za.ac.sun.cs.deepsea.diver.
-	 *      Dive)
 	 */
 	public Map<String, Constant> refine(String signature, Expression pathCondition) {
 		if (!visitedSignatures.add(signature)) {
