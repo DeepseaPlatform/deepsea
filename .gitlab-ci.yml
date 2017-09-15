@@ -1,5 +1,5 @@
-image: localhost:5000/git-jdk-alpine
-# image: git.cs.sun.ac.za:4567/computer-science/docker-prebuild/alpine-openjdk8-ant
+image: git.cs.sun.ac.za:4567/deepsea/deepsea/alpine-jdk8-git
+# image: localhost:5000/git-jdk-alpine
 before_script:
   - echo `pwd`
   - export GRADLE_USER_HOME=`pwd`/.gradle
