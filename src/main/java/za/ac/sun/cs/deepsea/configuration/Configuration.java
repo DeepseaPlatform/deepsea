@@ -148,6 +148,7 @@ public class Configuration {
 		setTarget();
 		setArgs();
 		setTriggers();
+		setDelegates();
 		setBounds();
 		setProduceOutput();
 		setExplorer();
@@ -177,7 +178,7 @@ public class Configuration {
 	/**
 	 * Reads and sets the "{@code deepsea.triggers}" setting. The value of this
 	 * setting is expected to be a "<code>;</code>" separated list. Each
-	 * components is the fully qualified name of a method with its parameters.
+	 * component is the fully qualified name of a method with its parameters.
 	 * The parameters is given as a "<code>,</code>" separated list of
 	 * "<code>name:type</code>" and "<code>type</code>" entries. Parameters with
 	 * a name is treated symbolically when the method is invoked; parameters
@@ -266,6 +267,26 @@ public class Configuration {
 			return Boolean.class;
 		} else {
 			return Object.class;
+		}
+	}
+
+	/**
+	 * Reads and sets the "{@code deepsea.delegates}" setting. The value of this
+	 * setting is expected to be a "<code>;</code>" separated list. Each
+	 * component is a two-part mapping "X:Y", where both "X" and "Y" are fully
+	 * qualified names of classes. When the system calls a method of class "X",
+	 * a corresponding method of class "Y" is invoked.
+	 */
+	private void setDelegates() {
+		String p = properties.getProperty("deepsea.delegates");
+		if (p != null) {
+			String[] delegates = p.trim().split(";");
+			for (String delegate : delegates) {
+				String[] pair = delegate.split(":");
+				Class<?> from = loadClass(pair[0].trim());
+				Object to = createInstance(pair[1].trim());
+				diver.addDelegate(from, to);
+			}
 		}
 	}
 

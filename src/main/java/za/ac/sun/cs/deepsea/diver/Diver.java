@@ -444,6 +444,11 @@ public class Diver implements Reporter {
 			log.info(line);
 		}
 	}
+
+	public void addDelegate(Class<?> target, Object delegate) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 	
 }
