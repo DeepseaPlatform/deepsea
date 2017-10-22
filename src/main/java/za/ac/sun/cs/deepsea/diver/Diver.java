@@ -445,9 +445,16 @@ public class Diver implements Reporter {
 		}
 	}
 
-	public void addDelegate(Class<?> target, Object delegate) {
-		// TODO Auto-generated method stub
-		
+	/**
+	 * Add a new entry to the registry of delegates.
+	 * 
+	 * @param target the class name that is delegates
+	 * @param delegate the object that handles calls of the target class
+	 */
+	public void addDelegate(String target, Object delegate) {
+		log.info(">>>> DELETEGATE:");
+		log.info("FROM: " + target);
+		log.info("TO:   " + delegate.getClass().getName());
 	}
 	
 	

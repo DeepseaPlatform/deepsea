@@ -283,9 +283,10 @@ public class Configuration {
 			String[] delegates = p.trim().split(";");
 			for (String delegate : delegates) {
 				String[] pair = delegate.split(":");
-				Class<?> from = loadClass(pair[0].trim());
 				Object to = createInstance(pair[1].trim());
-				diver.addDelegate(from, to);
+				if (to != null) {
+					diver.addDelegate(pair[0].trim(), to);
+				}
 			}
 		}
 	}
