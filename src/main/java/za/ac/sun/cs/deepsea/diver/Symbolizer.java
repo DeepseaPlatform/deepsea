@@ -27,7 +27,7 @@ public class Symbolizer {
 
 	private int objectIdCount = 0;
 
-	private int newVariableCount = 0;
+	private static int newVariableCount = 0;
 	
 	private final Map<String, Expression> instanceData = new HashMap<>();
 
@@ -79,6 +79,10 @@ public class Symbolizer {
 		} else {
 			return frames.peek();
 		}
+	}
+
+	public static String getNewVariableName() {
+		return "$" + newVariableCount++;
 	}
 
 	public Expression getPathCondition() {
@@ -156,7 +160,7 @@ public class Symbolizer {
 		Expression value = instanceData.get(fullFieldName);
 		if (value == null) {
 			// TODO create bounds on fields
-			value = new IntVariable("$q" + newVariableCount++, 0, 999);
+			value = new IntVariable(getNewVariableName(), 0, 999);
 			instanceData.put(fullFieldName, value);
 		}
 		return value;
