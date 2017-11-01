@@ -78,4 +78,18 @@ public class ConstantNameAndType extends Constant {
 		return cp.constantToString(signatureIndex, Constants.CONSTANT_Utf8);
 	}
 
+	/**
+	 * TODO
+	 * 
+	 * @param cp TODO
+	 * @return TODO
+	 */
+	public String getAsciiSignature(final ConstantPool cp) {
+		return cp.constantToString(signatureIndex, Constants.CONSTANT_Utf8)
+				.replace('[', 'T')
+				.replace(';', '$')
+				.replace('(', '_')
+				.replace(')', '_');
+	}
+	
 }
