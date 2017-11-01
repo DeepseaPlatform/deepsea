@@ -1,6 +1,7 @@
 package za.ac.sun.cs.deepsea.diver;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -48,7 +49,7 @@ public class Stepper extends AbstractEventListener {
 	public static class IntArray {
 
 		private final int length;
-		
+
 		public IntArray(int length) {
 			this.length = length;
 		}
@@ -151,124 +152,148 @@ public class Stepper extends AbstractEventListener {
 		String methodName = method.name();
 		String key = methodName + method.signature();
 		String fullKey = className + "." + key;
+		// First step: collect the bytecodes for the method, if necessary
 		if (!visitedMethods.contains(fullKey)) {
 			visitedMethods.add(fullKey);
 			byte[] bytecodes = method.bytecodes();
 			Instruction.map(this, bytecodes, fullKey, instructionMap);
 		}
+		// Second step: if in symbolic mode, arrange the frames
 		if (symbolizer.inSymbolicMode()) {
-			try {
-				int n = method.argumentTypes().size();
-				if (!method.isStatic()) {
-					n++;
-				}
-				SymbolicFrame frame = symbolizer.getTopFrame();
-				assert args.isEmpty();
-				for (int i = 0; i < n; i++) {
-					args.push(frame.pop());
-				}
-				frame = symbolizer.pushNewFrame();
-				for (int i = 0; i < n; i++) {
-					frame.setLocal(i, args.pop());
-				}
-			} catch (ClassNotLoadedException x) {
-				x.printStackTrace();
-				return false;
+			return symbolicInvocation(method);
+		}
+		// Third step: if not in symbolic mode, check if the method is a trigger
+		Trigger trigger = dive.getDiver().findTrigger(method, className);
+		if (trigger != null) {
+			return triggerSymbolicMode(trigger, event, method);
+		}
+		// Last step: nothing happened; just return true
+		return true;
+	}
+
+	/**
+	 * Arrange the frames of the symbolic stack. This method is invoked when we
+	 * are in symbolic mode, and a methodEntry event has occurred.
+	 *
+	 * @param method the method that has been entered
+	 * @return {@code true} if and only if everything has executed OK
+	 */
+	private boolean symbolicInvocation(Method method) {
+		try {
+			int n = method.argumentTypes().size();
+			if (!method.isStatic()) {
+				n++;
 			}
-		} else {
-			Trigger trigger = dive.getDiver().findTrigger(method, className);
-			if (trigger != null) {
-				Map<String, Constant> concreteValues = dive.getConcreteValues();
-				int n = trigger.getParameterCount();
-				symbolizer.enterSymbolicMode();
-				SymbolicFrame sframe = symbolizer.pushNewFrame();
-				try {
-					VirtualMachine vm = event.virtualMachine();
-					StackFrame frame = event.thread().frame(0);
-					List<Value> actualValues = frame.getArgumentValues();
-					List<LocalVariable> args = method.arguments();
-					for (int i = 0; i < n; i++) {
-						Object type = trigger.getParameterType(i);
-						boolean symbolic = trigger.isParameterSymbolic(i);
-						String name = trigger.getParameterName(i);
-						if (type == Boolean.class) {
-							Value actualValue = actualValues.get(i);
-							Expression expr = new IntConstant(((BooleanValue) actualValue).intValue());
-							Expression varValue = expr;
-							if (symbolic) {
-								Constant concrete = ((name == null) || (concreteValues == null)) ? null : concreteValues.get(name);
-								expr = new IntVariable(trigger.getParameterName(i), 0, 1);
-								if ((concrete != null) && (concrete instanceof IntConstant)) {
-									boolean value = ((IntConstant) concrete).getValue() != 0;
-									frame.setValue(args.get(i), vm.mirrorOf(value));
-									varValue = concrete;
-								}
-							}
-							sframe.setLocal(i, expr);
-							dive.setActualValue(name, varValue);
-						} else if (type == Integer.class) {
-							Value actualValue = actualValues.get(i);
-							Expression expr = new IntConstant(((IntegerValue) actualValue).intValue());
-							Expression varValue = expr;
-							if (symbolic) {
-								Constant concrete = ((name == null) || (concreteValues == null)) ? null : concreteValues.get(name);
-								int min = dive.getDiver().getMinBound(name);
-								int max = dive.getDiver().getMaxBound(name);
-								expr = new IntVariable(name, min, max);
-								if ((concrete != null) && (concrete instanceof IntConstant)) {
-									int value = ((IntConstant) concrete).getValue();
-									frame.setValue(args.get(i), vm.mirrorOf(value));
-									varValue = concrete;
-								}
-							}
-							sframe.setLocal(i, expr);
-							dive.setActualValue(name, varValue);
-						} else if (type instanceof IntArray) {
-							Value actualValue = actualValues.get(i);
-							assert actualValue instanceof ArrayReference;
-							ArrayReference actualArray = (ArrayReference) actualValue;
-							int arrayLength = actualArray.length();
-							int arrayId = symbolizer.incrAndGetNewObjectId();
-							Expression expr = new IntConstant(arrayId);
-							if (symbolic) {
-								for (int j = 0; j < arrayLength; j++) {
-									String entryName = name + "$" + j;
-									Constant concrete = ((entryName == null) || (concreteValues == null)) ? null : concreteValues.get(entryName);
-									int min = dive.getDiver().getMinBound(entryName, dive.getDiver().getMinBound(name));
-									int max = dive.getDiver().getMaxBound(entryName, dive.getDiver().getMaxBound(name));
-									Expression entryExpr = new IntVariable(entryName, min, max);
-									if ((concrete != null) && (concrete instanceof IntConstant)) {
-										int value = ((IntConstant) concrete).getValue();
-										actualArray.setValue(j, vm.mirrorOf(value));
-										IntConstant valueExpr = new IntConstant(value);
-										dive.setActualValue(entryName, valueExpr);
-									} else {
-										dive.setActualValue(entryName, entryExpr);
-									}
-									symbolizer.putField(arrayId, "" + j, entryExpr);
-								}
-							} else {
-								for (int j = 0; j < arrayLength; j++) {
-									IntConstant value = new IntConstant(((IntegerValue) actualArray.getValue(j)).intValue());
-									symbolizer.putField(arrayId, "" + j, value);
-									dive.setActualValue(name + "$" + j, value);
-								}
-							}
-							sframe.setLocal(i, expr);
-						} else {
-							throw new Error("Unhandled symbolic type: " + type);
+			SymbolicFrame frame = symbolizer.getTopFrame();
+			assert args.isEmpty();
+			for (int i = 0; i < n; i++) {
+				args.push(frame.pop());
+			}
+			frame = symbolizer.pushNewFrame();
+			for (int i = 0; i < n; i++) {
+				frame.setLocal(i, args.pop());
+			}
+		} catch (ClassNotLoadedException x) {
+			x.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+
+	private boolean triggerSymbolicMode(Trigger trigger, MethodEntryEvent event, Method method) {
+		Map<String, Constant> concreteValues = dive.getConcreteValues();
+		int n = trigger.getParameterCount();
+		symbolizer.enterSymbolicMode();
+		SymbolicFrame sframe = symbolizer.pushNewFrame();
+		try {
+			VirtualMachine vm = event.virtualMachine();
+			StackFrame frame = event.thread().frame(0);
+			List<Value> actualValues = frame.getArgumentValues();
+			List<LocalVariable> args = method.arguments();
+			for (int i = 0; i < n; i++) {
+				Object type = trigger.getParameterType(i);
+				boolean symbolic = trigger.isParameterSymbolic(i);
+				String name = trigger.getParameterName(i);
+				if (type == Boolean.class) {
+					Value actualValue = actualValues.get(i);
+					Expression expr = new IntConstant(((BooleanValue) actualValue).intValue());
+					Expression varValue = expr;
+					if (symbolic) {
+						Constant concrete = ((name == null) || (concreteValues == null)) ? null
+								: concreteValues.get(name);
+						expr = new IntVariable(trigger.getParameterName(i), 0, 1);
+						if ((concrete != null) && (concrete instanceof IntConstant)) {
+							boolean value = ((IntConstant) concrete).getValue() != 0;
+							frame.setValue(args.get(i), vm.mirrorOf(value));
+							varValue = concrete;
 						}
 					}
-				} catch (IncompatibleThreadStateException x) {
-					x.printStackTrace();
-				} catch (AbsentInformationException x) {
-					x.printStackTrace();
-				} catch (InvalidTypeException x) {
-					x.printStackTrace();
-				} catch (ClassNotLoadedException x) {
-					x.printStackTrace();
+					sframe.setLocal(i, expr);
+					dive.setActualValue(name, varValue);
+				} else if (type == Integer.class) {
+					Value actualValue = actualValues.get(i);
+					Expression expr = new IntConstant(((IntegerValue) actualValue).intValue());
+					Expression varValue = expr;
+					if (symbolic) {
+						Constant concrete = ((name == null) || (concreteValues == null)) ? null
+								: concreteValues.get(name);
+						int min = dive.getDiver().getMinBound(name);
+						int max = dive.getDiver().getMaxBound(name);
+						expr = new IntVariable(name, min, max);
+						if ((concrete != null) && (concrete instanceof IntConstant)) {
+							int value = ((IntConstant) concrete).getValue();
+							frame.setValue(args.get(i), vm.mirrorOf(value));
+							varValue = concrete;
+						}
+					}
+					sframe.setLocal(i, expr);
+					dive.setActualValue(name, varValue);
+				} else if (type instanceof IntArray) {
+					Value actualValue = actualValues.get(i);
+					assert actualValue instanceof ArrayReference;
+					ArrayReference actualArray = (ArrayReference) actualValue;
+					int arrayLength = actualArray.length();
+					int arrayId = symbolizer.incrAndGetNewObjectId();
+					Expression expr = new IntConstant(arrayId);
+					if (symbolic) {
+						for (int j = 0; j < arrayLength; j++) {
+							String entryName = name + "$" + j;
+							Constant concrete = ((entryName == null) || (concreteValues == null)) ? null
+									: concreteValues.get(entryName);
+							int min = dive.getDiver().getMinBound(entryName, dive.getDiver().getMinBound(name));
+							int max = dive.getDiver().getMaxBound(entryName, dive.getDiver().getMaxBound(name));
+							Expression entryExpr = new IntVariable(entryName, min, max);
+							if ((concrete != null) && (concrete instanceof IntConstant)) {
+								int value = ((IntConstant) concrete).getValue();
+								actualArray.setValue(j, vm.mirrorOf(value));
+								IntConstant valueExpr = new IntConstant(value);
+								dive.setActualValue(entryName, valueExpr);
+							} else {
+								dive.setActualValue(entryName, entryExpr);
+							}
+							symbolizer.putField(arrayId, "" + j, entryExpr);
+						}
+					} else {
+						for (int j = 0; j < arrayLength; j++) {
+							IntConstant value = new IntConstant(
+									((IntegerValue) actualArray.getValue(j)).intValue());
+							symbolizer.putField(arrayId, "" + j, value);
+							dive.setActualValue(name + "$" + j, value);
+						}
+					}
+					sframe.setLocal(i, expr);
+				} else {
+					throw new Error("Unhandled symbolic type: " + type);
 				}
 			}
+		} catch (IncompatibleThreadStateException x) {
+			x.printStackTrace();
+		} catch (AbsentInformationException x) {
+			x.printStackTrace();
+		} catch (InvalidTypeException x) {
+			x.printStackTrace();
+		} catch (ClassNotLoadedException x) {
+			x.printStackTrace();
 		}
 		return true;
 	}
@@ -314,6 +339,61 @@ public class Stepper extends AbstractEventListener {
 		return cp.getConstant(index);
 	}
 
+	private static final Class<?>[] argumentTypes = { Symbolizer.class };
+
+	public int delegateMethod(ReferenceType clas, int index, Symbolizer symbolizer) {
+		ConstantPool cp = cpMap.get(clas);
+		if (cp == null) {
+			try {
+				cp = new ConstantPool(clas.constantPoolCount(), clas.constantPool());
+			} catch (IOException x) {
+				x.printStackTrace();
+				return 0;
+			}
+			cpMap.put(clas, cp);
+		}
+		ConstantMethodref m = (ConstantMethodref) cp.getConstant(index,
+				za.ac.sun.cs.deepsea.constantpool.Constants.CONSTANT_Methodref);
+		String className = m.getClass(cp).replace('/', '.');
+		Object delegate = dive.getDiver().findDelegate(className);
+		if (delegate != null) {
+			ConstantNameAndType nt = (ConstantNameAndType) cp.getConstant(m.getNameAndTypeIndex(),
+					za.ac.sun.cs.deepsea.constantpool.Constants.CONSTANT_NameAndType);
+			String methodName = nt.getName(cp);
+			String signature = nt.getAsciiSignature(cp);
+			java.lang.reflect.Method delegateMethod = null;
+			try {
+				delegateMethod = delegate.getClass().getDeclaredMethod(methodName + signature, argumentTypes);
+			} catch (NoSuchMethodException | SecurityException e) {
+				// Do nothing and leave delegateMethod == null
+			}
+			if (delegateMethod != null) {
+				boolean delegateSuccess = false;
+				try {
+					Object[] arguments = { symbolizer };
+					delegateSuccess = (Boolean) delegateMethod.invoke(delegate, arguments);
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException x) {
+					// This should never happen!
+					x.printStackTrace();
+				}
+				/*
+				 * If the delegated method executes successfully, we return -2
+				 * to signal to the instruction (that invoked this method) that
+				 * it does not need to manipulate the stack any further.
+				 */
+				if (delegateSuccess) {
+					return -2;
+				}
+			}
+		}
+		if (!mgr.isFiltered(className)) {
+			return -1;
+		}
+		ConstantNameAndType nt = (ConstantNameAndType) cp.getConstant(m.getNameAndTypeIndex(),
+				za.ac.sun.cs.deepsea.constantpool.Constants.CONSTANT_NameAndType);
+		return countArguments(nt.getSignature(cp));
+	}
+	
 	public int getArgumentCount(ReferenceType clas, int index) {
 		ConstantPool cp = cpMap.get(clas);
 		if (cp == null) {

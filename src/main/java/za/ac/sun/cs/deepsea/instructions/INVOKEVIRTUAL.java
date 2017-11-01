@@ -62,7 +62,7 @@ public class INVOKEVIRTUAL extends Instruction {
 		String type = stepper.getReturnType(clas, index);
 		char typeCh = type.charAt(0);
 		if ((typeCh == 'I') || (typeCh == 'Z')) {
-			frame.push(new IntVariable("$v" + variableCount++, -1000, 1000));
+			frame.push(new IntVariable(Symbolizer.getNewVariableName(), -1000, 1000));
 		} else if ((typeCh != 'V') && (typeCh != '?')) {
 			frame.push(Operation.ZERO);
 		}

@@ -28,8 +28,6 @@ public abstract class Instruction {
 	 */
 	protected static final StringBuilder sb = new StringBuilder();
 
-	protected static int variableCount = 0;
-
 	/**
 	 * The instance of {@link Stepper} that created this instruction and "in"
 	 * which the instruction will execute.

@@ -29,16 +29,24 @@ public class INVOKESTATIC extends Instruction {
 
 	@Override
 	public void execute(StepEvent event, Symbolizer symbolizer) {
-		/*
-		 * First we throw away the arguments. We can do this, because
-		 * Stepper.getArgumentCount() will return 0 for "monitored" methods. For
-		 * these routines, the MethodEntryEvent will handle the actual transfer
-		 * of parameters. For unmonitored methods, the code below removes the
-		 * arguments passed to the code.
-		 */
 		SymbolicFrame frame = symbolizer.getTopFrame();
 		ReferenceType clas = event.location().declaringType();
-		int argumentCount = stepper.getArgumentCount(clas, index);
+		/*
+		 * First check if we are invoking a delegated method. If so, and if it
+		 * executes successfully, it will take care of the stack (popping
+		 * arguments and pushing the result), and it will return -2.
+		 * 
+		 * If the method is not delegated, the method will return one of two
+		 * values:
+		 * 
+		 * - For monitored methods, the method returns -1. The MethodEntryEvent
+		 * handler will take care of the actual transfer of parameters.
+		 *
+		 * - For unmonitored methods, the method return the actual number of
+		 * arguments and the code below removes the arguments passed to the
+		 * code.
+		 */
+		int argumentCount = stepper.delegateMethod(clas, index, symbolizer);
 		if (argumentCount > 0) {
 			while (argumentCount-- > 0) {
 				frame.pop();
@@ -51,12 +59,14 @@ public class INVOKESTATIC extends Instruction {
 		 * value on the current stack. In other cases (unmonitored methods),
 		 * this code places an appropriate symbolic value or zero on the stack.
 		 */
-		String type = stepper.getReturnType(clas, index);
-		char typeCh = type.charAt(0);
-		if ((typeCh == 'I') || (typeCh == 'Z')) {
-			frame.push(new IntVariable("$v" + variableCount++, -1000, 1000));
-		} else if ((typeCh != 'V') && (typeCh != '?')) {
-			frame.push(Operation.ZERO);
+		if (argumentCount != -2) {
+			String type = stepper.getReturnType(clas, index);
+			char typeCh = type.charAt(0);
+			if ((typeCh == 'I') || (typeCh == 'Z')) {
+				frame.push(new IntVariable(Symbolizer.getNewVariableName(), -1000, 1000));
+			} else if ((typeCh != 'V') && (typeCh != '?')) {
+				frame.push(Operation.ZERO);
+			}
 		}
 	}
 

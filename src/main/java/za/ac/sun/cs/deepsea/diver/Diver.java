@@ -77,6 +77,8 @@ public class Diver implements Reporter {
 	 */
 	private final List<Trigger> triggers = new LinkedList<>();
 
+	private final Map<String, Object> delegates = new HashMap<>();
+
 	/**
 	 * Maps variable names to lower bounds. 
 	 */
@@ -452,10 +454,11 @@ public class Diver implements Reporter {
 	 * @param delegate the object that handles calls of the target class
 	 */
 	public void addDelegate(String target, Object delegate) {
-		log.info(">>>> DELETEGATE:");
-		log.info("FROM: " + target);
-		log.info("TO:   " + delegate.getClass().getName());
+		delegates.put(target, delegate);
 	}
-	
-	
+
+	public Object findDelegate(String target) {
+		return delegates.get(target);
+	}
+
 }
