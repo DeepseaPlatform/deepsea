@@ -13,8 +13,9 @@ dependencies {
 	compile files("lib/green.jar")
 	compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.9.0'
 	compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.9.0'
-    compile 'org.apfloat:apfloat:1.8.2'
+	compile 'org.apfloat:apfloat:1.8.2'
     testImplementation 'junit:junit:4.12'
+    runtime files("/z3/build/com.microsoft.z3.jar") // For Docker
 }
 
 javadoc {
