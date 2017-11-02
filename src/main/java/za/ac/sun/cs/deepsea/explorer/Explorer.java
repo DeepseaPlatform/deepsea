@@ -35,6 +35,12 @@ public interface Explorer extends Reporter {
 	 * </p>
 	 * 
 	 * <p>
+	 * THE INFORMATION BELOW IS OUTDATED. SHOULD BE REPLACED WITH A DESCRIPTION
+	 * OF THE SINGLE ROUTINE {@link Dive#getSegmentedPathCondition()} THAT
+	 * RETURNS THE OLD INFORMATION IN ONE PACKAGE.
+	 * </p>
+	 * 
+	 * <p>
 	 * There are two routines, in particular, that can help an {@link Explorer}:
 	 * </p>
 	 * 

@@ -25,6 +25,7 @@ public class Math {
 				new Operation(Operator.AND,
 						new Operation(Operator.LT, arg0, arg1),
 						new Operation(Operator.EQ, arg1, var)));
+		symbolizer.pushExtraConjunct(pc);
 		frame.push(var);
 		return true;
 	}

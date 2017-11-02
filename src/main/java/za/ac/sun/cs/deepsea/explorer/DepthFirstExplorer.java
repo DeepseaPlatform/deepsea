@@ -12,14 +12,12 @@ import org.apache.logging.log4j.Logger;
 
 import za.ac.sun.cs.deepsea.diver.Dive;
 import za.ac.sun.cs.deepsea.diver.Diver;
+import za.ac.sun.cs.deepsea.diver.SegmentedPathCondition;
 import za.ac.sun.cs.green.Green;
 import za.ac.sun.cs.green.Instance;
 import za.ac.sun.cs.green.expr.Constant;
-import za.ac.sun.cs.green.expr.Expression;
 import za.ac.sun.cs.green.expr.IntConstant;
 import za.ac.sun.cs.green.expr.IntVariable;
-import za.ac.sun.cs.green.expr.Operation;
-import za.ac.sun.cs.green.expr.Operation.Operator;
 import za.ac.sun.cs.green.util.Configuration;
 
 /**
@@ -108,7 +106,8 @@ public class DepthFirstExplorer extends AbstractExplorer {
 		this.solver = new Green("DEEPSEA");
 		// properties.setProperty("green.log.level", "OFF");
 		properties.setProperty("green.services", "model");
-		properties.setProperty("green.service.model", "(bounder (canonizer modeller))");
+		properties.setProperty("green.service.model", "(bounder modeller)");
+//		properties.setProperty("green.service.model", "(bounder (canonizer modeller))");
 		properties.setProperty("green.service.model.bounder", "za.ac.sun.cs.green.service.bounder.BounderService");
 		properties.setProperty("green.service.model.canonizer",
 				"za.ac.sun.cs.green.service.canonizer.ModelCanonizerService");
@@ -261,67 +260,50 @@ public class DepthFirstExplorer extends AbstractExplorer {
 	 * @param pathCondition TODO
 	 * @return a mapping from variables names to values, or {@code null}
 	 */
-	public Map<String, Constant> refine(String signature, Expression pathCondition) {
-		if (!visitedSignatures.add(signature)) {
+	public Map<String, Constant> refine(SegmentedPathCondition spc) {
+		if (!visitedSignatures.add(spc.getSignature())) {
 			/*
 			 * If we are revisiting this path, we truncate it by removing
 			 * conjuncts one by one, until we get a path condition that we have
 			 * not visited before and that we have not classified as unfeasible.
 			 */
-			log.debug("revisit of signature \"" + signature + "\", truncating");
+			log.debug("revisit of signature \"" + spc.getSignature() + "\", truncating");
 			revisitCounter++;
-			while ((signature.length() > 0)
-					&& (visitedSignatures.contains(signature) || infeasibleSignatures.contains(signature))) {
-				signature = signature.substring(1);
-				assert pathCondition instanceof Operation;
-				Operation pc = (Operation) pathCondition;
-				assert pc.getOperator() == Operator.AND;
-				pathCondition = pc.getOperand(1);
+			while ((spc.getSignature().length() > 0)
+					&& (visitedSignatures.contains(spc.getSignature()) || infeasibleSignatures.contains(spc.getSignature()))) {
+				spc = spc.getParent();
 			}
 		}
-		log.info("path signature: " + signature);
-		log.info("path condition: " + pathCondition);
-		while (signature.length() > 0) {
+		log.info("path signature: " + spc.getSignature());
+		log.info("path condition: " + spc.getPathCondition());
+		while (spc.getSignature().length() > 0) {
 			/*
 			 * Flip the first char ('0' <-> '1') of signature.
 			 */
-			char firstSignature = (signature.charAt(0) == '0') ? '1' : '0';
-			String restSignature = signature.substring(1);
-			String candidateSignature = firstSignature + restSignature;
-			if (visitedSignatures.contains(candidateSignature)) {
+			SegmentedPathCondition npc = spc.getNegated1st();
+			if (visitedSignatures.contains(npc.getSignature())) {
 				/*
 				 * We now know that both this path condition and the
 				 * complementary path condition (i.e., with the first conjunct
-				 * negated) have been visited. We therefore record that there
+				 * negated) have been visited. We therefore record that their
 				 * common prefix has been visited, and we drop the first
 				 * conjunct and try to negate the new first conjunct.
 				 */
-				visitedSignatures.add(restSignature);
-				signature = restSignature;
-				assert pathCondition instanceof Operation;
-				Operation pc = (Operation) pathCondition;
-				assert pc.getOperator() == Operator.AND;
-				pathCondition = pc.getOperand(1);
-				log.debug("dropping first conjunct -> " + pathCondition);
+				visitedSignatures.add(spc.getParent().getSignature());
+				spc = spc.getParent();
+				log.debug("dropping first conjunct -> " + spc.getPathCondition());
 			} else {
 				// negate first conjunct of path condition and check if it has a model
-				assert pathCondition instanceof Operation;
-				Operation pc = (Operation) pathCondition;
-				assert pc.getOperator() == Operator.AND;
-				Expression firstPC = negate(pc.getOperand(0));
-				Expression restPC = pc.getOperand(1);
-				pathCondition = new Operation(Operator.AND, firstPC, restPC);
-				log.debug("trying <" + candidateSignature + "> " + pathCondition);
-				Instance instance = new Instance(solver, null, pathCondition);
+				log.debug("trying <" + npc.getSignature() + "> " + npc.getPathCondition());
+				Instance instance = new Instance(solver, null, npc.getPathCondition());
 				@SuppressWarnings("unchecked")
 				Map<IntVariable, Object> model = (Map<IntVariable, Object>) instance.request("model");
 				if (model == null) {
-					// again drop the first conjunct
-					signature = restSignature;
-					pathCondition = pc.getOperand(1);
+					infeasibleSignatures.add(npc.getSignature());
 					log.debug("no model");
-					infeasibleSignatures.add(signature);
 					unSatCounter++;
+					// again drop the first conjunct
+					spc = spc.getParent();
 				} else {
 					// translate model
 					Map<String, Constant> newModel = new HashMap<>();
@@ -338,7 +320,7 @@ public class DepthFirstExplorer extends AbstractExplorer {
 						return newModel;
 					} else {
 						log.debug("model {} has been visited before, recurring", modelString);
-						return refine(candidateSignature, pathCondition);
+						return refine(spc.getParent());
 					}
 				}
 			}
@@ -353,41 +335,8 @@ public class DepthFirstExplorer extends AbstractExplorer {
 	@Override
 	public Map<String, Constant> refine(Dive dive) {
 		pathCounter++;
-		return refine(dive.getSignature(), dive.getPathCondition());
-	}
-
-	/**
-	 * Negates an expression without adding too many {@code NOT} operators. If
-	 * the expression is already of the form "{@code NOT x}", then this method
-	 * simply returns "{@code x}".
-	 * 
-	 * @param expression
-	 *            the expression to negate
-	 * @return the negation of the expression
-	 */
-	private Expression negate(Expression expression) {
-		if (expression instanceof Operation) {
-			Operation operation = (Operation) expression;
-			switch (operation.getOperator()) {
-			case NOT:
-				return operation.getOperand(0);
-			case EQ:
-				return new Operation(Operator.NE, operation.getOperand(0), operation.getOperand(1));
-			case NE:
-				return new Operation(Operator.EQ, operation.getOperand(0), operation.getOperand(1));
-			case LT:
-				return new Operation(Operator.GE, operation.getOperand(0), operation.getOperand(1));
-			case LE:
-				return new Operation(Operator.GT, operation.getOperand(0), operation.getOperand(1));
-			case GT:
-				return new Operation(Operator.LE, operation.getOperand(0), operation.getOperand(1));
-			case GE:
-				return new Operation(Operator.LT, operation.getOperand(0), operation.getOperand(1));
-			default:
-				break;
-			}
-		}
-		return new Operation(Operator.NOT, expression);
+//		return refine(dive.getSignature(), dive.getPathCondition());
+		return refine(dive.getSegmentedPathCondition());
 	}
 
 	/**

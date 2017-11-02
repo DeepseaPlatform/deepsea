@@ -31,8 +31,12 @@ public class Symbolizer {
 	
 	private final Map<String, Expression> instanceData = new HashMap<>();
 
-	private Expression pathCondition = Operation.TRUE;
+	private SegmentedPathCondition segmentedPathCondition = new SegmentedPathCondition(null, Operation.TRUE, Operation.TRUE, 'x');
 
+	@Deprecated
+	private Expression pathCondition = Operation.TRUE;
+	
+	@Deprecated
 	private String signature = "";
 
 	private Expression pendingConjunct = null;
@@ -85,10 +89,16 @@ public class Symbolizer {
 		return "$" + newVariableCount++;
 	}
 
+	public SegmentedPathCondition getSegmentedPathCondition() {
+		return segmentedPathCondition;
+	}
+
+	@Deprecated
 	public Expression getPathCondition() {
 		return pathCondition;
 	}
 
+	@Deprecated
 	public String getSignature() {
 		return signature;
 	}
@@ -134,11 +144,12 @@ public class Symbolizer {
 					branch = '0';
 					pendingConjunct = new Operation(Operator.NOT, pendingConjunct);
 				}
-				signature = branch + signature;
-				if (pendingExtraConjunct != null) {
-					pathCondition = new Operation(Operator.AND, pendingExtraConjunct, pathCondition);
-				}
-				pathCondition = new Operation(Operator.AND, pendingConjunct, pathCondition);
+//				signature = branch + signature;
+//				if (pendingExtraConjunct != null) {
+//					pathCondition = new Operation(Operator.AND, pendingExtraConjunct, pathCondition);
+//				}
+//				pathCondition = new Operation(Operator.AND, pendingConjunct, pathCondition);
+				segmentedPathCondition = new SegmentedPathCondition(segmentedPathCondition, pendingConjunct, pendingExtraConjunct, branch);
 				pendingConjunct = null;
 				pendingExtraConjunct = null;
 			}

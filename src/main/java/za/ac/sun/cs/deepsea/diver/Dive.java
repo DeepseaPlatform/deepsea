@@ -125,15 +125,26 @@ public class Dive {
 	}
 
 	/**
+	 * Returns the path condition and signature collected by {@link #symbolizer} during the
+	 * most recent invocation of the target program.
+	 * 
+	 * @return the segmented path condition for the most recent run
+	 */
+	public SegmentedPathCondition getSegmentedPathCondition() {
+		return symbolizer.getSegmentedPathCondition();
+	}
+
+	/**
 	 * Returns the path condition collected by {@link #symbolizer} during the
 	 * most recent invocation of the target program.
 	 * 
 	 * @return the path condition for the most recent run
 	 */
+	@Deprecated
 	public Expression getPathCondition() {
 		return symbolizer.getPathCondition();
 	}
-
+	
 	/**
 	 * Returns the signature string for the most recent invocation of the target
 	 * program. A signature is a sequence of "{@code 0}s" and "{@code 1}s" that
@@ -142,6 +153,7 @@ public class Dive {
 	 * 
 	 * @return the signature string for the most recent run
 	 */
+	@Deprecated
 	public String getSignature() {
 		return symbolizer.getSignature();
 	}
