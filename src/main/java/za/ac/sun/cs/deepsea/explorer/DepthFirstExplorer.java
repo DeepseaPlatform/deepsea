@@ -256,8 +256,7 @@ public class DepthFirstExplorer extends AbstractExplorer {
 	 * 
 	 * </ol>
 	 * 
-	 * @param signature TODO
-	 * @param pathCondition TODO
+	 * @param spc the segmented path condition
 	 * @return a mapping from variables names to values, or {@code null}
 	 */
 	public Map<String, Constant> refine(SegmentedPathCondition spc) {
