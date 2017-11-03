@@ -14,7 +14,7 @@ dependencies {
 	compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.9.0'
 	compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.9.0'
 	compile 'org.apfloat:apfloat:1.8.2'
-    testImplementation 'junit:junit:4.12'
+	testImplementation 'junit:junit:4.12'
 }
 
 javadoc {
