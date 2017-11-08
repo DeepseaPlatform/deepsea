@@ -40,7 +40,7 @@ public class IINC extends Instruction {
 		SymbolicFrame frame = symbolizer.getTopFrame();
 		Expression e1 = new IntConstant(value);
 		Expression e0 = frame.getLocal(index);
-		frame.push(new Operation(Operator.ADD, e0, e1));
+		frame.setLocal(index, new Operation(Operator.ADD, e0, e1));
 	}
 	
 	@Override
