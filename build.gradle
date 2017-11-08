@@ -5,7 +5,7 @@ apply plugin: 'java-library'
 mainClassName = 'za.ac.sun.cs.deepsea.DEEPSEA'
 
 repositories {
-    jcenter()
+	jcenter()
 }
 
 dependencies {
@@ -41,3 +41,13 @@ task generateVersion {
 	}
 }
 compileJava.dependsOn generateVersion
+
+startScripts {
+	classpath += files('src/dist/dummy')
+	doLast {
+		def windowsScriptFile = file getWindowsScript()
+		def unixScriptFile = file getUnixScript()
+		windowsScriptFile.text = windowsScriptFile.text.replace('%APP_HOME%\\lib\\dummy', '.;%EXTRA_CLASSPATH%')
+		unixScriptFile.text = unixScriptFile.text.replace('$APP_HOME/lib/dummy', '.:$EXTRA_CLASSPATH')
+	} 
+} 
