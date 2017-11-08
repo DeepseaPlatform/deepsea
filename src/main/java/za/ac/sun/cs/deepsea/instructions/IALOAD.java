@@ -28,9 +28,7 @@ public class IALOAD extends Instruction {
 	
 	@Override
 	public String toString() {
-		sb.setLength(0);
-		sb.append("iaload ");
-		return sb.toString();
+		return "iaload ";
 	}
 	
 }
