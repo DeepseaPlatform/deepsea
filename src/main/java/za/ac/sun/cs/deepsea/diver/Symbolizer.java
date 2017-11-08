@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import org.apache.logging.log4j.Logger;
+
 import com.sun.jdi.Location;
 import com.sun.jdi.event.StepEvent;
 
@@ -19,7 +21,7 @@ import za.ac.sun.cs.green.expr.Operation.Operator;
 public class Symbolizer {
 
 	//	private final Diver diver;
-	//	private final Logger log;
+	private final Logger log;
 
 	private boolean inSymbolicMode;
 
@@ -49,7 +51,7 @@ public class Symbolizer {
 
 	public Symbolizer(final Diver diver) {
 		//		this.diver = diver;
-		//		this.log = this.diver.getLog();
+		this.log = diver.getLog();
 		inSymbolicMode = false;
 	}
 
@@ -120,9 +122,15 @@ public class Symbolizer {
 
 	public void pushConjunct(Expression conjunct, int target) {
 		assert pendingConjunct == null;
-		if (!isConstantConjunct(conjunct) && conjunctSet.add(conjunct.toString())) {
+		String c = conjunct.toString();
+		if (isConstantConjunct(conjunct)) {
+			log.trace(">>> constant conjunct ignored: {}", c);
+		} else if (conjunctSet.add(c)) {
 			pendingConjunct = conjunct;
 			pendingTarget = target;
+			log.trace(">>> adding conjunct: {}", c);
+		} else {
+			log.trace(">>> duplicate conjunct ignored: {}", c);
 		}
 	}
 
