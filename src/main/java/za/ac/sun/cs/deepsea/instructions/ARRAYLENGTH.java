@@ -31,6 +31,7 @@ public class ARRAYLENGTH extends Instruction {
 			List<Value> actualValues = frame.getArgumentValues();
 			ArrayReference array = (ArrayReference) actualValues.get(0);
 			SymbolicFrame symbolicFrame = symbolizer.getTopFrame();
+			symbolicFrame.pop();
 			symbolicFrame.push(new IntConstant(array.length()));
 		} catch (IncompatibleThreadStateException x) {
 			x.printStackTrace();
