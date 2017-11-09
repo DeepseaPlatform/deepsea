@@ -41,7 +41,7 @@ public class StringMethods {
 		if (length0 >= length1) {
 			// ...construct the equality constraint
 			Expression guard = null;
-			for (int i = 0; i < length0; i++) {
+			for (int i = 0; i < length1; i++) {
 				Expression elem0 = symbolizer.getArrayValue(array0, i);
 				Expression elem1 = symbolizer.getArrayValue(array1, i);
 				Expression elemGuard = Operation.apply(Operator.EQ, elem0, elem1);
