@@ -1,24 +1,13 @@
 package examples.simple;
 
-public class StringTest {
+import examples.simple.StringMethods;
 
-	public static boolean startsWith(int[] one, int[] two) {
-		int idx = 0;
-		boolean theSame = true;
-		while (idx < two.length) {
-			if (one[idx] != two[idx]) {
-				theSame = false;
-				break;
-			}
-			idx++;
-		}
-		return theSame;
-	}
+public class StringTest {
 	
 	public static void test(int[] in) {
 		int[] match = {1,2,3,4};
-		if (startsWith(in,match)) {
-			System.out.println("Match ");
+		if (StringMethods.startsWith(in,match)) {
+			System.out.println("Match "); assert false;
 		} else {
 			System.out.println("No Match ");
 		}
