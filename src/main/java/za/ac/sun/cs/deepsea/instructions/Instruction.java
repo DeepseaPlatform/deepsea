@@ -92,9 +92,11 @@ public abstract class Instruction {
 	}
 
 	/**
-	 * Responds to the {@link StepEvent} by executing the instruction. This
-	 * version of the method does nothing, but those instructions that influence
-	 * the symbolic state will override this method.
+	 * Responds to the {@link StepEvent} by executing the instruction. The
+	 * default implementation below throws a runtime exception. Since many
+	 * instructions have a symbolic counterpart, it makes sense to explicitly
+	 * mark non-symbolic instructions by requiring that they override this
+	 * method with an empty method (one that does nothing).
 	 * 
 	 * @param event
 	 *            the triggering event
@@ -102,6 +104,7 @@ public abstract class Instruction {
 	 *            the symbolic state
 	 */
 	public void execute(StepEvent event, Symbolizer symbolizer) {
+		throw new RuntimeException("UNIMPLEMENTED INSTRUCTION");
 	}
 
 	/**

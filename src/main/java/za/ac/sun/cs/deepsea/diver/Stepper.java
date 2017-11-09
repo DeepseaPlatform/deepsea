@@ -339,9 +339,9 @@ public class Stepper extends AbstractEventListener {
 		return cp.getConstant(index);
 	}
 
-	private static final Class<?>[] argumentTypes = { Symbolizer.class };
+	private static final Class<?>[] argumentTypes = { Symbolizer.class, ThreadReference.class };
 
-	public int delegateMethod(ReferenceType clas, int index, Symbolizer symbolizer) {
+	public int delegateMethod(ReferenceType clas, int index, Symbolizer symbolizer, ThreadReference thread) {
 		ConstantPool cp = cpMap.get(clas);
 		if (cp == null) {
 			try {
@@ -370,7 +370,7 @@ public class Stepper extends AbstractEventListener {
 			if (delegateMethod != null) {
 				boolean delegateSuccess = false;
 				try {
-					Object[] arguments = { symbolizer };
+					Object[] arguments = { symbolizer, thread };
 					delegateSuccess = (Boolean) delegateMethod.invoke(delegate, arguments);
 				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException x) {
 					// This should never happen!

@@ -2,13 +2,19 @@ package za.ac.sun.cs.deepsea.diver;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
 import org.apache.logging.log4j.Logger;
 
+import com.sun.jdi.ArrayReference;
+import com.sun.jdi.IncompatibleThreadStateException;
 import com.sun.jdi.Location;
+import com.sun.jdi.StackFrame;
+import com.sun.jdi.ThreadReference;
+import com.sun.jdi.Value;
 import com.sun.jdi.event.StepEvent;
 
 import za.ac.sun.cs.deepsea.instructions.Instruction;
@@ -216,6 +222,31 @@ public class Symbolizer {
 		}
 		return value;
 		*/
+	}
+
+	/**
+	 * Returns the size of an array on the actual expression stack of the given
+	 * thread.
+	 * 
+	 * @param thread
+	 *            the thread whose stack will be peeked at
+	 * @param index
+	 *            the position of the array on the stack
+	 * @return the size of the array or 0 if it is invalid
+	 */
+	public static int getRealArrayLength(ThreadReference thread, int index) {
+		try {
+			StackFrame frame = thread.frame(0);
+			List<Value> actualValues = frame.getArgumentValues();
+			Value value = actualValues.get(index);
+			if (value instanceof ArrayReference) {
+				ArrayReference array = (ArrayReference) actualValues.get(index);
+				return array.length();
+			}
+		} catch (IncompatibleThreadStateException x) {
+			x.printStackTrace();
+		}
+		return 0;
 	}
 
 }

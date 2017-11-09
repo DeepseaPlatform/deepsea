@@ -1,11 +1,5 @@
 package za.ac.sun.cs.deepsea.instructions;
 
-import java.util.List;
-
-import com.sun.jdi.ArrayReference;
-import com.sun.jdi.IncompatibleThreadStateException;
-import com.sun.jdi.StackFrame;
-import com.sun.jdi.Value;
 import com.sun.jdi.event.StepEvent;
 
 import za.ac.sun.cs.deepsea.diver.Stepper;
@@ -14,33 +8,43 @@ import za.ac.sun.cs.deepsea.diver.Symbolizer;
 import za.ac.sun.cs.green.expr.IntConstant;
 
 /**
- * UNIMPLEMENTED &amp; BROKEN
+ * The {@code ARRAYLENGTH} instruction.
  * 
- * @author Jaco Geldenhuys (geld@sun.ac.za)
+ * <h3>Description</h3>
+ * 
+ * <p>
+ * replace the top stack element, which is an array, with its length
+ * </p>
+ * 
+ * <h3>Effect</h3>
+ * 
+ * <p>
+ * ..., a &rArr; ..., a.length
+ * </p>
+ * 
+ * <h3>Symbolic effect</h3>
+ * 
+ * <p>
+ * Peeks in the memory of the "real" VM and push the length of the actual array
+ * parameter onto the symbolic stack (after removing the array address).
+ * </p>
  */
 public class ARRAYLENGTH extends Instruction {
 
 	public ARRAYLENGTH(Stepper stepper, int position) {
 		super(stepper, position, 190);
 	}
-	
+
 	@Override
 	public void execute(StepEvent event, Symbolizer symbolizer) {
-		try {
-			StackFrame frame = event.thread().frame(0);
-			List<Value> actualValues = frame.getArgumentValues();
-			ArrayReference array = (ArrayReference) actualValues.get(0);
-			SymbolicFrame symbolicFrame = symbolizer.getTopFrame();
-			symbolicFrame.pop();
-			symbolicFrame.push(new IntConstant(array.length()));
-		} catch (IncompatibleThreadStateException x) {
-			x.printStackTrace();
-		}
+		SymbolicFrame frame = symbolizer.getTopFrame();
+		frame.pop();
+		frame.push(new IntConstant(Symbolizer.getRealArrayLength(event.thread(), 0)));
 	}
-	
+
 	@Override
 	public String toString() {
 		return "arraylength ";
 	}
-	
+
 }

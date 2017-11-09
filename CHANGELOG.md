@@ -7,7 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 ### Added
+- Users can define delegated methods to model complex behaviour
+- Models from the SMT solver are recorded and not reused
+- Support for arrays
 - DEEPSEA now prints a header with version information
+
+### Changed
+- Unimplemented instructions now throw an exception
+- Path conditions are handled from intelligently, support "additional" conditions
 
 ### Fixed
 - Issue with build.gradle that caused CI to fail.

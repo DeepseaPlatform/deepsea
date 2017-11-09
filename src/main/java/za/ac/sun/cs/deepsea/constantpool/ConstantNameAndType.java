@@ -87,6 +87,7 @@ public class ConstantNameAndType extends Constant {
 	public String getAsciiSignature(final ConstantPool cp) {
 		return cp.constantToString(signatureIndex, Constants.CONSTANT_Utf8)
 				.replace('[', 'T')
+				.replace('/', '_')
 				.replace(';', '$')
 				.replace('(', '_')
 				.replace(')', '_');
