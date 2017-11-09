@@ -1,5 +1,7 @@
 package za.ac.sun.cs.deepsea.models;
 
+import com.sun.jdi.ThreadReference;
+
 import za.ac.sun.cs.deepsea.diver.Diver;
 import za.ac.sun.cs.deepsea.diver.SymbolicFrame;
 import za.ac.sun.cs.deepsea.diver.Symbolizer;
@@ -13,7 +15,7 @@ public class Math {
 	public Math(Diver diver) {
 	}
 
-	public boolean max_II_I(Symbolizer symbolizer) {
+	public boolean max_II_I(Symbolizer symbolizer, ThreadReference thread) {
 		SymbolicFrame frame = symbolizer.getTopFrame();
 		Expression arg0 = frame.pop();
 		Expression arg1 = frame.pop();

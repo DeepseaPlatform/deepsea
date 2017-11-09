@@ -46,7 +46,7 @@ public class INVOKESTATIC extends Instruction {
 		 * arguments and the code below removes the arguments passed to the
 		 * code.
 		 */
-		int argumentCount = stepper.delegateMethod(clas, index, symbolizer);
+		int argumentCount = stepper.delegateMethod(clas, index, symbolizer, event.thread());
 		if (argumentCount > 0) {
 			while (argumentCount-- > 0) {
 				frame.pop();
