@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - DEEPSEA now prints a header with version information
 
 ### Changed
+- Unimplemented instructions now throw an exception
 - Path conditions are handled from intelligently, support "additional" conditions
 
 ### Fixed
