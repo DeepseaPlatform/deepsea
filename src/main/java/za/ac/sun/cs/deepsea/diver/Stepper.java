@@ -166,6 +166,7 @@ public class Stepper extends AbstractEventListener {
 		}
 		// If in symbolic mode, ...
 		if (symbolizer.inSymbolicMode()) {
+			// ...execute the delegate if available...
 			if (delegateMethod != null) {
 				boolean delegateSuccess = false;
 				try {
@@ -175,14 +176,17 @@ public class Stepper extends AbstractEventListener {
 					// This should never happen!
 					x.printStackTrace();
 				}
+				delegateMethod = null;
 				if (delegateSuccess) {
 					// Delegate executed successfully
-					delegateMethod = null;
 					return true;
 				} else {
 					// We need to throw a runtime exception here because the symbolic frame may be damaged
 					throw new RuntimeException("DELEGATE FAILED");
 				}
+			} else if (mgr.isFiltered(className)) {
+				// ...or do nothing is this is a sometimes-delegated method...
+				return true;
 			} else {
 				// ...or synchronize the concrete and symbolic frames
 				return symbolicInvocation(method);
@@ -328,6 +332,9 @@ public class Stepper extends AbstractEventListener {
 	public boolean classPrepare(ClassPrepareEvent event) {
 		if (dive.getDiver().getTarget().equals(event.referenceType().name())) {
 			mgr.createMethodEntryRequest(r -> mgr.filterExcludes(r));
+			for (String delegateTarget : dive.getDiver().getDelegateTargets()) {
+				mgr.createMethodEntryRequest(r -> { r.addClassFilter(delegateTarget); });
+			}
 			ThreadReference mt = RequestManager.findThread(vm, "main");
 			mgr.createStepRequest(mt, StepRequest.STEP_MIN, StepRequest.STEP_INTO, r -> {
 				mgr.filterExcludes(r);
@@ -396,6 +403,7 @@ public class Stepper extends AbstractEventListener {
 			if (delegateMethod != null) {
 				log.trace("@@@ found delegate: {}", methodName + signature);
 				delegateThread = thread;
+				return -2;
 			} else {
 				log.trace("@@@ no delegate: {}", methodName + signature);
 			}

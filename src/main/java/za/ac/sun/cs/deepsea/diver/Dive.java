@@ -87,6 +87,9 @@ public class Dive {
 		log.trace("issuing monitor requests");
 		RequestManager m = new RequestManager(diver, vm.eventRequestManager());
 		m.addExclude("java.*", "javax.*", "sun.*", "com.sun.*");
+		for (String delegateTarget : diver.getDelegateTargets()) {
+			m.addExclude(delegateTarget);
+		}
 		m.createClassPrepareRequest(r -> m.filterExcludes(r));
 //		m.createMethodEntryRequest(r -> m.filterExcludes(r));
 //		ThreadReference mt = RequestManager.findThread(vm, "main");

@@ -104,7 +104,7 @@ public abstract class Instruction {
 	 *            the symbolic state
 	 */
 	public void execute(StepEvent event, Symbolizer symbolizer) {
-		throw new RuntimeException("UNIMPLEMENTED INSTRUCTION");
+		throw new RuntimeException("UNIMPLEMENTED INSTRUCTION (opcode == " + opcode + ")");
 	}
 
 	/**

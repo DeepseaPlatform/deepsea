@@ -1,6 +1,13 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import com.sun.jdi.event.StepEvent;
+
 import za.ac.sun.cs.deepsea.diver.Stepper;
+import za.ac.sun.cs.deepsea.diver.SymbolicFrame;
+import za.ac.sun.cs.deepsea.diver.Symbolizer;
+import za.ac.sun.cs.green.expr.Expression;
+import za.ac.sun.cs.green.expr.Operation;
+import za.ac.sun.cs.green.expr.Operation.Operator;
 
 public class IFEQ extends Instruction {
 
@@ -20,6 +27,13 @@ public class IFEQ extends Instruction {
 		return 3;
 	}
 
+	@Override
+	public void execute(StepEvent event, Symbolizer symbolizer) {
+		SymbolicFrame frame = symbolizer.getTopFrame();
+		Expression e0 = frame.pop();
+		symbolizer.pushConjunct(Operation.apply(Operator.EQ, e0, Operation.ZERO), position + offset);
+	}
+	
 	@Override
 	public String toString() {
 		sb.setLength(0);

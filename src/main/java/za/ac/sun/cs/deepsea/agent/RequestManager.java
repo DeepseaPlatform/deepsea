@@ -62,9 +62,13 @@ public class RequestManager {
 				}
 			}
 		}
+		for (String d : diver.getDelegateTargets()) {
+			if (name.equals(d)) {
+				return true;
+			}
+		}
 		return false;
 	}
-
 
 	public void filterExcludes(MethodEntryRequest eventRequest) {
 		for (String e : excludes) {

@@ -457,6 +457,10 @@ public class Diver implements Reporter {
 		delegates.put(target, delegate);
 	}
 
+	public Iterable<String> getDelegateTargets() {
+		return delegates.keySet();
+	}
+
 	public Object findDelegate(String target) {
 		return delegates.get(target);
 	}
