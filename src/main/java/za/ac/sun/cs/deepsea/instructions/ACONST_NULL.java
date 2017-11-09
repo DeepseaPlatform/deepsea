@@ -27,8 +27,6 @@ import za.ac.sun.cs.green.expr.Operation;
  * <p>
  * Pushes the integer constant {@link za.ac.sun.cs.green.expr.Operation}{@code .ZERO} onto the stack.
  * </p>
- * 
- * @author Jaco Geldenhuys (geld@sun.ac.za)
  */
 public class ACONST_NULL extends Instruction {
 
