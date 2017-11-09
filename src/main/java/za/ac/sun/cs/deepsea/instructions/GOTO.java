@@ -1,6 +1,9 @@
 package za.ac.sun.cs.deepsea.instructions;
 
+import com.sun.jdi.event.StepEvent;
+
 import za.ac.sun.cs.deepsea.diver.Stepper;
+import za.ac.sun.cs.deepsea.diver.Symbolizer;
 
 public class GOTO extends Instruction {
 
@@ -18,6 +21,11 @@ public class GOTO extends Instruction {
 	@Override
 	public int getSize() {
 		return 3;
+	}
+	
+	@Override
+	public void execute(StepEvent event, Symbolizer symbolizer) {
+		// Do nothing
 	}
 
 	@Override

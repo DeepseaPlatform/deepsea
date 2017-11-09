@@ -82,6 +82,12 @@ public class Stepper extends AbstractEventListener {
 
 	private final Map<ReferenceType, ConstantPool> cpMap = new HashMap<>();
 
+	private Object delegate = null;
+
+	private java.lang.reflect.Method delegateMethod = null;
+
+	private ThreadReference delegateThread = null;
+
 	public Stepper(Dive dive, VirtualMachine vm, RequestManager mgr) {
 		this.dive = dive;
 		this.log = dive.getDiver().getLog();
@@ -152,22 +158,42 @@ public class Stepper extends AbstractEventListener {
 		String methodName = method.name();
 		String key = methodName + method.signature();
 		String fullKey = className + "." + key;
-		// First step: collect the bytecodes for the method, if necessary
+		// Collect the bytecodes for the method, if necessary
 		if (!visitedMethods.contains(fullKey)) {
 			visitedMethods.add(fullKey);
 			byte[] bytecodes = method.bytecodes();
 			Instruction.map(this, bytecodes, fullKey, instructionMap);
 		}
-		// Second step: if in symbolic mode, arrange the frames
+		// If in symbolic mode, ...
 		if (symbolizer.inSymbolicMode()) {
-			return symbolicInvocation(method);
+			if (delegateMethod != null) {
+				boolean delegateSuccess = false;
+				try {
+					Object[] arguments = { symbolizer, delegateThread };
+					delegateSuccess = (Boolean) delegateMethod.invoke(delegate, arguments);
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException x) {
+					// This should never happen!
+					x.printStackTrace();
+				}
+				if (delegateSuccess) {
+					// Delegate executed successfully
+					delegateMethod = null;
+					return true;
+				} else {
+					// We need to throw a runtime exception here because the symbolic frame may be damaged
+					throw new RuntimeException("DELEGATE FAILED");
+				}
+			} else {
+				// ...or synchronize the concrete and symbolic frames
+				return symbolicInvocation(method);
+			}
 		}
-		// Third step: if not in symbolic mode, check if the method is a trigger
+		// If not in symbolic mode, check if the method is a trigger
 		Trigger trigger = dive.getDiver().findTrigger(method, className);
 		if (trigger != null) {
 			return triggerSymbolicMode(trigger, event, method);
 		}
-		// Last step: nothing happened; just return true
+		// Nothing happened; just return true
 		return true;
 	}
 
@@ -355,35 +381,23 @@ public class Stepper extends AbstractEventListener {
 		ConstantMethodref m = (ConstantMethodref) cp.getConstant(index,
 				za.ac.sun.cs.deepsea.constantpool.Constants.CONSTANT_Methodref);
 		String className = m.getClass(cp).replace('/', '.');
-		Object delegate = dive.getDiver().findDelegate(className);
+		delegate = dive.getDiver().findDelegate(className);
 		if (delegate != null) {
 			ConstantNameAndType nt = (ConstantNameAndType) cp.getConstant(m.getNameAndTypeIndex(),
 					za.ac.sun.cs.deepsea.constantpool.Constants.CONSTANT_NameAndType);
 			String methodName = nt.getName(cp);
 			String signature = nt.getAsciiSignature(cp);
-			java.lang.reflect.Method delegateMethod = null;
+			
 			try {
 				delegateMethod = delegate.getClass().getDeclaredMethod(methodName + signature, argumentTypes);
 			} catch (NoSuchMethodException | SecurityException e) {
 				// Do nothing and leave delegateMethod == null
 			}
 			if (delegateMethod != null) {
-				boolean delegateSuccess = false;
-				try {
-					Object[] arguments = { symbolizer, thread };
-					delegateSuccess = (Boolean) delegateMethod.invoke(delegate, arguments);
-				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException x) {
-					// This should never happen!
-					x.printStackTrace();
-				}
-				/*
-				 * If the delegated method executes successfully, we return -2
-				 * to signal to the instruction (that invoked this method) that
-				 * it does not need to manipulate the stack any further.
-				 */
-				if (delegateSuccess) {
-					return -2;
-				}
+				log.trace("@@@ found delegate: {}", methodName + signature);
+				delegateThread = thread;
+			} else {
+				log.trace("@@@ no delegate: {}", methodName + signature);
 			}
 		}
 		if (!mgr.isFiltered(className)) {

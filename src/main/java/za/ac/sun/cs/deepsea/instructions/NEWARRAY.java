@@ -34,6 +34,7 @@ public class NEWARRAY extends Instruction {
 	public void execute(StepEvent event, Symbolizer symbolizer) {
 		int objectId = symbolizer.createArray();
 		SymbolicFrame frame = symbolizer.getTopFrame();
+		frame.pop();
 		frame.push(new IntConstant(objectId));
 	}
 
