@@ -34,7 +34,7 @@ public class Math {
 	 * constraint to the path condition:
 	 * 
 	 * <pre>
-	 * (X >= Y && Z == X) || (X < Y && Z == Y)
+	 * (X &gt;= Y &amp;&amp; Z == X) || (X &lt; Y &amp;&amp; Z == Y)
 	 * </pre>
 	 * 
 	 * @param symbolizer

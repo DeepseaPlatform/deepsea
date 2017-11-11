@@ -31,8 +31,7 @@ public class String {
 	}
 
 	/**
-	 * Abstract implementation of the
-	 * {@link java.lang.String#startsWith(String)} operation.
+	 * Abstract implementation of the {@code startsWith(String)} operation.
 	 * 
 	 * @param symbolizer
 	 *            the symbolic state of the execution
@@ -76,8 +75,7 @@ public class String {
 	}
 
 	/**
-	 * Abstract implementation of the {@link java.lang.String#endsWith(String)}
-	 * operation.
+	 * Abstract implementation of the {@code endsWith(String)} operation.
 	 * 
 	 * @param symbolizer
 	 *            the symbolic state of the execution
