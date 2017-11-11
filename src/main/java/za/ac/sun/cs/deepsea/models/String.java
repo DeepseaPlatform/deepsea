@@ -49,8 +49,7 @@ public class String {
 				frame.push(var);
 			}
 		} else {
-			// |target array| < |pattern array|, so it can never match
-			frame.push(Operation.ZERO);
+			frame.push(Operation.ZERO); // |this| < |prefix|, so result is always FALSE (=0)
 		}
 		return true;
 	}
@@ -88,8 +87,7 @@ public class String {
 				frame.push(var);
 			}
 		} else {
-			// |target array| < |pattern array|, so it can never match
-			frame.push(Operation.ZERO);
+			frame.push(Operation.ZERO); // |this| < |prefix|, so result is always FALSE (=0)
 		}
 		return true;
 	}
