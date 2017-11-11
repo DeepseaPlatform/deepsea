@@ -23,7 +23,7 @@ public class StringMethods {
 	 * 
 	 * 
 	 */
-	public boolean startsWith_TITI_Z(Symbolizer symbolizer, ThreadReference thread) {
+	public boolean startsWith___3I_3I__Z(Symbolizer symbolizer, ThreadReference thread) {
 		// Find the symbolic frame
 		SymbolicFrame frame = symbolizer.getTopFrame();
 		// Find the address of the first (target) array

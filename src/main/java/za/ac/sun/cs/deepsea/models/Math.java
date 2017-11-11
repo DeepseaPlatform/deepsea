@@ -15,7 +15,7 @@ public class Math {
 	public Math(Diver diver) {
 	}
 
-	public boolean max_II_I(Symbolizer symbolizer, ThreadReference thread) {
+	public boolean max__II__I(Symbolizer symbolizer, ThreadReference thread) {
 		SymbolicFrame frame = symbolizer.getTopFrame();
 		Expression arg0 = frame.pop();
 		Expression arg1 = frame.pop();
