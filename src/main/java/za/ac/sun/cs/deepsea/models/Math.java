@@ -16,8 +16,8 @@ import za.ac.sun.cs.green.expr.Operation.Operator;
 public class Math {
 
 	/**
-	 * Construct a {@link Math} model. Since the operations are all
-	 * {@code static}, there is nothing much to construct.
+	 * Construct an instance. Since the operations are all {@code static}, there
+	 * is nothing much to construct.
 	 * 
 	 * @param diver
 	 *            the {@link Diver} to which the model belongs
@@ -28,6 +28,14 @@ public class Math {
 	/**
 	 * Abstract implementation of the {@link java.lang.Math#max(int, int)}
 	 * operation.
+	 * 
+	 * The routine replace the top two symbolic stack entries, {@code X} and
+	 * {@code Y}, with the symbolic value {@code Z}. It adds the following
+	 * constraint to the path condition:
+	 * 
+	 * <pre>
+	 * (X >= Y && Z == X) || (X < Y && Z == Y)
+	 * </pre>
 	 * 
 	 * @param symbolizer
 	 *            the symbolic state of the execution

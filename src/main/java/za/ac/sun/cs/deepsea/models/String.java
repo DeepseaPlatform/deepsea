@@ -11,11 +11,35 @@ import za.ac.sun.cs.green.expr.IntVariable;
 import za.ac.sun.cs.green.expr.Operation;
 import za.ac.sun.cs.green.expr.Operation.Operator;
 
+/**
+ * A model of some operations of {@link java.lang.String}. This implementation
+ * exploits the fact that string instances enjoy a special status in Java and
+ * are also treated specially by DEEPSEA. Wherever possible, DEEPSEA mirrors
+ * Java string instances with much simpler array-like symbolic values.
+ */
 public class String {
 
+	/**
+	 * Construct an instance. Despite the fact that the operations are not all
+	 * {@code static}, the current set of routines do not need to construct any
+	 * additional information and are implemented in a {@code static} fashion.
+	 * 
+	 * @param diver
+	 *            the {@link Diver} to which the model belongs
+	 */
 	public String(Diver diver) {
 	}
 
+	/**
+	 * Abstract implementation of the
+	 * {@link java.lang.String#startsWith(String)} operation.
+	 * 
+	 * @param symbolizer
+	 *            the symbolic state of the execution
+	 * @param thread
+	 *            a reference to the concrete thread
+	 * @return always {@code true}
+	 */
 	public boolean startsWith__Ljava_1lang_1String_2__Z(Symbolizer symbolizer, ThreadReference thread) {
 		SymbolicFrame frame = symbolizer.getTopFrame();
 		int prefixAddress = intConstantValue(frame.pop());
@@ -39,12 +63,9 @@ public class String {
 			} else {
 				Expression var = new IntVariable(Symbolizer.getNewVariableName(), 0, 1);
 				Expression pc = Operation.apply(Operator.OR,
-						Operation.apply(Operator.AND,
-							guard,
-							Operation.apply(Operator.EQ, var, Operation.ONE)),
-						Operation.apply(Operator.AND,
-							Operation.apply(Operator.NOT, guard),
-							Operation.apply(Operator.EQ, var, Operation.ZERO)));
+						Operation.apply(Operator.AND, guard, Operation.apply(Operator.EQ, var, Operation.ONE)),
+						Operation.apply(Operator.AND, Operation.apply(Operator.NOT, guard),
+								Operation.apply(Operator.EQ, var, Operation.ZERO)));
 				symbolizer.pushExtraConjunct(pc);
 				frame.push(var);
 			}
@@ -54,6 +75,16 @@ public class String {
 		return true;
 	}
 
+	/**
+	 * Abstract implementation of the {@link java.lang.String#endsWith(String)}
+	 * operation.
+	 * 
+	 * @param symbolizer
+	 *            the symbolic state of the execution
+	 * @param thread
+	 *            a reference to the concrete thread
+	 * @return always {@code true}
+	 */
 	public boolean endsWith__Ljava_1lang_1String_2__Z(Symbolizer symbolizer, ThreadReference thread) {
 		SymbolicFrame frame = symbolizer.getTopFrame();
 		int prefixAddress = intConstantValue(frame.pop());
@@ -77,11 +108,8 @@ public class String {
 			} else {
 				Expression var = new IntVariable(Symbolizer.getNewVariableName(), 0, 1);
 				Expression pc = Operation.apply(Operator.OR,
-						Operation.apply(Operator.AND,
-								guard,
-								Operation.apply(Operator.EQ, var, Operation.ONE)),
-						Operation.apply(Operator.AND,
-								Operation.apply(Operator.NOT, guard),
+						Operation.apply(Operator.AND, guard, Operation.apply(Operator.EQ, var, Operation.ONE)),
+						Operation.apply(Operator.AND, Operation.apply(Operator.NOT, guard),
 								Operation.apply(Operator.EQ, var, Operation.ZERO)));
 				symbolizer.pushExtraConjunct(pc);
 				frame.push(var);
@@ -91,7 +119,15 @@ public class String {
 		}
 		return true;
 	}
-	
+
+	/**
+	 * Return the native value (i.e., {@code int} value) of a Green integer
+	 * constant.
+	 * 
+	 * @param expr
+	 *            the integer constant instance
+	 * @return the value of the constant
+	 */
 	private int intConstantValue(Expression expr) {
 		assert expr instanceof IntConstant;
 		return ((IntConstant) expr).getValue();

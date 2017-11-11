@@ -1,4 +1,5 @@
 /**
+ * <p>
  * Abstract symbolic models for complex concrete operations. For example, to
  * analyze a program that manipulates {@link java.lang.String} values, it is
  * possible to "shadow" the native code instruction-by-instruction. But the
@@ -8,6 +9,7 @@
  * symbolic implementation of a complex concrete operation that is executed in
  * its place. The model of an operation operates on the method-level, which
  * means that some operations of a class may be modeled, while others are not.
+ * </p>
  * 
  * <p>
  * For complex data types, a model may construct and maintain a symbolic
