@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 - Unimplemented instructions now throw an exception
-- Path conditions are handled from intelligently, support "additional" conditions
+- Path conditions are handled more intelligently, support "additional" conditions
 
 ### Fixed
 - Issue with build.gradle that caused CI to fail.
