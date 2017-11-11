@@ -37,6 +37,8 @@ public class INVOKEVIRTUAL extends Instruction {
 			ReferenceType clas = loc.declaringType();
 			methodName = stepper.getMethodName(clas, index);
 		}
+		SymbolicFrame frame = symbolizer.getTopFrame();
+		ReferenceType clas = loc.declaringType();
 		/*
 		 * First we throw away the arguments. We can do this, because
 		 * Stepper.getArgumentCount() will return 0 for "monitored" methods. For
@@ -44,9 +46,8 @@ public class INVOKEVIRTUAL extends Instruction {
 		 * of parameters. For unmonitored methods, the code below removes the
 		 * arguments passed to the code.
 		 */
-		SymbolicFrame frame = symbolizer.getTopFrame();
-		ReferenceType clas = loc.declaringType();
-		int argumentCount = 1 + stepper.getArgumentCount(clas, index);
+//		int argumentCount = 1 + stepper.getArgumentCount(clas, index);
+		int argumentCount = stepper.delegateMethod(clas, index, symbolizer, event.thread());
 		if (argumentCount > 0) {
 			while (argumentCount-- > 0) {
 				frame.pop();
@@ -59,12 +60,14 @@ public class INVOKEVIRTUAL extends Instruction {
 		 * value on the current stack. In other cases (unmonitored methods),
 		 * this code places an appropriate symbolic value or zero on the stack.
 		 */
-		String type = stepper.getReturnType(clas, index);
-		char typeCh = type.charAt(0);
-		if ((typeCh == 'I') || (typeCh == 'Z')) {
-			frame.push(new IntVariable(Symbolizer.getNewVariableName(), -1000, 1000));
-		} else if ((typeCh != 'V') && (typeCh != '?')) {
-			frame.push(Operation.ZERO);
+		if (argumentCount != -2) {
+			String type = stepper.getReturnType(clas, index);
+			char typeCh = type.charAt(0);
+			if ((typeCh == 'I') || (typeCh == 'Z')) {
+				frame.push(new IntVariable(Symbolizer.getNewVariableName(), -1000, 1000));
+			} else if ((typeCh != 'V') && (typeCh != '?')) {
+				frame.push(Operation.ZERO);
+			}
 		}
 	}
 	

@@ -3,17 +3,18 @@ package examples.strings;
 public class First {
 
 	public static int test(String str) {
-		if (str.startsWith("blah")) {
-			return 0;
+		if (str.startsWith("bl")) {
+			System.out.println("Match");
+			return 1;
 		}
 		else {
-			return 1;
+			System.out.println("No match");
+			return 0;
 		}
 	}
 	
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		test("hello");
+		test("hel");
 	}
 
 }

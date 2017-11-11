@@ -24,6 +24,7 @@ import com.sun.jdi.Location;
 import com.sun.jdi.Method;
 import com.sun.jdi.ReferenceType;
 import com.sun.jdi.StackFrame;
+import com.sun.jdi.StringReference;
 import com.sun.jdi.ThreadReference;
 import com.sun.jdi.Value;
 import com.sun.jdi.VirtualMachine;
@@ -38,6 +39,7 @@ import za.ac.sun.cs.deepsea.constantpool.ConstantFieldref;
 import za.ac.sun.cs.deepsea.constantpool.ConstantMethodref;
 import za.ac.sun.cs.deepsea.constantpool.ConstantNameAndType;
 import za.ac.sun.cs.deepsea.constantpool.ConstantPool;
+import za.ac.sun.cs.deepsea.constantpool.ConstantString;
 import za.ac.sun.cs.deepsea.instructions.Instruction;
 import za.ac.sun.cs.green.expr.Constant;
 import za.ac.sun.cs.green.expr.Expression;
@@ -312,6 +314,42 @@ public class Stepper extends AbstractEventListener {
 						}
 					}
 					sframe.setLocal(i, expr);
+				} else if (type == String.class) {
+					Value actualValue = actualValues.get(i);
+					assert actualValue instanceof StringReference;
+					String stringValue = ((StringReference) actualValue).value();
+					int stringLength = stringValue.length();
+					int stringId = symbolizer.incrAndGetNewObjectId();
+					symbolizer.putField(stringId, "length", new IntConstant(stringLength));
+					Expression expr = new IntConstant(stringId);
+					if (symbolic) {
+						char[] newStringChars = new char[stringLength];
+						stringValue.getChars(0, stringLength, newStringChars, 0);
+						for (int j = 0; j < stringLength; j++) {
+							String entryName = name + "$" + j;
+							Constant concrete = ((entryName == null) || (concreteValues == null)) ? null
+									: concreteValues.get(entryName);
+							Expression entryExpr = new IntVariable(entryName, 0, 255);
+							if ((concrete != null) && (concrete instanceof IntConstant)) {
+								newStringChars[j] = (char) ((IntConstant) concrete).getValue();
+								dive.setActualValue(entryName, concrete);
+							} else {
+								dive.setActualValue(entryName, entryExpr);
+							}
+							symbolizer.putField(stringId, "" + j, entryExpr);
+						}
+						String newStringValue = new String(newStringChars);
+						if (!stringValue.equals(newStringValue)) {
+							frame.setValue(args.get(i), vm.mirrorOf(newStringValue));
+						}
+					} else {
+						for (int j = 0; j < stringLength; j++) {
+							IntConstant value = new IntConstant(stringValue.charAt(j));
+							symbolizer.putField(stringId, "" + j, value);
+							dive.setActualValue(name + "$" + j, value);
+						}
+					}
+					sframe.setLocal(i, expr);
 				} else {
 					throw new Error("Unhandled symbolic type: " + type);
 				}
@@ -372,6 +410,20 @@ public class Stepper extends AbstractEventListener {
 		return cp.getConstant(index);
 	}
 
+	public String getConstantString(ReferenceType clas, int index) {
+		ConstantPool cp = cpMap.get(clas);
+		if (cp == null) {
+			try {
+				cp = new ConstantPool(clas.constantPoolCount(), clas.constantPool());
+			} catch (IOException x) {
+				x.printStackTrace();
+				return null;
+			}
+			cpMap.put(clas, cp);
+		}
+		return ((ConstantString) cp.getConstant(index)).getString(cp);
+	}
+	
 	private static final Class<?>[] argumentTypes = { Symbolizer.class, ThreadReference.class };
 
 	public int delegateMethod(ReferenceType clas, int index, Symbolizer symbolizer, ThreadReference thread) {

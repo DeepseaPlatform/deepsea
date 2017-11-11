@@ -5,6 +5,7 @@ import com.sun.jdi.event.StepEvent;
 
 import za.ac.sun.cs.deepsea.constantpool.Constant;
 import za.ac.sun.cs.deepsea.constantpool.ConstantInteger;
+import za.ac.sun.cs.deepsea.constantpool.ConstantString;
 import za.ac.sun.cs.deepsea.diver.Stepper;
 import za.ac.sun.cs.deepsea.diver.SymbolicFrame;
 import za.ac.sun.cs.deepsea.diver.Symbolizer;
@@ -37,6 +38,14 @@ public class LDC extends Instruction {
 		if (constant instanceof ConstantInteger) {
 			int value = ((ConstantInteger) constant).getValue();
 			frame.push(new IntConstant(value));
+		} else if (constant instanceof ConstantString) {
+			String value = stepper.getConstantString(clas, index);
+			int stringId = symbolizer.createArray();
+			symbolizer.putField(stringId, "length", new IntConstant(value.length()));
+			for (int i = 0; i < value.length(); i++) {
+				symbolizer.putField(stringId, "" + i, new IntConstant(value.charAt(i)));
+			}
+			frame.push(new IntConstant(stringId));
 		} else {
 			frame.push(Operation.ZERO);
 		}

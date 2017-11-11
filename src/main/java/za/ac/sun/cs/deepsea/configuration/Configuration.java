@@ -265,6 +265,8 @@ public class Configuration {
 			return Integer.class;
 		} else if (type.equals("boolean")) {
 			return Boolean.class;
+		} else if (type.equals("string")) {
+			return String.class;
 		} else {
 			return Object.class;
 		}

@@ -4,7 +4,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.sun.jdi.ClassNotLoadedException;
+import com.sun.jdi.ClassType;
 import com.sun.jdi.Method;
+import com.sun.jdi.Type;
 
 import za.ac.sun.cs.deepsea.diver.Stepper.IntArray;
 
@@ -76,15 +79,24 @@ public class Trigger {
 			return false;
 		}
 		List<String> types = method.argumentTypeNames();
+		List<Type> actualTypes = null;
+		try {
+			actualTypes = method.argumentTypes();
+		} catch (ClassNotLoadedException x) {
+			x.printStackTrace();
+		}
 		if (parameterCount != types.size()) {
 			return false;
 		}
 		for (int i = 0; i < parameterCount; i++) {
 			String type = types.get(i);
+			Type actualType = (actualTypes == null) ? null : actualTypes.get(i);
 			if (parameterType[i] == null) { continue; }
 			if ((parameterType[i] == Boolean.class) && type.equals("boolean")) { continue; }
 			if ((parameterType[i] == Integer.class) && type.equals("int")) { continue; }
-			if ((parameterType[i] instanceof IntArray) && type.equals("int[]")) { continue; }
+			if ((parameterType[i] == String.class) && type.equals("java.lang.String")) { continue; }
+			if ((parameterType[i] instanceof IntArray) && type.equals("int[]")) { continue; } // int[5]? int[4]?...
+			if ((parameterType[i] == Object.class) && (actualType != null)  && (actualType instanceof ClassType)) { continue; }
 			return false;
 		}
 		return true;
