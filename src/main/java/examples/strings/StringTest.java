@@ -1,6 +1,6 @@
-package examples.simple;
+package examples.strings;
 
-import examples.simple.StringMethods;
+import examples.strings.StringMethods;
 
 public class StringTest {
 	

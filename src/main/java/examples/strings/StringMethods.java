@@ -1,4 +1,4 @@
-package examples.simple;
+package examples.strings;
 
 public class StringMethods {
 	public static boolean startsWith(int[] one, int[] two) {

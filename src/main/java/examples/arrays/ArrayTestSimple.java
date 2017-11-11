@@ -1,4 +1,4 @@
-package examples.simple;
+package examples.arrays;
 
 public class ArrayTestSimple {
 
