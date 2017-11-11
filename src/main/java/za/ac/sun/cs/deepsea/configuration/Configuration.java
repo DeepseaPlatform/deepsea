@@ -372,15 +372,15 @@ public class Configuration {
 				log.fatal("constructor not found: " + objectName, x);
 			}
 		} catch (SecurityException x) {
-			log.fatal("constructor not found: " + objectName, x);
+			log.fatal("constructor security error: " + objectName, x);
 		} catch (IllegalArgumentException x) {
-			log.fatal("constructor error: " + objectName, x);
+			log.fatal("constructor argument error: " + objectName, x);
 		} catch (InstantiationException x) {
-			log.fatal("constructor error: " + objectName, x);
+			log.fatal("constructor instantiation error: " + objectName, x);
 		} catch (IllegalAccessException x) {
-			log.fatal("constructor error: " + objectName, x);
+			log.fatal("constructor access error: " + objectName, x);
 		} catch (InvocationTargetException x) {
-			log.fatal("constructor error: " + objectName, x);
+			log.fatal("constructor invocation error: " + objectName, x);
 		}
 		return null;
 	}
