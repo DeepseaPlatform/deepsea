@@ -45,7 +45,7 @@ RUN git clone https://github.com/Z3Prover/z3.git \
 ARG BUILD_DATE
 LABEL build_date="$BUILD_DATE"
 
-RUN git clone https://git.cs.sun.ac.za/deepsea/deepsea.git
+RUN git clone https://git.cs.sun.ac.za/deepsea/deepsea.git \
 	&& cd deepsea \
 	&& ./gradlew installDist
 
