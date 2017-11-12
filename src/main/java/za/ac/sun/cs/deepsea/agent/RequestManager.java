@@ -32,7 +32,6 @@ import za.ac.sun.cs.deepsea.diver.Diver;
 
 public class RequestManager {
 
-	@SuppressWarnings("unused")
 	private final Diver diver;
 
 	private final EventRequestManager mgr;
