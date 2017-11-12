@@ -68,7 +68,7 @@ public class Dive {
 	/**
 	 * TODO
 	 */
-	public void dive() {
+	public boolean dive() {
 		log.info("----- starting dive " + diver.getName() + "." + id + " -----");
 
 		log.trace("launching vm");
@@ -100,7 +100,8 @@ public class Dive {
 
 		log.trace("setting up event monitoring");
 		EventReader ev = new EventReader(diver, vm.eventQueue());
-		ev.addEventListener(new Stepper(this, vm, m));
+		Stepper st = new Stepper(this, vm, m);
+		ev.addEventListener(st);
 		ev.start();
 
 		log.trace("starting vm");
@@ -125,6 +126,7 @@ public class Dive {
 		} catch (IOException x) {
 			x.printStackTrace();
 		}
+		return st.isErrorFree();
 	}
 
 	/**

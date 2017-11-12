@@ -41,6 +41,7 @@ import za.ac.sun.cs.deepsea.constantpool.ConstantNameAndType;
 import za.ac.sun.cs.deepsea.constantpool.ConstantPool;
 import za.ac.sun.cs.deepsea.constantpool.ConstantString;
 import za.ac.sun.cs.deepsea.instructions.Instruction;
+import za.ac.sun.cs.deepsea.reporting.Banner;
 import za.ac.sun.cs.green.expr.Constant;
 import za.ac.sun.cs.green.expr.Expression;
 import za.ac.sun.cs.green.expr.IntConstant;
@@ -90,6 +91,8 @@ public class Stepper extends AbstractEventListener {
 
 	private ThreadReference delegateThread = null;
 
+	private boolean errorFree = true;
+
 	public Stepper(Dive dive, VirtualMachine vm, RequestManager mgr) {
 		this.dive = dive;
 		this.log = dive.getDiver().getLog();
@@ -104,6 +107,10 @@ public class Stepper extends AbstractEventListener {
 
 	public RequestManager getRequestManager() {
 		return mgr;
+	}
+
+	public boolean isErrorFree() {
+		return errorFree;
 	}
 
 	@Override
@@ -241,7 +248,18 @@ public class Stepper extends AbstractEventListener {
 			VirtualMachine vm = event.virtualMachine();
 			StackFrame frame = event.thread().frame(0);
 			List<Value> actualValues = frame.getArgumentValues();
-			List<LocalVariable> args = method.arguments();
+			List<LocalVariable> args = null;
+			try {
+				args = method.arguments();
+			} catch (AbsentInformationException x) {
+				new Banner('@')
+					.println("CANNOT OBTAIN APPLICATION INFORMATION")
+					.println("")
+					.println("COMPILE WITH THE -g FLAG (javac -g ...)")
+					.display(log, Level.FATAL);
+				errorFree = false;
+				return false;
+			}
 			for (int i = 0; i < n; i++) {
 				Object type = trigger.getParameterType(i);
 				boolean symbolic = trigger.isParameterSymbolic(i);
@@ -355,8 +373,6 @@ public class Stepper extends AbstractEventListener {
 				}
 			}
 		} catch (IncompatibleThreadStateException x) {
-			x.printStackTrace();
-		} catch (AbsentInformationException x) {
 			x.printStackTrace();
 		} catch (InvalidTypeException x) {
 			x.printStackTrace();

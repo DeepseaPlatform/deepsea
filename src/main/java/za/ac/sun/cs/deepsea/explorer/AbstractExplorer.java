@@ -1,7 +1,7 @@
 package za.ac.sun.cs.deepsea.explorer;
 
-import za.ac.sun.cs.deepsea.Reporter;
 import za.ac.sun.cs.deepsea.diver.Diver;
+import za.ac.sun.cs.deepsea.reporting.Reporter;
 
 /**
  * Provides a concrete constructor for user-specified instances of

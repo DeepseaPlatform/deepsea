@@ -16,8 +16,8 @@ import org.apache.logging.log4j.Logger;
 
 import com.sun.jdi.Method;
 
-import za.ac.sun.cs.deepsea.Reporter;
 import za.ac.sun.cs.deepsea.explorer.Explorer;
+import za.ac.sun.cs.deepsea.reporting.Reporter;
 import za.ac.sun.cs.green.expr.Constant;
 
 /**
@@ -377,7 +377,10 @@ public class Diver implements Reporter {
 			Map<String, Constant> concreteValues = null;
 			do {
 				Dive d = new Dive(this, concreteValues);
-				d.dive();
+				if (!d.dive()) {
+					// A serious error has occurred.
+					return;
+				}
 				concreteValues = explorer.refine(d);
 			} while (concreteValues != null);
 			stopped = Calendar.getInstance();

@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 import za.ac.sun.cs.deepsea.diver.Dive;
 import za.ac.sun.cs.deepsea.diver.Diver;
 import za.ac.sun.cs.deepsea.diver.SegmentedPathCondition;
+import za.ac.sun.cs.deepsea.reporting.Banner;
 import za.ac.sun.cs.green.Green;
 import za.ac.sun.cs.green.Instance;
 import za.ac.sun.cs.green.expr.Constant;
@@ -352,15 +353,11 @@ public class DepthFirstExplorer extends AbstractExplorer {
 	public void report(PrintWriter out) {
 		out.println("# paths explored: " + pathCounter);
 		if (pathCounter <= 1) {
-			out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-			out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-			out.println("!!!!                                                    !!!!");
-			out.println("!!!!   FEWER THAN TWO PATHS EXPLORED...                 !!!!");
-			out.println("!!!!                                                    !!!!");
-			out.println("!!!!   CHECK THAT THE TRIGGERS ARE CORRECT              !!!!");
-			out.println("!!!!                                                    !!!!");
-			out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-			out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+			new Banner('!')
+				.println("FEWER THAN TWO PATHS EXPLORED...")
+				.println("")
+				.println("CHECK THAT THE TRIGGERS ARE CORRECT")
+				.display(out);
 		} else {
 			out.println("# paths revisited: " + revisitCounter);
 			out.println("# unique paths: " + pathCounter + "-" + revisitCounter + "=" + (pathCounter - revisitCounter));

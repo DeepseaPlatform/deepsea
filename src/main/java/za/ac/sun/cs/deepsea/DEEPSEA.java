@@ -1,16 +1,18 @@
 package za.ac.sun.cs.deepsea;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.net.URL;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Properties;
+
+import org.apache.logging.log4j.Level;
 
 import za.ac.sun.cs.deepsea.configuration.Configuration;
 import za.ac.sun.cs.deepsea.diver.Diver;
+import za.ac.sun.cs.deepsea.reporting.Banner;
 
 /**
  * Main class and launcher for the DEEPSEA project. It expects a single
@@ -38,32 +40,21 @@ public class DEEPSEA {
 		}
 		Diver dv = new Diver("DEEPSEA");
 		new Configuration(dv, pr).apply();
-		dv.getLog().info("");
-		dv.getLog().info("~~~ DEEPSEA version {} ~~~", getVersion());
+		new Banner('~').println("DEEPSEA version " + getVersion()).display(dv.getLog(), Level.INFO);
 		dv.getLog().info("");
 		dv.start();
 		dv.getLog().info("");
-		dv.getLog().info("~~~ DEEPSEA DONE ~~~");
-		dv.getLog().info("");
+		new Banner('~').println("DEEPSEA DONE").display(dv.getLog(), Level.INFO);
 	}
 
 	private static String getVersion() {
-		ClassLoader classLoader = DEEPSEA.class.getClassLoader();
-		URL url = classLoader.getResource("VERSION");
-		if (url == null) {
-			return "unspecified";
-		}
-		File file = new File(url.getFile());
-		if (!file.exists()) {
-			return "unspecified";
-		}
-		try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+		InputStream in = DEEPSEA.class.getResourceAsStream("/VERSION");
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
 			String line = br.readLine();
 			if  (line != null) {
 				return line;
 			}
-		} catch (FileNotFoundException e) {
-		} catch (IOException e) {
+		} catch (IOException x) {
 		}
 		return "unspecified";
 	}

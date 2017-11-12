@@ -2,8 +2,8 @@ package za.ac.sun.cs.deepsea.explorer;
 
 import java.util.Map;
 
-import za.ac.sun.cs.deepsea.Reporter;
 import za.ac.sun.cs.deepsea.diver.Dive;
+import za.ac.sun.cs.deepsea.reporting.Reporter;
 import za.ac.sun.cs.green.expr.Constant;
 
 /**

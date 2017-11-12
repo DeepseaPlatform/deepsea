@@ -97,7 +97,11 @@ public class EventReader extends AbstractReader {
 		while (!isStopping) {
 			try {
 				if (!isStopping) {
-					EventSet eventSet = eventQueue.remove();
+					EventSet eventSet = eventQueue.remove(2000);
+					if (eventSet == null) {
+						isStopping = true;
+						break;
+					}
 					boolean resumeVM = true;
 					EventIterator iterator = eventSet.eventIterator();
 					while (iterator.hasNext()) {
