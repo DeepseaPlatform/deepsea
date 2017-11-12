@@ -30,20 +30,34 @@ public class DEEPSEA {
 	 * @param args command-line arguments.
 	 */
 	public static void main(String[] args) {
-		Properties pr = new Properties();
-		try {
-			pr.load(new FileInputStream(args[0]));
-		} catch (FileNotFoundException x) {
-			x.printStackTrace();
-		} catch (IOException x) {
-			x.printStackTrace();
-		}
 		Diver dv = new Diver("DEEPSEA");
-		new Configuration(dv, pr).apply();
 		new Banner('~').println("DEEPSEA version " + getVersion()).display(dv.getLog(), Level.INFO);
-		dv.getLog().info("");
-		dv.start();
-		dv.getLog().info("");
+		if (args.length < 1) {
+			new Banner('@')
+				.println("MISSING PROPERTIES FILE")
+				.println("")
+				.println("USAGE: deepsea <properties file>")
+				.display(dv.getLog(), Level.FATAL);
+		} else {
+			Properties pr = new Properties();
+			try {
+				pr.load(new FileInputStream(args[0]));
+			} catch (FileNotFoundException x) {
+			} catch (IOException x) {
+			}
+			if (pr.containsKey("deepsea.target")) {
+				new Configuration(dv, pr).apply();
+				dv.getLog().info("");
+				dv.start();
+				dv.getLog().info("");
+			} else {
+				new Banner('@')
+				.println("SUSPICIOUS PROPERTIES FILE")
+				.println("")
+				.println("ARE YOU SURE THAT THE ARGUMENT IS A .properties FILE?")
+				.display(dv.getLog(), Level.FATAL);
+			}
+		}
 		new Banner('~').println("DEEPSEA DONE").display(dv.getLog(), Level.INFO);
 	}
 
