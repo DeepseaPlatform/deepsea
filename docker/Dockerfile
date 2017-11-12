@@ -51,7 +51,7 @@ RUN git clone https://git.cs.sun.ac.za/deepsea/deepsea.git \
 
 RUN ( F=/deepsea/build/install/deepsea/bin/deepsea ; cat $F \
 	| sed -e 's,^CLASSPATH=,CLASSPATH=/z3/build/com.microsoft.z3.jar:,' \
-	| > /tmp/t ; mv -f /tmp/t $F ) \
+	> /tmp/t ; mv -f /tmp/t $F ) \
 	&& ln -s /deepsea/build/install/deepsea/bin/deepsea /usr/bin/deepsea \
 	&& chmod +x /deepsea/build/install/deepsea/bin/deepsea /usr/bin/deepsea
 
@@ -60,7 +60,7 @@ RUN ( F=/deepsea/build/install/deepsea/bin/deepsea ; cat $F \
 #-------------------------------------------------------------------------------
 
 ENV LD_LIBRARY_PATH "/z3/build/"
-ENV DEEPSEA_OPTS $LD_LIBRARY_PATH
+ENV DEEPSEA_OPTS "-Djava.library.path=$LD_LIBRARY_PATH"
 
 CMD [ "/bin/bash" ]
 
