@@ -67,6 +67,7 @@ public class Dive {
 
 	/**
 	 * TODO
+	 * @return whether a serious error has occurred
 	 */
 	public boolean dive() {
 		log.info("----- starting dive " + diver.getName() + "." + id + " -----");

@@ -347,7 +347,7 @@ public class DepthFirstExplorer extends AbstractExplorer {
 	 * 
 	 * @param out
 	 *            the destination to which the report must be written
-	 * @see za.ac.sun.cs.deepsea.Reporter#report(java.io.PrintWriter)
+	 * @see za.ac.sun.cs.deepsea.reporting.Reporter#report(java.io.PrintWriter)
 	 */
 	@Override
 	public void report(PrintWriter out) {
