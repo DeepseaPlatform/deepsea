@@ -1,4 +1,4 @@
-package za.ac.sun.cs.deepsea;
+package za.ac.sun.cs.deepsea.reporting;
 
 import java.io.PrintWriter;
 
