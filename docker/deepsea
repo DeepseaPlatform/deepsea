@@ -1,0 +1,2 @@
+#!/bin/sh
+docker run --interactive --tty --rm --volume "$PWD":/work --workdir /work deepsea:latest deepsea $@
