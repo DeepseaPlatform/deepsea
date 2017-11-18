@@ -15,7 +15,16 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.appender.ConsoleAppender;
+import org.apache.logging.log4j.core.appender.FileAppender;
+import org.apache.logging.log4j.core.config.AppenderRef;
+import org.apache.logging.log4j.core.config.LoggerConfig;
+import org.apache.logging.log4j.core.appender.ConsoleAppender.Target;
+import org.apache.logging.log4j.core.layout.PatternLayout;
 
 import com.sun.jdi.Method;
 
@@ -26,6 +35,11 @@ import za.ac.sun.cs.deepsea.reporting.Banner;
  * A container for user-configurable parameters for analysis.
  */
 public class Configuration {
+
+	/**
+	 * The default name of the detailed log file.
+	 */
+	private static final String DEFAULT_LOGFILE = "/tmp/deepsea.log";
 
 	/**
 	 * The minimum value that integer variables can assume by default.
@@ -43,9 +57,9 @@ public class Configuration {
 	protected Properties properties = null;
 
 	/**
-	 * Log to write to.
+	 * Logger to write to.
 	 */
-	protected final Logger logger;
+	protected Logger logger = null;
 
 	/**
 	 * The fully qualified of the target class. This class should contain a Java
@@ -93,6 +107,11 @@ public class Configuration {
 	/**
 	 * Whether or not the settings should be dumped to the log.
 	 */
+	private String logfile = DEFAULT_LOGFILE;
+
+	/**
+	 * Whether or not the settings should be dumped to the log.
+	 */
 	private boolean dumpConfig = false;
 
 	/**
@@ -110,19 +129,62 @@ public class Configuration {
 	 */
 	private final ClassLoader loader = Configuration.class.getClassLoader();
 
+	//======================================================================
+	//
+	// Logger constructor.
+	//
+	//======================================================================
+
 	/**
-	 * An internal instance used to construct log messages.
+	 * The name of the logger. Each logger has a name so that it can be
+	 * "accessed" from different contexts.
 	 */
-	private static final StringBuilder sb = new StringBuilder();
+	private static final String LOGGER_NAME = "za.ac.sun.cs.deepsea.DEEPSEA";
 
-	//======================================================================
-	//
-	// Constructor.
-	//
-	//======================================================================
+	/**
+	 * Pattern for log messages that are written to the console.
+	 */
+	private static final String PATTERN_1 = "%-5level %msg%n";
 
-	public Configuration(Logger logger) {
-		this.logger = logger;
+	/**
+	 * Pattern for log messages that are written to the log file.
+	 */
+	private static final String PATTERN_2 = "%highlight{%d{HH:mm:ss.SSS} [%-8.8t] %-5level - %msg%n}{CONF=magenta,PROPS=magenta,TRACE=black,DEBUG=blue,INFO=blue,WARN=black,ERROR=red,FATAL=red}";
+
+	/**
+	 * Configures and creates the logger.
+	 * 
+	 * @return the new logger
+	 */
+	private Logger createLogger() {
+		LoggerContext context = (LoggerContext) LogManager.getContext(false);
+		org.apache.logging.log4j.core.config.Configuration conf = context.getConfiguration();
+		PatternLayout pl1 = PatternLayout.newBuilder().withConfiguration(conf).withPattern(PATTERN_1).build();
+		Appender a1 = ConsoleAppender.newBuilder().setConfiguration(conf).withName("ConsoleLog")
+				.setTarget(Target.SYSTEM_OUT).withLayout(pl1).build();
+		a1.start();
+		PatternLayout pl2 = PatternLayout.newBuilder().withConfiguration(conf).withPattern(PATTERN_2).build();
+		Appender a2 = FileAppender.newBuilder().setConfiguration(conf).withName("FileLog").withFileName(getLogfile())
+				.withAppend(false).withLayout(pl2).build();
+		a2.start();
+		AppenderRef r1 = AppenderRef.createAppenderRef("ConsoleLog", Level.INFO, null);
+		AppenderRef r2 = AppenderRef.createAppenderRef("FileLog", null, null);
+		AppenderRef[] refs = new AppenderRef[] { r1, r2 };
+		LoggerConfig lc = LoggerConfig.createLogger(false, Level.TRACE, LOGGER_NAME, "true", refs, null, conf, null);
+		lc.addAppender(a1, Level.INFO, null);
+		lc.addAppender(a2, null, null);
+		conf.addLogger(LOGGER_NAME, lc);
+		context.updateLoggers();
+		return LogManager.getLogger(LOGGER_NAME);
+	}
+
+	/**
+	 * Returns the logger.
+	 * 
+	 * @return the logger
+	 */
+	public Logger getLogger() {
+		return logger;
 	}
 
 	//======================================================================
@@ -196,7 +258,7 @@ public class Configuration {
 	public int getNumberOfTriggers() {
 		return triggers.size();
 	}
-	
+
 	/**
 	 * Returns an iterable over all triggers.
 	 * 
@@ -236,7 +298,7 @@ public class Configuration {
 	public int getNumberOfDelegateTargets() {
 		return delegates.keySet().size();
 	}
-	
+
 	/**
 	 * Returns an iterable over all known delegated classes.
 	 * 
@@ -358,6 +420,25 @@ public class Configuration {
 	}
 
 	/**
+	 * Returns the name of the log file.
+	 * 
+	 * @return the name of the log file
+	 */
+	public String getLogfile() {
+		return logfile;
+	}
+
+	/**
+	 * Sets the name of the log file.
+	 * 
+	 * @param logfile
+	 *            the new name of the log file
+	 */
+	public void setLogfile(String logfile) {
+		this.logfile = logfile;
+	}
+
+	/**
 	 * Returns whether or not the settings should be dumped to the log.
 	 * 
 	 * @return whether settings should be dumped
@@ -418,7 +499,7 @@ public class Configuration {
 	/**
 	 * The configuration logging level.
 	 */
-	private static final Level CONFIG = Level.forName("CONFIG", 350);
+	private static final Level CONF = Level.forName("CONF", 350);
 
 	/**
 	 * Dumps all the settings if the flag is set.
@@ -427,19 +508,19 @@ public class Configuration {
 		if (getDumpConfig() && (logger != null)) {
 			// --- TARGET & ARGS ---
 			if (getTarget() != null) {
-				logger.log(CONFIG, "deepsea.target = {}", getTarget());
+				logger.log(CONF, "deepsea.target = {}", getTarget());
 			}
 			if (getArgs() != null) {
-				logger.log(CONFIG, "deepsea.args = {}", getArgs());
+				logger.log(CONF, "deepsea.args = {}", getArgs());
 			}
 			// --- TRIGGERS ---
 			int t = getNumberOfTriggers(), i = t;
 			for (Trigger trigger : getTriggers()) {
 				String pre = (i == t) ? "deepsea.triggers = " : "\t";
 				String post = (i > 1) ? ";\\" : "";
-				logger.log(CONFIG, "{}{}{}", pre, trigger.toString(), post);
+				logger.log(CONF, "{}{}{}", pre, trigger.toString(), post);
 				i--;
-				
+
 			}
 			// --- DELEGATES ---
 			int d = getNumberOfDelegateTargets(), j = d;
@@ -447,7 +528,7 @@ public class Configuration {
 				Object delegate = findDelegate(target);
 				String pre = (j == d) ? "deepsea.delegate = " : "\t";
 				String post = (j > 1) ? ";\\" : "";
-				logger.log(CONFIG, "{}{}:{}{}", pre, target, delegate.getClass().getName(), post);
+				logger.log(CONF, "{}{}:{}{}", pre, target, delegate.getClass().getName(), post);
 				j--;
 			}
 			// --- BOUNDS ---
@@ -455,21 +536,21 @@ public class Configuration {
 			vars.addAll(maxBounds.keySet());
 			for (String var : vars) {
 				if (!minBounds.containsKey(var)) {
-					logger.log(CONFIG, "deepsea.bounds.{}.max = {}", var, maxBounds.get(var));
+					logger.log(CONF, "deepsea.bounds.{}.max = {}", var, maxBounds.get(var));
 				} else if (!maxBounds.containsKey(var)) {
-					logger.log(CONFIG, "deepsea.bounds.{}.min = {}", var, minBounds.get(var));
+					logger.log(CONF, "deepsea.bounds.{}.min = {}", var, minBounds.get(var));
 				} else {
-					logger.log(CONFIG, "deepsea.bounds.{} = {}..{}", var, minBounds.get(var), maxBounds.get(var));
+					logger.log(CONF, "deepsea.bounds.{} = {}..{}", var, minBounds.get(var), maxBounds.get(var));
 				}
 			}
 			// --- SOME BOOLEAN SETTINGS ---
-			logger.log(CONFIG, "deepsea.echooutput = {}", getEchoOutput());
-			logger.log(CONFIG, "deepsea.dumpconfig = {}", getDumpConfig());
-			logger.log(CONFIG, "deepsea.dumpproperties = {}", getDumpProperties());
+			logger.log(CONF, "deepsea.echooutput = {}", getEchoOutput());
+			logger.log(CONF, "deepsea.dumpconfig = {}", getDumpConfig());
+			logger.log(CONF, "deepsea.dumpproperties = {}", getDumpProperties());
 			// --- EXPLORER ---
 			Explorer e = getExplorer();
 			if (e != null) {
-				logger.log(CONFIG, "deepsea.explorer = {}", e.getClass().getName());
+				logger.log(CONF, "deepsea.explorer = {}", e.getClass().getName());
 			}
 		}
 	}
@@ -512,16 +593,20 @@ public class Configuration {
 		try {
 			properties.load(new FileInputStream(filename));
 		} catch (IOException x) {
-			Banner b = new Banner('@').println("COULD NOT READ PROPERTY FILE \"" + filename + "\"");
-			if (logger == null) {
-				b.display(System.out);
-			} else {
-				b.display(logger, Level.FATAL);
-			}
 			return false;
 		}
-		return processTarget() && processArgs() && processTriggers() && processDelegates() && processBounds()
-				&& processEchoOutput() && processExplorer() && processDumpConfig() && processDumpProperties();
+		processTarget();
+		processArgs();
+		processTriggers();
+		processBounds();
+		processEchoOutput();
+		processLogfile();
+		processDumpConfig();
+		processDumpProperties();
+		logger = createLogger(); // Need logger for following routines
+		processDelegates();
+		processExplorer();
+		return true;
 	}
 
 	/**
@@ -529,12 +614,11 @@ public class Configuration {
 	 * 
 	 * @return {@code true} if and only if the property was read successfully
 	 */
-	private boolean processTarget() {
+	private void processTarget() {
 		String p = properties.getProperty("deepsea.target");
 		if (p != null) {
 			setTarget(p);
 		}
-		return true;
 	}
 
 	/**
@@ -542,12 +626,11 @@ public class Configuration {
 	 * 
 	 * @return {@code true} if and only if the property was read successfully
 	 */
-	private boolean processArgs() {
+	private void processArgs() {
 		String p = properties.getProperty("deepsea.args");
 		if (p != null) {
 			setArgs(p);
 		}
-		return true;
 	}
 
 	/**
@@ -563,7 +646,7 @@ public class Configuration {
 	 * 
 	 * @return {@code true} if and only if the property was read successfully
 	 */
-	private boolean processTriggers() {
+	private void processTriggers() {
 		String p = properties.getProperty("deepsea.triggers");
 		if (p != null) {
 			String[] triggers = p.trim().split(";");
@@ -571,7 +654,6 @@ public class Configuration {
 				processTrigger(trigger);
 			}
 		}
-		return true;
 	}
 
 	/**
@@ -600,10 +682,8 @@ public class Configuration {
 				} else {
 					String name = parameter.substring(0, colonPos).trim();
 					if (names.contains(name)) {
-						sb.setLength(0);
-						sb.append("ignored trigger with duplicates, ");
-						sb.append('"').append(triggerDesc).append('"');
-						logger.warn(sb.toString());
+						new Banner('@').println("DEEPSEA PROBLEM\n")
+								.println("IGNORED TRIGGER WITH DUPLICATES \"" + triggerDesc + "\"").display(System.out);
 						return;
 					}
 					names.add(name);
@@ -617,10 +697,8 @@ public class Configuration {
 		if (names.size() > 0) {
 			addTrigger(trigger);
 		} else {
-			sb.setLength(0);
-			sb.append("ignored non-symbolic trigger ");
-			sb.append('"').append(triggerDesc).append('"');
-			logger.warn(sb.toString());
+			new Banner('@').println("DEEPSEA PROBLEM\n").println("IGNORED NON-SYMBOLIC TRIGGER \"" + triggerDesc + "\"")
+					.display(System.out);
 		}
 	}
 
@@ -659,7 +737,7 @@ public class Configuration {
 	 * 
 	 * @return {@code true} if and only if the property was read successfully
 	 */
-	private boolean processDelegates() {
+	private void processDelegates() {
 		String p = properties.getProperty("deepsea.delegates");
 		if (p != null) {
 			String[] delegates = p.trim().split(";");
@@ -671,7 +749,6 @@ public class Configuration {
 				}
 			}
 		}
-		return true;
 	}
 
 	/**
@@ -680,7 +757,7 @@ public class Configuration {
 	 * 
 	 * @return {@code true} if and only if the property was read successfully
 	 */
-	private boolean processBounds() {
+	private void processBounds() {
 		for (Object key : properties.keySet()) {
 			String k = (String) key;
 			if (k.startsWith("deepsea.bounds.")) {
@@ -707,21 +784,19 @@ public class Configuration {
 				}
 			}
 		}
-		return true;
 	}
 
 	/**
 	 * Reads and sets the "{@code deepsea.echooutput}" setting.
 	 */
-	private boolean processEchoOutput() {
+	private void processEchoOutput() {
 		setEchoOutput(getBooleanProperty(properties, "deepsea.echooutput", getEchoOutput()));
-		return true;
 	}
 
 	/**
 	 * Reads and sets the "{@code deepsea.explorer}" setting.
 	 */
-	private boolean processExplorer() {
+	private void processExplorer() {
 		String p = properties.getProperty("deepsea.explorer");
 		if (p != null) {
 			Explorer explorer = (Explorer) createInstance(p);
@@ -729,23 +804,30 @@ public class Configuration {
 				setExplorer(explorer);
 			}
 		}
-		return true;
+	}
+
+	/**
+	 * Reads and sets the "{@code deepsea.logfile}" setting.
+	 */
+	private void processLogfile() {
+		String p = properties.getProperty("deepsea.logfile");
+		if (p != null) {
+			setLogfile(p);
+		}
 	}
 
 	/**
 	 * Reads and sets the "{@code deepsea.dumpconfig}" setting.
 	 */
-	private boolean processDumpConfig() {
+	private void processDumpConfig() {
 		setDumpConfig(getBooleanProperty(properties, "deepsea.dumpconfig", getDumpConfig()));
-		return true;
 	}
 
 	/**
 	 * Reads and sets the "{@code deepsea.dumpproperties}" setting.
 	 */
-	private boolean processDumpProperties() {
+	private void processDumpProperties() {
 		setDumpProperties(getBooleanProperty(properties, "deepsea.dumpproperties", getDumpProperties()));
-		return true;
 	}
 
 	/**

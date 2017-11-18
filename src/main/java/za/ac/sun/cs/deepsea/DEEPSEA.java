@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import za.ac.sun.cs.deepsea.diver.Diver;
@@ -28,24 +27,29 @@ public class DEEPSEA {
 	 *            command-line arguments.
 	 */
 	public static void main(String[] args) {
-		Logger logger = LogManager.getLogger(DEEPSEA.class);
-		Configuration config = new Configuration(logger);
+		Configuration config = new Configuration();
+		if (args.length < 1) {
+			new Banner('@').println("DEEPSEA PROBLEM\nMISSING PROPERTIES FILE\n")
+					.println("USAGE: deepsea <properties file>").display(System.out);
+			return;
+		}
+		if (!config.processProperties(args[0])) {
+			new Banner('@').println("DEEPSEA PROBLEM\n").println("COULD NOT READ PROPERTY FILE \"" + args[0] + "\"")
+					.display(System.out);
+			return;
+		}
+		if (config.getTarget() == null) {
+			new Banner('@').println("SUSPICIOUS PROPERTIES FILE\n")
+					.println("ARE YOU SURE THAT THE ARGUMENT IS A .properties FILE?").display(System.out);
+			return;
+		}
+		// Configuration has now been loaded and seems OK
+		Logger logger = config.getLogger();
 		Diver diver = new Diver("DEEPSEA", logger, config);
 		new Banner('~').println("DEEPSEA version " + getVersion()).display(logger, Level.INFO);
-		if (args.length < 1) {
-			new Banner('@').println("MISSING PROPERTIES FILE").println("").println("USAGE: deepsea <properties file>")
-					.display(logger, Level.FATAL);
-		} else {
-			config.processProperties(args[0]);
-			if (config.getTarget() != null) {
-				logger.info("");
-				diver.start();
-				logger.info("");
-			} else {
-				new Banner('@').println("SUSPICIOUS PROPERTIES FILE").println("")
-						.println("ARE YOU SURE THAT THE ARGUMENT IS A .properties FILE?").display(logger, Level.FATAL);
-			}
-		}
+		logger.info("");
+		diver.start();
+		logger.info("");
 		new Banner('~').println("DEEPSEA DONE").display(logger, Level.INFO);
 	}
 

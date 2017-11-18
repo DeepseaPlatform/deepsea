@@ -77,7 +77,10 @@ public class Dive {
 
 		logger.trace("launching vm");
 		VirtualMachine vm = VMConnectLauncher.launchTarget(new String[] { config.getTarget(), config.getArgs() });
-		logger.trace("target vm details:\n" + vm.description());
+		logger.trace("target vm details:");
+		for (String detail : vm.description().split("\n")) {
+			logger.trace("  " + detail);
+		}
 
 		logger.trace("redirecting output");
 		Process pr = vm.process();

@@ -111,15 +111,17 @@ public class Banner {
 	 * @return the banner instance
 	 */
 	public Banner println(String message) {
-		sb.setLength(0);
-		sb.append(borderLeft).append(message);
-		if (sb.length() <= WIDTH - SIDE_WIDTH - SIDE_SPACE) {
-			while (sb.length() < WIDTH - SIDE_WIDTH - SIDE_SPACE) {
-				sb.append(' ');
+		for (String line : message.split("\n")) {
+			sb.setLength(0);
+			sb.append(borderLeft).append(line);
+			if (sb.length() <= WIDTH - SIDE_WIDTH - SIDE_SPACE) {
+				while (sb.length() < WIDTH - SIDE_WIDTH - SIDE_SPACE) {
+					sb.append(' ');
+				}
+				sb.append(borderRight);
 			}
-			sb.append(borderRight);
+			bannerWriter.append(sb.append(LS).toString());
 		}
-		bannerWriter.append(sb.append(LS).toString());
 		return this;
 	}
 
