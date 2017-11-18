@@ -31,7 +31,7 @@ import za.ac.sun.cs.green.expr.IntVariable;
  */
 public class DepthFirstExplorer extends AbstractExplorer {
 
-	//	/**
+	//	/*
 	//	 * Prefix for all properties that apply to this explorer. For example, to
 	//	 * control the Green instance created by this class, it reads properties of
 	//	 * the form
@@ -68,7 +68,7 @@ public class DepthFirstExplorer extends AbstractExplorer {
 	 * Models that have been generated (and explored) before.
 	 */
 	protected final Set<String> visitedModels = new HashSet<>();
-	
+
 	/**
 	 * A count of the number of paths explored.
 	 */
@@ -90,10 +90,10 @@ public class DepthFirstExplorer extends AbstractExplorer {
 	 * Constructs an instance of the depth-first explorer, given the associated
 	 * diver.
 	 * 
-	 * @param diver
-	 *            the associated diver
-	 * @param properties
-	 *            TODO
+	 * @param logger
+	 *            the log destination
+	 * @param config
+	 *            configuration settings
 	 */
 	public DepthFirstExplorer(Logger logger, Configuration config) {
 		super(logger, config);
@@ -103,11 +103,13 @@ public class DepthFirstExplorer extends AbstractExplorer {
 		greenProperties.setProperty("green.services", "model");
 		greenProperties.setProperty("green.service.model", "(bounder modeller)");
 		greenProperties.setProperty("green.service.model.bounder", "za.ac.sun.cs.green.service.bounder.BounderService");
-		greenProperties.setProperty("green.service.model.canonizer", "za.ac.sun.cs.green.service.canonizer.ModelCanonizerService");
+		greenProperties.setProperty("green.service.model.canonizer",
+				"za.ac.sun.cs.green.service.canonizer.ModelCanonizerService");
 		greenProperties.setProperty("green.service.model.modeller", "za.ac.sun.cs.green.service.z3.ModelZ3JavaService");
-//		greenProperties.setProperty("green.service.model", "(bounder (canonizer modeller))");
-//		greenProperties.setProperty("green.service.model.modeller", "za.ac.sun.cs.green.service.choco3.ModelChoco3Service");
-		za.ac.sun.cs.green.util.Configuration greenConfig = new za.ac.sun.cs.green.util.Configuration(solver, greenProperties);
+		//		greenProperties.setProperty("green.service.model", "(bounder (canonizer modeller))");
+		//		greenProperties.setProperty("green.service.model.modeller", "za.ac.sun.cs.green.service.choco3.ModelChoco3Service");
+		za.ac.sun.cs.green.util.Configuration greenConfig = new za.ac.sun.cs.green.util.Configuration(solver,
+				greenProperties);
 		greenConfig.configure();
 	}
 
@@ -118,7 +120,7 @@ public class DepthFirstExplorer extends AbstractExplorer {
 	public String getName() {
 		return "DepthFirstExplorer";
 	}
-	
+
 	/**
 	 * Proposes new concrete values in response to a newly discovered path
 	 * condition. This method attempts to work in a depth-first fashion, but
@@ -250,7 +252,8 @@ public class DepthFirstExplorer extends AbstractExplorer {
 	 * 
 	 * </ol>
 	 * 
-	 * @param spc the segmented path condition
+	 * @param spc
+	 *            the segmented path condition
 	 * @return a mapping from variables names to values, or {@code null}
 	 */
 	public Map<String, Constant> refine(SegmentedPathCondition spc) {
@@ -262,8 +265,8 @@ public class DepthFirstExplorer extends AbstractExplorer {
 			 */
 			logger.debug("revisit of signature \"" + spc.getSignature() + "\", truncating");
 			revisitCounter++;
-			while ((spc.getSignature().length() > 0)
-					&& (visitedSignatures.contains(spc.getSignature()) || infeasibleSignatures.contains(spc.getSignature()))) {
+			while ((spc.getSignature().length() > 0) && (visitedSignatures.contains(spc.getSignature())
+					|| infeasibleSignatures.contains(spc.getSignature()))) {
 				spc = spc.getParent();
 			}
 		}
@@ -305,9 +308,8 @@ public class DepthFirstExplorer extends AbstractExplorer {
 						Constant value = new IntConstant((Integer) model.get(variable));
 						newModel.put(name, value);
 					}
-					String modelString = newModel.entrySet().stream()
-							.filter(p -> !p.getKey().startsWith("$"))
-							.collect(Collectors.toMap(p -> p.getKey(),  p -> p.getValue())).toString();
+					String modelString = newModel.entrySet().stream().filter(p -> !p.getKey().startsWith("$"))
+							.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue())).toString();
 					logger.debug("new model: {}", modelString);
 					if (visitedModels.add(modelString)) {
 						return newModel;
@@ -324,11 +326,12 @@ public class DepthFirstExplorer extends AbstractExplorer {
 
 	/**
 	 * Proposes new concrete values in response to a newly discovered path
-	 * condition. 	 */
+	 * condition.
+	 */
 	@Override
 	public Map<String, Constant> refine(Dive dive) {
 		pathCounter++;
-//		return refine(dive.getSignature(), dive.getPathCondition());
+		//		return refine(dive.getSignature(), dive.getPathCondition());
 		return refine(dive.getSegmentedPathCondition());
 	}
 
@@ -346,11 +349,8 @@ public class DepthFirstExplorer extends AbstractExplorer {
 	public void report(PrintWriter out) {
 		out.println("# paths explored: " + pathCounter);
 		if (pathCounter <= 1) {
-			new Banner('!')
-				.println("FEWER THAN TWO PATHS EXPLORED...")
-				.println("")
-				.println("CHECK THAT THE TRIGGERS ARE CORRECT")
-				.display(out);
+			new Banner('!').println("FEWER THAN TWO PATHS EXPLORED...").println("")
+					.println("CHECK THAT THE TRIGGERS ARE CORRECT").display(out);
 		} else {
 			out.println("# paths revisited: " + revisitCounter);
 			out.println("# unique paths: " + pathCounter + "-" + revisitCounter + "=" + (pathCounter - revisitCounter));

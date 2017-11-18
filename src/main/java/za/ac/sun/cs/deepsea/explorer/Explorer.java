@@ -35,28 +35,16 @@ public interface Explorer extends Reporter {
 	 * </p>
 	 * 
 	 * <p>
-	 * THE INFORMATION BELOW IS OUTDATED. SHOULD BE REPLACED WITH A DESCRIPTION
-	 * OF THE SINGLE ROUTINE {@link Dive#getSegmentedPathCondition()} THAT
-	 * RETURNS THE OLD INFORMATION IN ONE PACKAGE.
+	 * Perhaps the most important support routine is
+	 * {@link Dive#getSegmentedPathCondition()}: it returns a complex path
+	 * condition structure that includes a string containing the characters
+	 * "{@code 0}" and "{@code 1}" to describe the {@code false}/{@code true}
+	 * decisions made along the path. There is a one-to-one mapping between such
+	 * strings and the execution paths of the program. It is often more
+	 * convenient to manipulate such path signatures than it is to manipulate
+	 * path conditions. The path condition structures also includes the path
+	 * condition as a Green expression.
 	 * </p>
-	 * 
-	 * <p>
-	 * There are two routines, in particular, that can help an {@link Explorer}:
-	 * </p>
-	 * 
-	 * <ol>
-	 * 
-	 * <li>{@link Dive#getSignature()} returns a string containing the
-	 * characters "{@code 0}" and "{@code 1}" to describe the
-	 * {@code false}/{@code true} decisions made along the path. There is a
-	 * one-to-one mapping between such strings and the execution paths of the
-	 * program. It is often more convenient to manipulate such path signatures
-	 * than it is to manipulate path conditions.</li>
-	 * 
-	 * <li>{@link Dive#getPathCondition()} returns the path condition as a Green
-	 * expression.</li>
-	 * 
-	 * </ol>
 	 * 
 	 * <p>
 	 * The concrete values takes the form of a mapping from variable names to

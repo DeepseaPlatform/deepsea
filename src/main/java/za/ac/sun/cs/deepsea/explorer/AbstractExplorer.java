@@ -22,7 +22,7 @@ public abstract class AbstractExplorer implements Explorer {
 	 * the identify of the diver in an instance field..
 	 * 
 	 * @param logger the log destination
-	 * @param properties properties that 
+	 * @param config configuration settings 
 	 */
 	public AbstractExplorer(Logger logger, Configuration config) {
 		this.logger = logger;

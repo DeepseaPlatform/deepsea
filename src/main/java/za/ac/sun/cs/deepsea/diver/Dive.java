@@ -30,7 +30,7 @@ public class Dive {
 	/**
 	 * The logger.
 	 */
-	private final Logger log;
+	private final Logger logger;
 
 	/**
 	 * The settings that control and apply to this dive.
@@ -55,14 +55,16 @@ public class Dive {
 	/**
 	 * TODO
 	 * 
-	 * @param diver TODO
-	 * @param concreteValues  TODO
+	 * @param name name for this dive (displayed in log)
+	 * @param logger destination for log messages
+	 * @param config configuration settings
+	 * @param concreteValues concrete input values
 	 */
-	public Dive(String name, Logger log, Configuration config, Map<String, Constant> concreteValues) {
+	public Dive(String name, Logger logger, Configuration config, Map<String, Constant> concreteValues) {
 		this.name = name;
-		this.log = log;
+		this.logger = logger;
 		this.config = config;
-		this.symbolizer = new Symbolizer(log);
+		this.symbolizer = new Symbolizer(logger);
 		this.concreteValues = concreteValues;
 	}
 
@@ -71,13 +73,13 @@ public class Dive {
 	 * @return whether a serious error has occurred
 	 */
 	public boolean dive() {
-		Banner.displayBannerLine("starting dive " + name, '-', log);
+		Banner.displayBannerLine("starting dive " + name, '-', logger);
 
-		log.trace("launching vm");
+		logger.trace("launching vm");
 		VirtualMachine vm = VMConnectLauncher.launchTarget(new String[] { config.getTarget(), config.getArgs() });
-		log.trace("target vm details:\n" + vm.description());
+		logger.trace("target vm details:\n" + vm.description());
 
-		log.trace("redirecting output");
+		logger.trace("redirecting output");
 		Process pr = vm.process();
 		InputStream es = pr.getErrorStream();
 		InputStream is = pr.getInputStream();
@@ -86,22 +88,22 @@ public class Dive {
 		er.start();
 		or.start();
 
-		log.trace("issuing monitor requests");
+		logger.trace("issuing monitor requests");
 		RequestManager m = new RequestManager(vm.eventRequestManager());
 		m.addExclude("java.*", "javax.*", "sun.*", "com.sun.*");
 		m.addExclude(config.getDelegateTargets());
 		m.createClassPrepareRequest(r -> m.filterExcludes(r));
 
-		log.trace("setting up event monitoring");
-		EventReader ev = new EventReader(log, vm.eventQueue());
-		Stepper st = new Stepper(log, config, this, vm, m);
+		logger.trace("setting up event monitoring");
+		EventReader ev = new EventReader(logger, vm.eventQueue());
+		Stepper st = new Stepper(logger, config, this, vm, m);
 		ev.addEventListener(st);
 		ev.start();
 
-		log.trace("starting vm");
+		logger.trace("starting vm");
 		vm.resume();
 
-		log.trace("waiting for completion");
+		logger.trace("waiting for completion");
 		while (!ev.isStopping()) {
 			try {
 				Thread.sleep(100);
@@ -110,7 +112,7 @@ public class Dive {
 			}
 		}
 
-		log.trace("shutting down event monitoring");
+		logger.trace("shutting down event monitoring");
 		ev.stop();
 		er.interrupt();
 		or.interrupt();
