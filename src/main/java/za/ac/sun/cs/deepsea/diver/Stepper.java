@@ -63,9 +63,17 @@ public class Stepper extends AbstractEventListener {
 
 	}
 
-	private final Dive dive;
-
+	/**
+	 * The logger.
+	 */
 	private final Logger log;
+
+	/**
+	 * The settings that control and apply to this session.
+	 */
+	private final Configuration config;
+
+	private final Dive dive;
 
 	private final VirtualMachine vm;
 
@@ -93,16 +101,13 @@ public class Stepper extends AbstractEventListener {
 
 	private boolean errorFree = true;
 
-	public Stepper(Dive dive, VirtualMachine vm, RequestManager mgr) {
+	public Stepper(Logger log, Configuration config, Dive dive, VirtualMachine vm, RequestManager mgr) {
+		this.log = log;
+		this.config = config;
 		this.dive = dive;
-		this.log = dive.getDiver().getLog();
 		this.vm = vm;
 		this.mgr = mgr;
 		this.symbolizer = dive.getSymbolizer();
-	}
-
-	public Dive getDive() {
-		return dive;
 	}
 
 	public RequestManager getRequestManager() {
@@ -202,7 +207,7 @@ public class Stepper extends AbstractEventListener {
 			}
 		}
 		// If not in symbolic mode, check if the method is a trigger
-		Trigger trigger = dive.getDiver().findTrigger(method, className);
+		Trigger trigger = config.findTrigger(method, className);
 		if (trigger != null) {
 			return triggerSymbolicMode(trigger, event, method);
 		}
@@ -287,8 +292,8 @@ public class Stepper extends AbstractEventListener {
 					if (symbolic) {
 						Constant concrete = ((name == null) || (concreteValues == null)) ? null
 								: concreteValues.get(name);
-						int min = dive.getDiver().getMinBound(name);
-						int max = dive.getDiver().getMaxBound(name);
+						int min = config.getMinBound(name);
+						int max = config.getMaxBound(name);
 						expr = new IntVariable(name, min, max);
 						if ((concrete != null) && (concrete instanceof IntConstant)) {
 							int value = ((IntConstant) concrete).getValue();
@@ -310,8 +315,8 @@ public class Stepper extends AbstractEventListener {
 							String entryName = name + "$" + j;
 							Constant concrete = ((entryName == null) || (concreteValues == null)) ? null
 									: concreteValues.get(entryName);
-							int min = dive.getDiver().getMinBound(entryName, dive.getDiver().getMinBound(name));
-							int max = dive.getDiver().getMaxBound(entryName, dive.getDiver().getMaxBound(name));
+							int min = config.getMinBound(entryName, config.getMinBound(name));
+							int max = config.getMaxBound(entryName, config.getMaxBound(name));
 							Expression entryExpr = new IntVariable(entryName, min, max);
 							if ((concrete != null) && (concrete instanceof IntConstant)) {
 								int value = ((IntConstant) concrete).getValue();
@@ -384,9 +389,9 @@ public class Stepper extends AbstractEventListener {
 
 	@Override
 	public boolean classPrepare(ClassPrepareEvent event) {
-		if (dive.getDiver().getTarget().equals(event.referenceType().name())) {
+		if (config.getTarget().equals(event.referenceType().name())) {
 			mgr.createMethodEntryRequest(r -> mgr.filterExcludes(r));
-			for (String delegateTarget : dive.getDiver().getDelegateTargets()) {
+			for (String delegateTarget : config.getDelegateTargets()) {
 				mgr.createMethodEntryRequest(r -> { r.addClassFilter(delegateTarget); });
 			}
 			ThreadReference mt = RequestManager.findThread(vm, "main");
@@ -456,7 +461,7 @@ public class Stepper extends AbstractEventListener {
 		ConstantMethodref m = (ConstantMethodref) cp.getConstant(index,
 				za.ac.sun.cs.deepsea.constantpool.Constants.CONSTANT_Methodref);
 		String className = m.getClass(cp).replace('/', '.');
-		delegate = dive.getDiver().findDelegate(className);
+		delegate = config.findDelegate(className);
 		if (delegate != null) {
 			ConstantNameAndType nt = (ConstantNameAndType) cp.getConstant(m.getNameAndTypeIndex(),
 					za.ac.sun.cs.deepsea.constantpool.Constants.CONSTANT_NameAndType);

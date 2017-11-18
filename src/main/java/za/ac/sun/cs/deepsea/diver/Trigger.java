@@ -22,6 +22,11 @@ public class Trigger {
 	private Object[] parameterType = null;
 
 	private final Set<String> symbolicNames = new HashSet<>();
+	
+	/**
+	 * String representation of this trigger.
+	 */
+	private String stringRepr = null;
 
 	public Trigger(final String name) {
 		this.name = name;
@@ -100,6 +105,28 @@ public class Trigger {
 			return false;
 		}
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		if (stringRepr == null) {
+			StringBuilder sb = new StringBuilder();
+			sb.append(name).append('(');
+			for (int i = 0; i < parameterCount; i++) {
+				if (i > 0) { sb.append(", "); }
+				if (parameterName[i] != null) {
+					sb.append(parameterName[i]).append(": ");
+				}
+				if (parameterType[i] == null) { sb.append("?"); }
+				else if (parameterType[i] == Boolean.class) { sb.append("boolean"); }
+				else if (parameterType[i] == Integer.class) { sb.append("int"); }
+				else if (parameterType[i] == String.class) { sb.append("string"); }
+				else if (parameterType[i] instanceof IntArray) { sb.append("int[]"); } // int[5]? int[4]?...
+				else { sb.append('*'); }
+			}
+			stringRepr = sb.append(')').toString();
+		}
+		return stringRepr;
 	}
 
 }

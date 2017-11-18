@@ -10,8 +10,8 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.Logger;
 
+import za.ac.sun.cs.deepsea.diver.Configuration;
 import za.ac.sun.cs.deepsea.diver.Dive;
-import za.ac.sun.cs.deepsea.diver.Diver;
 import za.ac.sun.cs.deepsea.diver.SegmentedPathCondition;
 import za.ac.sun.cs.deepsea.reporting.Banner;
 import za.ac.sun.cs.green.Green;
@@ -19,7 +19,6 @@ import za.ac.sun.cs.green.Instance;
 import za.ac.sun.cs.green.expr.Constant;
 import za.ac.sun.cs.green.expr.IntConstant;
 import za.ac.sun.cs.green.expr.IntVariable;
-import za.ac.sun.cs.green.util.Configuration;
 
 /**
  * An explorer that tries to explore paths in a depth-first pattern.
@@ -50,47 +49,42 @@ public class DepthFirstExplorer extends AbstractExplorer {
 	//	private static final String PROPERTY_PREFIX = "deepsea.dfexplorer.";
 
 	/**
-	 * A logger for communicating with users.
-	 */
-	private final Logger log;
-
-	/**
 	 * An instance of Green used for generating models. Any properties specified
 	 * in the configuration file overrides the defaults used in this explorer.
 	 */
-	private final Green solver;
+	protected final Green solver;
 
 	/**
 	 * Signatures for those paths we have visited.
 	 */
-	private final Set<String> visitedSignatures = new HashSet<>();
+	protected final Set<String> visitedSignatures = new HashSet<>();
 
 	/**
 	 * Signatures for those path that have already been found to be unreachable.
 	 */
-	private final Set<String> infeasibleSignatures = new HashSet<>();
+	protected final Set<String> infeasibleSignatures = new HashSet<>();
 
 	/**
 	 * Models that have been generated (and explored) before.
 	 */
-	private final Set<String> visitedModels = new HashSet<>();
+	protected final Set<String> visitedModels = new HashSet<>();
 	
 	/**
 	 * A count of the number of paths explored.
 	 */
-	private int pathCounter = 0;
+	protected int pathCounter = 0;
 
 	/**
 	 * A count of the number of paths revisited (i.e., the number of visited
 	 * signatures that are re-encountered).
 	 */
-	private int revisitCounter = 0;
+	protected int revisitCounter = 0;
 
 	/**
 	 * A count of the number of generated (modified) path conditions that are
 	 * UNSAT.
 	 */
-	private int unSatCounter = 0;
+	protected int unSatCounter = 0;
 
 	/**
 	 * Constructs an instance of the depth-first explorer, given the associated
@@ -101,21 +95,20 @@ public class DepthFirstExplorer extends AbstractExplorer {
 	 * @param properties
 	 *            TODO
 	 */
-	public DepthFirstExplorer(Diver diver, Properties properties) {
-		super(diver);
-		this.log = diver.getLog();
+	public DepthFirstExplorer(Logger logger, Configuration config) {
+		super(logger, config);
 		this.solver = new Green("DEEPSEA");
-		// properties.setProperty("green.log.level", "OFF");
-		properties.setProperty("green.services", "model");
-		properties.setProperty("green.service.model", "(bounder modeller)");
-//		properties.setProperty("green.service.model", "(bounder (canonizer modeller))");
-		properties.setProperty("green.service.model.bounder", "za.ac.sun.cs.green.service.bounder.BounderService");
-		properties.setProperty("green.service.model.canonizer",
-				"za.ac.sun.cs.green.service.canonizer.ModelCanonizerService");
-		properties.setProperty("green.service.model.modeller", "za.ac.sun.cs.green.service.z3.ModelZ3JavaService");
-		// props.setProperty("green.service.model.modeller", "za.ac.sun.cs.green.service.choco3.ModelChoco3Service");
-		Configuration config = new Configuration(solver, properties);
-		config.configure();
+		Properties greenProperties = new Properties();
+		greenProperties.setProperty("green.log.level", "OFF");
+		greenProperties.setProperty("green.services", "model");
+		greenProperties.setProperty("green.service.model", "(bounder modeller)");
+		greenProperties.setProperty("green.service.model.bounder", "za.ac.sun.cs.green.service.bounder.BounderService");
+		greenProperties.setProperty("green.service.model.canonizer", "za.ac.sun.cs.green.service.canonizer.ModelCanonizerService");
+		greenProperties.setProperty("green.service.model.modeller", "za.ac.sun.cs.green.service.z3.ModelZ3JavaService");
+//		greenProperties.setProperty("green.service.model", "(bounder (canonizer modeller))");
+//		greenProperties.setProperty("green.service.model.modeller", "za.ac.sun.cs.green.service.choco3.ModelChoco3Service");
+		za.ac.sun.cs.green.util.Configuration greenConfig = new za.ac.sun.cs.green.util.Configuration(solver, greenProperties);
+		greenConfig.configure();
 	}
 
 	/**
@@ -267,15 +260,15 @@ public class DepthFirstExplorer extends AbstractExplorer {
 			 * conjuncts one by one, until we get a path condition that we have
 			 * not visited before and that we have not classified as unfeasible.
 			 */
-			log.debug("revisit of signature \"" + spc.getSignature() + "\", truncating");
+			logger.debug("revisit of signature \"" + spc.getSignature() + "\", truncating");
 			revisitCounter++;
 			while ((spc.getSignature().length() > 0)
 					&& (visitedSignatures.contains(spc.getSignature()) || infeasibleSignatures.contains(spc.getSignature()))) {
 				spc = spc.getParent();
 			}
 		}
-		log.info("path signature: " + spc.getSignature());
-		log.info("path condition: " + spc.getPathCondition());
+		logger.info("path signature: " + spc.getSignature());
+		logger.info("path condition: " + spc.getPathCondition());
 		while (spc.getSignature().length() > 0) {
 			/*
 			 * Flip the first char ('0' <-> '1') of signature.
@@ -291,16 +284,16 @@ public class DepthFirstExplorer extends AbstractExplorer {
 				 */
 				visitedSignatures.add(spc.getParent().getSignature());
 				spc = spc.getParent();
-				log.debug("dropping first conjunct -> " + spc.getPathCondition());
+				logger.debug("dropping first conjunct -> " + spc.getPathCondition());
 			} else {
 				// negate first conjunct of path condition and check if it has a model
-				log.debug("trying <" + npc.getSignature() + "> " + npc.getPathCondition());
+				logger.debug("trying <" + npc.getSignature() + "> " + npc.getPathCondition());
 				Instance instance = new Instance(solver, null, npc.getPathCondition());
 				@SuppressWarnings("unchecked")
 				Map<IntVariable, Object> model = (Map<IntVariable, Object>) instance.request("model");
 				if (model == null) {
 					infeasibleSignatures.add(npc.getSignature());
-					log.debug("no model");
+					logger.debug("no model");
 					unSatCounter++;
 					// again drop the first conjunct
 					spc = spc.getParent();
@@ -315,17 +308,17 @@ public class DepthFirstExplorer extends AbstractExplorer {
 					String modelString = newModel.entrySet().stream()
 							.filter(p -> !p.getKey().startsWith("$"))
 							.collect(Collectors.toMap(p -> p.getKey(),  p -> p.getValue())).toString();
-					log.debug("new model: {}", modelString);
+					logger.debug("new model: {}", modelString);
 					if (visitedModels.add(modelString)) {
 						return newModel;
 					} else {
-						log.debug("model {} has been visited before, recurring", modelString);
+						logger.debug("model {} has been visited before, recurring", modelString);
 						return refine(spc.getParent());
 					}
 				}
 			}
 		}
-		log.debug("all signatures explored");
+		logger.debug("all signatures explored");
 		return null;
 	}
 

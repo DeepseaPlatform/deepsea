@@ -24,8 +24,6 @@ import com.sun.jdi.event.ThreadStartEvent;
 import com.sun.jdi.event.VMDeathEvent;
 import com.sun.jdi.event.VMDisconnectEvent;
 
-import za.ac.sun.cs.deepsea.diver.Diver;
-
 /**
  * An event reader that continuously reads events coming from the VM and
  * dispatch them to the registered listeners.
@@ -35,14 +33,14 @@ public class EventReader extends AbstractReader {
 
 	private final Logger log;
 
-	private EventQueue eventQueue;
+	private final EventQueue eventQueue;
 
 	private List<EventListener> eventListeners = new LinkedList<>();
 
-	public EventReader(final Diver diver, EventQueue queue) {
+	public EventReader(Logger log, EventQueue eventQueue) {
 		super();
-		this.log = diver.getLog();
-		eventQueue = queue;
+		this.log = log;
+		this.eventQueue = eventQueue;
 	}
 
 	/**

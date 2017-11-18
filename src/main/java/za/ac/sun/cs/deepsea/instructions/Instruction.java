@@ -1,20 +1,11 @@
 package za.ac.sun.cs.deepsea.instructions;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import com.sun.jdi.event.StepEvent;
 
 import za.ac.sun.cs.deepsea.diver.Stepper;
 import za.ac.sun.cs.deepsea.diver.Symbolizer;
-import za.ac.sun.cs.green.Green;
-import za.ac.sun.cs.green.Instance;
-import za.ac.sun.cs.green.expr.Expression;
-import za.ac.sun.cs.green.expr.IntVariable;
-import za.ac.sun.cs.green.expr.Operation;
-import za.ac.sun.cs.green.expr.Operation.Operator;
-import za.ac.sun.cs.green.util.Configuration;
 
 /**
  * Superclass of all symbolic JVM bytecode instructions.
@@ -571,55 +562,55 @@ public abstract class Instruction {
 		}
 	}
 
-	/**
-	 * An instance of the Green solver used to detect nonlinear expression.
-	 */
-	private static Green solver = null;
-
-	private static final Map<IntVariable, Expression> substitutions = new HashMap<>();
-
-	public static boolean isNonlinearExpression(Expression expression) {
-		if (solver == null) {
-			solver = new Green("DS-SIMPLIFIER");
-			Properties properties = new Properties();
-			properties.setProperty("green.log.level", "OFF");
-			properties.setProperty("green.services", "simplify");
-			properties.setProperty("green.service.simplify", "canonizer)");
-			properties.setProperty("green.service.simplify.canonizer",
-					"za.ac.sun.cs.green.service.canonizer.SATLeafCanonizerService");
-			Configuration config = new Configuration(solver, properties);
-			config.configure();
-		}
-		return (null == (Expression) new Instance(solver, null, expression).request("simplify"));
-	}
-
-	public Expression approximateNonlinearExpression(Expression expression) {
-		substitutions.clear();
-		return approximateNonlinearExpression0(expression);
-	}
-
-	public Expression approximateNonlinearExpression0(Expression expression) {
-		if (expression instanceof IntVariable) {
-			IntVariable variable = (IntVariable) expression;
-			Expression e = stepper.getDive().getActualValue(variable.getName());
-			if (e != null) {
-				substitutions.put(variable, e);
-				return e;
-			} else {
-				return Operation.ZERO;
-			}
-		} else if (expression instanceof Operation) {
-			Operation operation = (Operation) expression;
-			Operator operator = operation.getOperator();
-			int n = operation.getOperatandCount();
-			Expression[] operands = new Expression[n];
-			for (int i = 0; i < n; i++) {
-				operands[i] = approximateNonlinearExpression0(operation.getOperand(i));
-			}
-			return new Operation(operator, operands);
-		} else {
-			return expression;
-		}
-	}
+//	/**
+//	 * An instance of the Green solver used to detect nonlinear expression.
+//	 */
+//	private static Green solver = null;
+//
+//	private static final Map<IntVariable, Expression> substitutions = new HashMap<>();
+//
+//	public static boolean isNonlinearExpression(Expression expression) {
+//		if (solver == null) {
+//			solver = new Green("DS-SIMPLIFIER");
+//			Properties properties = new Properties();
+//			properties.setProperty("green.log.level", "OFF");
+//			properties.setProperty("green.services", "simplify");
+//			properties.setProperty("green.service.simplify", "canonizer)");
+//			properties.setProperty("green.service.simplify.canonizer",
+//					"za.ac.sun.cs.green.service.canonizer.SATLeafCanonizerService");
+//			Configuration config = new Configuration(solver, properties);
+//			config.configure();
+//		}
+//		return (null == (Expression) new Instance(solver, null, expression).request("simplify"));
+//	}
+//
+//	public Expression approximateNonlinearExpression(Expression expression) {
+//		substitutions.clear();
+//		return approximateNonlinearExpression0(expression);
+//	}
+//
+//	public Expression approximateNonlinearExpression0(Expression expression) {
+//		if (expression instanceof IntVariable) {
+//			IntVariable variable = (IntVariable) expression;
+//			Expression e = stepper.getDive().getActualValue(variable.getName());
+//			if (e != null) {
+//				substitutions.put(variable, e);
+//				return e;
+//			} else {
+//				return Operation.ZERO;
+//			}
+//		} else if (expression instanceof Operation) {
+//			Operation operation = (Operation) expression;
+//			Operator operator = operation.getOperator();
+//			int n = operation.getOperatandCount();
+//			Expression[] operands = new Expression[n];
+//			for (int i = 0; i < n; i++) {
+//				operands[i] = approximateNonlinearExpression0(operation.getOperand(i));
+//			}
+//			return new Operation(operator, operands);
+//		} else {
+//			return expression;
+//		}
+//	}
 
 }

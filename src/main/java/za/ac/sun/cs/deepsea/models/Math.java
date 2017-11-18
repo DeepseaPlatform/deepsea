@@ -1,8 +1,10 @@
 package za.ac.sun.cs.deepsea.models;
 
+import org.apache.logging.log4j.Logger;
+
 import com.sun.jdi.ThreadReference;
 
-import za.ac.sun.cs.deepsea.diver.Diver;
+import za.ac.sun.cs.deepsea.diver.Configuration;
 import za.ac.sun.cs.deepsea.diver.SymbolicFrame;
 import za.ac.sun.cs.deepsea.diver.Symbolizer;
 import za.ac.sun.cs.green.expr.Expression;
@@ -19,10 +21,12 @@ public class Math {
 	 * Construct an instance. Since the operations are all {@code static}, there
 	 * is nothing much to construct.
 	 * 
-	 * @param diver
-	 *            the {@link Diver} to which the model belongs
+	 * @param logger
+	 *            a log to write to
+	 * @param config
+	 *            the configuration of the session
 	 */
-	public Math(Diver diver) {
+	public Math(Logger logger, Configuration config) {
 	}
 
 	/**

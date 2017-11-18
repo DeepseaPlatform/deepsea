@@ -13,6 +13,7 @@ import za.ac.sun.cs.deepsea.agent.EventReader;
 import za.ac.sun.cs.deepsea.agent.RequestManager;
 import za.ac.sun.cs.deepsea.agent.StreamRedirector;
 import za.ac.sun.cs.deepsea.agent.VMConnectLauncher;
+import za.ac.sun.cs.deepsea.reporting.Banner;
 import za.ac.sun.cs.green.expr.Constant;
 import za.ac.sun.cs.green.expr.Expression;
 
@@ -22,29 +23,29 @@ import za.ac.sun.cs.green.expr.Expression;
 public class Dive {
 
 	/**
-	 * TODO 
+	 * TODO
 	 */
-	private final Diver diver;
+	private final String name;
 
 	/**
-	 * TODO
+	 * The logger.
 	 */
 	private final Logger log;
 
 	/**
-	 * TODO
+	 * The settings that control and apply to this dive.
 	 */
-	private final int id;
-
-	/**
-	 * TODO
-	 */
-	private final Symbolizer symbolizer;
+	private final Configuration config;
 
 	/**
 	 * TODO
 	 */
 	private final Map<String, Constant> concreteValues;
+
+	/**
+	 * TODO
+	 */
+	private final Symbolizer symbolizer;
 
 	/**
 	 * TODO
@@ -57,11 +58,11 @@ public class Dive {
 	 * @param diver TODO
 	 * @param concreteValues  TODO
 	 */
-	public Dive(Diver diver, Map<String, Constant> concreteValues) {
-		this.diver = diver;
-		this.log = diver.getLog();
-		this.id = diver.getDiveId();
-		this.symbolizer = new Symbolizer(diver);
+	public Dive(String name, Logger log, Configuration config, Map<String, Constant> concreteValues) {
+		this.name = name;
+		this.log = log;
+		this.config = config;
+		this.symbolizer = new Symbolizer(log);
 		this.concreteValues = concreteValues;
 	}
 
@@ -70,38 +71,30 @@ public class Dive {
 	 * @return whether a serious error has occurred
 	 */
 	public boolean dive() {
-		log.info("----- starting dive " + diver.getName() + "." + id + " -----");
+		Banner.displayBannerLine("starting dive " + name, '-', log);
 
 		log.trace("launching vm");
-		VirtualMachine vm = VMConnectLauncher.launchTarget(new String[] { diver.getTarget(), diver.getArgs() });
+		VirtualMachine vm = VMConnectLauncher.launchTarget(new String[] { config.getTarget(), config.getArgs() });
 		log.trace("target vm details:\n" + vm.description());
 
 		log.trace("redirecting output");
 		Process pr = vm.process();
 		InputStream es = pr.getErrorStream();
 		InputStream is = pr.getInputStream();
-		StreamRedirector er = new StreamRedirector(es, System.err, diver.isProducingOutput());
-		StreamRedirector or = new StreamRedirector(is, System.out, diver.isProducingOutput());
+		StreamRedirector er = new StreamRedirector(es, System.err, config.getEchoOutput());
+		StreamRedirector or = new StreamRedirector(is, System.out, config.getEchoOutput());
 		er.start();
 		or.start();
 
 		log.trace("issuing monitor requests");
-		RequestManager m = new RequestManager(diver, vm.eventRequestManager());
+		RequestManager m = new RequestManager(vm.eventRequestManager());
 		m.addExclude("java.*", "javax.*", "sun.*", "com.sun.*");
-		for (String delegateTarget : diver.getDelegateTargets()) {
-			m.addExclude(delegateTarget);
-		}
+		m.addExclude(config.getDelegateTargets());
 		m.createClassPrepareRequest(r -> m.filterExcludes(r));
-//		m.createMethodEntryRequest(r -> m.filterExcludes(r));
-//		ThreadReference mt = RequestManager.findThread(vm, "main");
-//		m.createStepRequest(mt, StepRequest.STEP_MIN, StepRequest.STEP_INTO, r -> {
-//			m.filterExcludes(r);
-//			r.addCountFilter(1);
-//		});
 
 		log.trace("setting up event monitoring");
-		EventReader ev = new EventReader(diver, vm.eventQueue());
-		Stepper st = new Stepper(this, vm, m);
+		EventReader ev = new EventReader(log, vm.eventQueue());
+		Stepper st = new Stepper(log, config, this, vm, m);
 		ev.addEventListener(st);
 		ev.start();
 
@@ -138,39 +131,6 @@ public class Dive {
 	 */
 	public SegmentedPathCondition getSegmentedPathCondition() {
 		return symbolizer.getSegmentedPathCondition();
-	}
-
-	/**
-	 * Returns the path condition collected by {@link #symbolizer} during the
-	 * most recent invocation of the target program.
-	 * 
-	 * @return the path condition for the most recent run
-	 */
-	@Deprecated
-	public Expression getPathCondition() {
-		return symbolizer.getPathCondition();
-	}
-	
-	/**
-	 * Returns the signature string for the most recent invocation of the target
-	 * program. A signature is a sequence of "{@code 0}s" and "{@code 1}s" that
-	 * describe the branches ({@code 0}=false, {@code 1}=true) taken along the
-	 * path.
-	 * 
-	 * @return the signature string for the most recent run
-	 */
-	@Deprecated
-	public String getSignature() {
-		return symbolizer.getSignature();
-	}
-
-	/**
-	 * TODO
-	 * 
-	 * @return TODO
-	 */
-	public Diver getDiver() {
-		return diver;
 	}
 
 	/**

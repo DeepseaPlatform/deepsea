@@ -1,8 +1,10 @@
 package za.ac.sun.cs.deepsea.models;
 
+import org.apache.logging.log4j.Logger;
+
 import com.sun.jdi.ThreadReference;
 
-import za.ac.sun.cs.deepsea.diver.Diver;
+import za.ac.sun.cs.deepsea.diver.Configuration;
 import za.ac.sun.cs.deepsea.diver.SymbolicFrame;
 import za.ac.sun.cs.deepsea.diver.Symbolizer;
 import za.ac.sun.cs.green.expr.Expression;
@@ -24,10 +26,12 @@ public class String {
 	 * {@code static}, the current set of routines do not need to construct any
 	 * additional information and are implemented in a {@code static} fashion.
 	 * 
-	 * @param diver
-	 *            the {@link Diver} to which the model belongs
+	 * @param logger
+	 *            a log to write to
+	 * @param config
+	 *            the configuration of the session
 	 */
-	public String(Diver diver) {
+	public String(Logger logger, Configuration config) {
 	}
 
 	/**

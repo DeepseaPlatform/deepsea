@@ -1,0 +1,881 @@
+package za.ac.sun.cs.deepsea.diver;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
+
+import com.sun.jdi.Method;
+
+import za.ac.sun.cs.deepsea.explorer.Explorer;
+import za.ac.sun.cs.deepsea.reporting.Banner;
+
+/**
+ * A container for user-configurable parameters for analysis.
+ */
+public class Configuration {
+
+	/**
+	 * The minimum value that integer variables can assume by default.
+	 */
+	private static final int DEFAULT_MIN_INT_VALUE = 0;
+
+	/**
+	 * The maximum value that integer variables can assume by default.
+	 */
+	private static final int DEFAULT_MAX_INT_VALUE = 99;
+
+	/**
+	 * Properties associated with these settings.
+	 */
+	protected Properties properties = null;
+
+	/**
+	 * Log to write to.
+	 */
+	protected final Logger logger;
+
+	/**
+	 * The fully qualified of the target class. This class should contain a Java
+	 * {@code main} method and it is the class that is run during each dive.
+	 */
+	protected String target = null;
+
+	/**
+	 * Arguments pass to the target class when it is run during a dive.
+	 */
+	private String args = null;
+
+	/**
+	 * The database of triggers. Each trigger is a method that will switch the
+	 * dive to symbolic mode. The trigger also describes which arguments are
+	 * treated symbolically, and which arguments stay concrete.
+	 */
+	private final List<Trigger> triggers = new LinkedList<>();
+
+	/**
+	 * The database of delegates. Each delegate is an object that may (or may
+	 * not) contain routines that are invoked when the responding method of the
+	 * class named by the key is called. In other words, if the database
+	 * contains the key-value pair <C, O>, and the method C.M is invoked, the
+	 * delegate O.M is invoked, if it exists.
+	 */
+	private final Map<String, Object> delegates = new HashMap<>();
+
+	/**
+	 * Maps variable names to lower bounds.
+	 */
+	private final Map<String, Integer> minBounds = new HashMap<>();
+
+	/**
+	 * Maps variable names to upper bounds.
+	 */
+	private final Map<String, Integer> maxBounds = new HashMap<>();
+
+	/**
+	 * Whether or not the output of the target program should be displayed
+	 * ({@code true}) or suppressed ({@code false}).
+	 */
+	private boolean echoOutput = false;
+
+	/**
+	 * Whether or not the settings should be dumped to the log.
+	 */
+	private boolean dumpConfig = false;
+
+	/**
+	 * Whether or not the properties should be dumped to the log.
+	 */
+	private boolean dumpProperties = false;
+
+	/**
+	 * The Explorer that directs the investigation of target programs.
+	 */
+	private Explorer explorer;
+
+	/**
+	 * Class loader for creating instances of user-specified objects.
+	 */
+	private final ClassLoader loader = Configuration.class.getClassLoader();
+
+	/**
+	 * An internal instance used to construct log messages.
+	 */
+	private static final StringBuilder sb = new StringBuilder();
+
+	//======================================================================
+	//
+	// Constructor.
+	//
+	//======================================================================
+
+	public Configuration(Logger logger) {
+		this.logger = logger;
+	}
+
+	//======================================================================
+	//
+	// Getters and setters for the settings.
+	//
+	//======================================================================
+
+	/**
+	 * Returns the target class.
+	 * 
+	 * @return the fully qualified target class
+	 */
+	public String getTarget() {
+		return target;
+	}
+
+	/**
+	 * Sets the target class.
+	 * 
+	 * @param target
+	 *            the fully qualified target class
+	 */
+	public void setTarget(String target) {
+		this.target = target;
+	}
+
+	/**
+	 * Returns the command-line arguments to pass to the target program.
+	 * 
+	 * @return the command-line arguments for the target
+	 */
+	public String getArgs() {
+		return args;
+	}
+
+	/**
+	 * Sets the command-line arguments to pass to the target program.
+	 * 
+	 * @param args
+	 *            the command-line arguments for the target
+	 */
+	public void setArgs(String args) {
+		this.args = args;
+	}
+
+	/**
+	 * Finds the first trigger that matches the given method and class. If no
+	 * matching trigger is found, the method returns {@code null}.
+	 * 
+	 * @param method
+	 *            the method to match
+	 * @param className
+	 *            the name of the class to match
+	 * @return the first matching trigger or {@code null}
+	 */
+	public Trigger findTrigger(Method method, String className) {
+		for (Trigger trigger : triggers) {
+			if (trigger.match(className, method)) {
+				return trigger;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Returns the number of triggers.
+	 * 
+	 * @return the number of triggers
+	 */
+	public int getNumberOfTriggers() {
+		return triggers.size();
+	}
+	
+	/**
+	 * Returns an iterable over all triggers.
+	 * 
+	 * @return an iterable over triggers
+	 */
+	public Iterable<Trigger> getTriggers() {
+		return triggers;
+	}
+
+	/**
+	 * Adds a trigger to the database of triggers.
+	 * 
+	 * @param trigger
+	 *            the trigger to add
+	 */
+	public void addTrigger(Trigger trigger) {
+		triggers.add(trigger);
+	}
+
+	/**
+	 * Returns the delegate object that handles the routines of the given target
+	 * class.
+	 * 
+	 * @param target
+	 *            the fully-qualified name of a class to be delegated
+	 * @return the object to delegate to, or {@code null}
+	 */
+	public Object findDelegate(String target) {
+		return delegates.get(target);
+	}
+
+	/**
+	 * Returns the number of delegates.
+	 * 
+	 * @return the number of delegates
+	 */
+	public int getNumberOfDelegateTargets() {
+		return delegates.keySet().size();
+	}
+	
+	/**
+	 * Returns an iterable over all known delegated classes.
+	 * 
+	 * @return an iterable over delegated classes
+	 */
+	public Iterable<String> getDelegateTargets() {
+		return delegates.keySet();
+	}
+
+	/**
+	 * Add a new entry to the registry of delegates.
+	 * 
+	 * @param target
+	 *            the class name that is delegates
+	 * @param delegate
+	 *            the object that handles calls of the target class
+	 */
+	public void addDelegate(String target, Object delegate) {
+		delegates.put(target, delegate);
+	}
+
+	/**
+	 * Returns the minimum value associated with a variable.
+	 * 
+	 * @param variable
+	 *            the variable name
+	 * @return the minimum value that the integer variable can assume
+	 */
+	public int getMinBound(String variable) {
+		return getMinBound(variable, DEFAULT_MIN_INT_VALUE);
+	}
+
+	/**
+	 * Returns the minimum value associated with a variable.
+	 * 
+	 * @param variable
+	 *            the variable name
+	 * @param defaultValue
+	 *            the value to return if there is no bound available
+	 * @return the minimum value that the integer variable can assume
+	 */
+	public int getMinBound(String variable, int defaultValue) {
+		Integer min = minBounds.get(variable);
+		if (min == null) {
+			min = defaultValue;
+		}
+		return min;
+	}
+
+	/**
+	 * Sets the minimum value of a variable.
+	 * 
+	 * @param variable
+	 *            the variable name
+	 * @param min
+	 *            the minimum value
+	 */
+	public void setMinBound(String variable, int min) {
+		minBounds.put(variable, min);
+	}
+
+	/**
+	 * Returns the maximum value associated with a variable.
+	 * 
+	 * @param variable
+	 *            the variable name
+	 * @return the maximum value that the integer variable can assume
+	 */
+	public int getMaxBound(String variable) {
+		return getMaxBound(variable, DEFAULT_MAX_INT_VALUE);
+	}
+
+	/**
+	 * Returns the maximum value associated with a variable.
+	 * 
+	 * @param variable
+	 *            the variable name
+	 * @param defaultValue
+	 *            the value to return if there is no bound available
+	 * @return the maximum value that the integer variable can assume
+	 */
+	public int getMaxBound(String variable, int defaultValue) {
+		Integer max = maxBounds.get(variable);
+		if (max == null) {
+			max = defaultValue;
+		}
+		return max;
+	}
+
+	/**
+	 * Sets the maximum value of a variable.
+	 * 
+	 * @param variable
+	 *            the variable name
+	 * @param max
+	 *            the maximum value
+	 */
+	public void setMaxBound(String variable, int max) {
+		maxBounds.put(variable, max);
+	}
+
+	/**
+	 * Returns whether or not the target program's output should be reproduced.
+	 * 
+	 * @return whether target program output should be echoed
+	 */
+	public boolean getEchoOutput() {
+		return echoOutput;
+	}
+
+	/**
+	 * Sets whether the target program's output should be reproduced (echoed).
+	 * 
+	 * @param echoOutput
+	 *            whether or not to reproduce output
+	 */
+	public void setEchoOutput(boolean echoOutput) {
+		this.echoOutput = echoOutput;
+	}
+
+	/**
+	 * Returns whether or not the settings should be dumped to the log.
+	 * 
+	 * @return whether settings should be dumped
+	 */
+	public boolean getDumpConfig() {
+		return dumpConfig;
+	}
+
+	/**
+	 * Sets whether the settings should be dumped to the log.
+	 * 
+	 * @param dumpConfig
+	 *            whether settings should be dumped
+	 */
+	public void setDumpConfig(boolean dumpConfig) {
+		this.dumpConfig = dumpConfig;
+	}
+
+	/**
+	 * Returns whether or not the properties should be dumped to the log.
+	 * 
+	 * @return whether properties should be dumped
+	 */
+	public boolean getDumpProperties() {
+		return dumpProperties;
+	}
+
+	/**
+	 * Sets whether the properties should be dumped to the log.
+	 * 
+	 * @param dumpProperties
+	 *            whether properties should be dumped
+	 */
+	public void setDumpProperties(boolean dumpProperties) {
+		this.dumpProperties = dumpProperties;
+	}
+
+	/**
+	 * Returns the current explorer for this session.
+	 * 
+	 * @return the current instance of explorer
+	 */
+	public Explorer getExplorer() {
+		return explorer;
+	}
+
+	/**
+	 * Sets a new explorer for this session. Note that there is ever only
+	 * explorer for a session.
+	 * 
+	 * @param explorer
+	 *            the new explorer
+	 */
+	public void setExplorer(Explorer explorer) {
+		this.explorer = explorer;
+	}
+
+	/**
+	 * The configuration logging level.
+	 */
+	private static final Level CONFIG = Level.forName("CONFIG", 350);
+
+	/**
+	 * Dumps all the settings if the flag is set.
+	 */
+	public void dumpConfig() {
+		if (getDumpConfig() && (logger != null)) {
+			// --- TARGET & ARGS ---
+			if (getTarget() != null) {
+				logger.log(CONFIG, "deepsea.target = {}", getTarget());
+			}
+			if (getArgs() != null) {
+				logger.log(CONFIG, "deepsea.args = {}", getArgs());
+			}
+			// --- TRIGGERS ---
+			int t = getNumberOfTriggers(), i = t;
+			for (Trigger trigger : getTriggers()) {
+				String pre = (i == t) ? "deepsea.triggers = " : "\t";
+				String post = (i > 1) ? ";\\" : "";
+				logger.log(CONFIG, "{}{}{}", pre, trigger.toString(), post);
+				i--;
+				
+			}
+			// --- DELEGATES ---
+			int d = getNumberOfDelegateTargets(), j = d;
+			for (String target : getDelegateTargets()) {
+				Object delegate = findDelegate(target);
+				String pre = (j == d) ? "deepsea.delegate = " : "\t";
+				String post = (j > 1) ? ";\\" : "";
+				logger.log(CONFIG, "{}{}:{}{}", pre, target, delegate.getClass().getName(), post);
+				j--;
+			}
+			// --- BOUNDS ---
+			Set<String> vars = new TreeSet<>(minBounds.keySet());
+			vars.addAll(maxBounds.keySet());
+			for (String var : vars) {
+				if (!minBounds.containsKey(var)) {
+					logger.log(CONFIG, "deepsea.bounds.{}.max = {}", var, maxBounds.get(var));
+				} else if (!maxBounds.containsKey(var)) {
+					logger.log(CONFIG, "deepsea.bounds.{}.min = {}", var, minBounds.get(var));
+				} else {
+					logger.log(CONFIG, "deepsea.bounds.{} = {}..{}", var, minBounds.get(var), maxBounds.get(var));
+				}
+			}
+			// --- SOME BOOLEAN SETTINGS ---
+			logger.log(CONFIG, "deepsea.echooutput = {}", getEchoOutput());
+			logger.log(CONFIG, "deepsea.dumpconfig = {}", getDumpConfig());
+			logger.log(CONFIG, "deepsea.dumpproperties = {}", getDumpProperties());
+			// --- EXPLORER ---
+			Explorer e = getExplorer();
+			if (e != null) {
+				logger.log(CONFIG, "deepsea.explorer = {}", e.getClass().getName());
+			}
+		}
+	}
+
+	/**
+	 * The properties logging level.
+	 */
+	private static final Level PROPS = Level.forName("PROPS", 350);
+
+	/**
+	 * Dumps all the properties if the flag is set and they exist.
+	 */
+	public void dumpProperties() {
+		if (getDumpProperties() && (properties != null) && (logger != null)) {
+			SortedSet<Object> sortedKeys = new TreeSet<>(properties.keySet());
+			for (Object key : sortedKeys) {
+				assert key instanceof String;
+				String k = key.toString();
+				logger.log(PROPS, "{} = {}", k, properties.getProperty(k));
+			}
+		}
+	}
+
+	//======================================================================
+	//
+	// The rest of this file contains routines that reads properties from a
+	// Java properties file.
+	//
+	//======================================================================
+
+	/**
+	 * Reads settings from a Java properties file.
+	 * 
+	 * @param filename
+	 *            the name of the file to read from
+	 * @return {@code true} if and only if properties were read successfully
+	 */
+	public boolean processProperties(String filename) {
+		properties = new Properties();
+		try {
+			properties.load(new FileInputStream(filename));
+		} catch (IOException x) {
+			Banner b = new Banner('@').println("COULD NOT READ PROPERTY FILE \"" + filename + "\"");
+			if (logger == null) {
+				b.display(System.out);
+			} else {
+				b.display(logger, Level.FATAL);
+			}
+			return false;
+		}
+		return processTarget() && processArgs() && processTriggers() && processDelegates() && processBounds()
+				&& processEchoOutput() && processExplorer() && processDumpConfig() && processDumpProperties();
+	}
+
+	/**
+	 * Reads and sets the "{@code deepsea.target}" setting.
+	 * 
+	 * @return {@code true} if and only if the property was read successfully
+	 */
+	private boolean processTarget() {
+		String p = properties.getProperty("deepsea.target");
+		if (p != null) {
+			setTarget(p);
+		}
+		return true;
+	}
+
+	/**
+	 * Reads and sets the "{@code deepsea.args}" setting.
+	 * 
+	 * @return {@code true} if and only if the property was read successfully
+	 */
+	private boolean processArgs() {
+		String p = properties.getProperty("deepsea.args");
+		if (p != null) {
+			setArgs(p);
+		}
+		return true;
+	}
+
+	/**
+	 * Reads and sets the "{@code deepsea.triggers}" setting. The value of this
+	 * setting is expected to be a "<code>;</code>" separated list. Each
+	 * component is the fully qualified name of a method with its parameters.
+	 * The parameters is given as a "<code>,</code>" separated list of
+	 * "<code>name:type</code>" and "<code>type</code>" entries. Parameters with
+	 * a name is treated symbolically when the method is invoked; parameters
+	 * without a name remain concrete. A trigger is only activated when the
+	 * number of parameters and their types match; this caters for method
+	 * overloading.
+	 * 
+	 * @return {@code true} if and only if the property was read successfully
+	 */
+	private boolean processTriggers() {
+		String p = properties.getProperty("deepsea.triggers");
+		if (p != null) {
+			String[] triggers = p.trim().split(";");
+			for (String trigger : triggers) {
+				processTrigger(trigger);
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Processes a single method description.
+	 * 
+	 * @param triggerDesc
+	 *            description of a triggering method
+	 */
+	private void processTrigger(String triggerDesc) {
+		final Set<String> names = new HashSet<>();
+		int paramStart = triggerDesc.indexOf('(');
+		assert paramStart != -1;
+		int paramEnd = triggerDesc.indexOf(')', paramStart);
+		assert paramEnd != -1;
+		String methodName = triggerDesc.substring(0, paramStart).trim();
+		Trigger trigger = new Trigger(methodName);
+		String parameterString = triggerDesc.substring(paramStart + 1, paramEnd).trim();
+		if (parameterString.length() > 0) {
+			String[] parameters = parameterString.split(",");
+			trigger.setParameterCount(parameters.length);
+			int index = 0;
+			for (String parameter : parameters) {
+				int colonPos = parameter.indexOf(':');
+				if (colonPos == -1) {
+					trigger.setParameterType(index, parseType(parameter.trim()));
+				} else {
+					String name = parameter.substring(0, colonPos).trim();
+					if (names.contains(name)) {
+						sb.setLength(0);
+						sb.append("ignored trigger with duplicates, ");
+						sb.append('"').append(triggerDesc).append('"');
+						logger.warn(sb.toString());
+						return;
+					}
+					names.add(name);
+					Object type = parseType(parameter.substring(colonPos + 1).trim());
+					trigger.setParameterName(index, name);
+					trigger.setParameterType(index, type);
+				}
+				index++;
+			}
+		}
+		if (names.size() > 0) {
+			addTrigger(trigger);
+		} else {
+			sb.setLength(0);
+			sb.append("ignored non-symbolic trigger ");
+			sb.append('"').append(triggerDesc).append('"');
+			logger.warn(sb.toString());
+		}
+	}
+
+	/**
+	 * Parses a string and returns the corresponding internal Java class.
+	 * 
+	 * @param type
+	 *            a string such as "<code>int</code>" or "<code>boolean</code>"
+	 * @return the corresponding Java class of the type
+	 */
+	private Object parseType(String type) {
+		if (type.startsWith("int[")) {
+			int closeBracket = type.indexOf(']');
+			int len = 0;
+			if (closeBracket > 4) {
+				len = Integer.parseInt(type.substring(4, closeBracket));
+			}
+			return new Stepper.IntArray(len);
+		} else if (type.equals("int")) {
+			return Integer.class;
+		} else if (type.equals("boolean")) {
+			return Boolean.class;
+		} else if (type.equals("string")) {
+			return String.class;
+		} else {
+			return Object.class;
+		}
+	}
+
+	/**
+	 * Reads and sets the "{@code deepsea.delegates}" setting. The value of this
+	 * setting is expected to be a "<code>;</code>" separated list. Each
+	 * component is a two-part mapping "X:Y", where both "X" and "Y" are fully
+	 * qualified names of classes. When the system calls a method of class "X",
+	 * a corresponding method of class "Y" is invoked.
+	 * 
+	 * @return {@code true} if and only if the property was read successfully
+	 */
+	private boolean processDelegates() {
+		String p = properties.getProperty("deepsea.delegates");
+		if (p != null) {
+			String[] delegates = p.trim().split(";");
+			for (String delegate : delegates) {
+				String[] pair = delegate.split(":");
+				Object to = createInstance(pair[1].trim());
+				if (to != null) {
+					addDelegate(pair[0].trim(), to);
+				}
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Reads and set the variable bounds when specified with the
+	 * "{@code deepsea.bounds...}" settings.
+	 * 
+	 * @return {@code true} if and only if the property was read successfully
+	 */
+	private boolean processBounds() {
+		for (Object key : properties.keySet()) {
+			String k = (String) key;
+			if (k.startsWith("deepsea.bounds.")) {
+				String var = k.substring("deepsea.bounds.".length());
+				if (var.endsWith(".min")) {
+					Integer min = getIntegerProperty(properties, k);
+					if (min != null) {
+						setMinBound(var.substring(0, var.length() - 4), min);
+					}
+				} else if (var.endsWith(".max")) {
+					Integer max = getIntegerProperty(properties, k);
+					if (max != null) {
+						setMaxBound(var.substring(0, var.length() - 4), max);
+					}
+				} else {
+					String[] bounds = properties.getProperty(k).split("\\.\\.");
+					assert bounds.length >= 2;
+					try {
+						setMinBound(var, Integer.parseInt(bounds[0].trim()));
+						setMaxBound(var, Integer.parseInt(bounds[1].trim()));
+					} catch (NumberFormatException x) {
+						logger.warn("Bounds in \"" + k + "\" is malformed and ignored");
+					}
+				}
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Reads and sets the "{@code deepsea.echooutput}" setting.
+	 */
+	private boolean processEchoOutput() {
+		setEchoOutput(getBooleanProperty(properties, "deepsea.echooutput", getEchoOutput()));
+		return true;
+	}
+
+	/**
+	 * Reads and sets the "{@code deepsea.explorer}" setting.
+	 */
+	private boolean processExplorer() {
+		String p = properties.getProperty("deepsea.explorer");
+		if (p != null) {
+			Explorer explorer = (Explorer) createInstance(p);
+			if (explorer != null) {
+				setExplorer(explorer);
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Reads and sets the "{@code deepsea.dumpconfig}" setting.
+	 */
+	private boolean processDumpConfig() {
+		setDumpConfig(getBooleanProperty(properties, "deepsea.dumpconfig", getDumpConfig()));
+		return true;
+	}
+
+	/**
+	 * Reads and sets the "{@code deepsea.dumpproperties}" setting.
+	 */
+	private boolean processDumpProperties() {
+		setDumpProperties(getBooleanProperty(properties, "deepsea.dumpproperties", getDumpProperties()));
+		return true;
+	}
+
+	/**
+	 * Creates an instance of the specified class. For now, only one constructor
+	 * pattern is tried to create an instance of {@code X}:
+	 * {@code X(Logger, Configuration)}. In the future alternative constructors
+	 * might be supported.
+	 * 
+	 * @param objectName
+	 *            the name of the class of the instance to create
+	 * @return an instance of the given class
+	 */
+	private Object createInstance(String objectName) {
+		Class<?> classx = loadClass(objectName);
+		try {
+			Constructor<?> constructor = null;
+			try {
+				constructor = classx.getConstructor(Logger.class, Configuration.class);
+				return constructor.newInstance(logger, this);
+			} catch (NoSuchMethodException x) {
+				logger.fatal("constructor not found: " + objectName, x);
+			}
+		} catch (SecurityException x) {
+			logger.fatal("constructor security error: " + objectName, x);
+		} catch (IllegalArgumentException x) {
+			logger.fatal("constructor argument error: " + objectName, x);
+		} catch (InstantiationException x) {
+			logger.fatal("constructor instantiation error: " + objectName, x);
+		} catch (IllegalAccessException x) {
+			logger.fatal("constructor access error: " + objectName, x);
+		} catch (InvocationTargetException x) {
+			logger.fatal("constructor invocation error: " + objectName, x);
+		}
+		return null;
+	}
+
+	/**
+	 * Tries to load the class with the given name.
+	 * 
+	 * @param className
+	 *            name of the class to load
+	 * @return the {@link Class} instance that corresponds to the loaded class
+	 */
+	private Class<?> loadClass(String className) {
+		if ((className != null) && (className.length() > 0)) {
+			try {
+				return loader.loadClass(className);
+			} catch (ClassNotFoundException x) {
+				logger.fatal("class not found: " + className, x);
+			} catch (ExceptionInInitializerError x) {
+				logger.fatal("class not found: " + className, x);
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Reads an integer property from a {@link Properties} file.
+	 * 
+	 * @param properties
+	 *            the {@link Properties} instance to read from
+	 * @param key
+	 *            the property key
+	 * @param defaultValue
+	 *            the default value to return if the key is not found
+	 * @return the integer value associated with the key (or the default value
+	 *         supplied)
+	 */
+	public static int getIntegerProperty(Properties properties, String key, int defaultValue) {
+		String s = properties.getProperty(key, Integer.toString(defaultValue));
+		try {
+			return Integer.parseInt(s);
+		} catch (NumberFormatException x) {
+			// ignore
+		}
+		return defaultValue;
+	}
+
+	/**
+	 * Reads an integer property from a {@link Properties} file.
+	 * 
+	 * @param properties
+	 *            the {@link Properties} instance to read from
+	 * @param key
+	 *            the property key
+	 * @return the integer value associated with the key (or {@code null} if the
+	 *         key is absent or not an integer)
+	 */
+	public static Integer getIntegerProperty(Properties properties, String key) {
+		String s = properties.getProperty(key);
+		if (s != null) {
+			try {
+				return Integer.parseInt(s);
+			} catch (NumberFormatException x) {
+				// ignore
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Reads a boolean property from a {@link Properties} file.
+	 * 
+	 * @param properties
+	 *            the {@link Properties} instance to read from
+	 * @param key
+	 *            the property key
+	 * @param defaultValue
+	 *            the default value to return if the key is not found
+	 * @return the boolean value associated with the key (or the default value
+	 *         supplied)
+	 */
+	public static boolean getBooleanProperty(Properties properties, String key, boolean defaultValue) {
+		String s = properties.getProperty(key, Boolean.toString(defaultValue)).trim();
+		try {
+			if (s.equalsIgnoreCase("true")) {
+				return true;
+			} else if (s.equalsIgnoreCase("yes")) {
+				return true;
+			} else if (s.equalsIgnoreCase("on")) {
+				return true;
+			} else if (s.equalsIgnoreCase("1")) {
+				return true;
+			} else {
+				return false;
+			}
+		} catch (NumberFormatException x) {
+			// ignore
+		}
+		return defaultValue;
+	}
+
+}

@@ -21,11 +21,12 @@ public class IMUL extends Instruction {
 		Expression e1 = frame.pop();
 		Expression e0 = frame.pop();
 		Expression r = new Operation(Operator.MUL, e0, e1);
-		if (Instruction.isNonlinearExpression(r)) {
-			frame.push(approximateNonlinearExpression(r));
-		} else {
-			frame.push(r);
-		}
+		frame.push(r);
+//		if (Instruction.isNonlinearExpression(r)) {
+//			frame.push(approximateNonlinearExpression(r));
+//		} else {
+//			frame.push(r);
+//		}
 	}
 
 	@Override

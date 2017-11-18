@@ -26,7 +26,6 @@ import za.ac.sun.cs.green.expr.Operation.Operator;
 
 public class Symbolizer {
 
-	//	private final Diver diver;
 	private final Logger log;
 
 	private boolean inSymbolicMode;
@@ -55,9 +54,8 @@ public class Symbolizer {
 
 	private Set<String> conjunctSet = new HashSet<>();
 
-	public Symbolizer(final Diver diver) {
-		//		this.diver = diver;
-		this.log = diver.getLog();
+	public Symbolizer(Logger log) {
+		this.log = log;
 		inSymbolicMode = false;
 	}
 

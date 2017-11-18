@@ -28,18 +28,13 @@ import com.sun.jdi.request.ThreadDeathRequest;
 import com.sun.jdi.request.ThreadStartRequest;
 import com.sun.jdi.request.VMDeathRequest;
 
-import za.ac.sun.cs.deepsea.diver.Diver;
-
 public class RequestManager {
 
-	private final Diver diver;
-
 	private final EventRequestManager mgr;
-	
+
 	private final Set<String> excludes = new HashSet<>();
 
-	public RequestManager(final Diver diver, final EventRequestManager mgr) {
-		this.diver = diver;
+	public RequestManager(final EventRequestManager mgr) {
 		this.mgr = mgr;
 	}
 
@@ -49,20 +44,19 @@ public class RequestManager {
 		}
 	}
 
+	public void addExclude(Iterable<String> excludes) {
+		for (String exclude : excludes) {
+			this.excludes.add(exclude);
+		}
+	}
+	
 	public void removeExclude(String exclude) {
 		excludes.remove(exclude);
 	}
 
 	public boolean isFiltered(String name) {
 		for (String e : excludes) {
-			if (e.endsWith(".*")) {
-				if (name.startsWith(e.substring(0, e.length() - 2))) {
-					return true;
-				}
-			}
-		}
-		for (String d : diver.getDelegateTargets()) {
-			if (name.equals(d)) {
+			if (e.equals(name) || (e.endsWith(".*") && name.startsWith(e.substring(0, e.length() - 2)))) {
 				return true;
 			}
 		}
@@ -80,13 +74,13 @@ public class RequestManager {
 			eventRequest.addClassExclusionFilter(e);
 		}
 	}
-	
+
 	public void filterExcludes(ClassPrepareRequest eventRequest) {
 		for (String e : excludes) {
 			eventRequest.addClassExclusionFilter(e);
 		}
 	}
-	
+
 	public void filterExcludes(StepRequest eventRequest) {
 		for (String e : excludes) {
 			eventRequest.addClassExclusionFilter(e);
@@ -112,7 +106,7 @@ public class RequestManager {
 		req.enable();
 		return req;
 	}
-	
+
 	public ClassPrepareRequest createClassPrepareRequest(Consumer<ClassPrepareRequest> refine) {
 		ClassPrepareRequest req = mgr.createClassPrepareRequest();
 		refine.accept(req);
@@ -120,26 +114,27 @@ public class RequestManager {
 		req.enable();
 		return req;
 	}
-	
+
 	public ClassPrepareRequest createClassPrepareRequest() {
 		ClassPrepareRequest req = mgr.createClassPrepareRequest();
 		req.setSuspendPolicy(EventRequest.SUSPEND_ALL);
 		req.enable();
 		return req;
 	}
-	
+
 	public ClassUnloadRequest createClassUnloadRequest() {
 		ClassUnloadRequest req = mgr.createClassUnloadRequest();
 		req.enable();
 		return req;
 	}
-	
-	public ExceptionRequest createExceptionRequest(ReferenceType refType, boolean notifyCaught, boolean notifyUncaught) {
+
+	public ExceptionRequest createExceptionRequest(ReferenceType refType, boolean notifyCaught,
+			boolean notifyUncaught) {
 		ExceptionRequest req = mgr.createExceptionRequest(refType, notifyCaught, notifyUncaught);
 		req.enable();
 		return req;
 	}
-	
+
 	public MethodEntryRequest createMethodEntryRequest(Consumer<MethodEntryRequest> refine) {
 		MethodEntryRequest req = mgr.createMethodEntryRequest();
 		refine.accept(req);
@@ -147,14 +142,14 @@ public class RequestManager {
 		req.enable();
 		return req;
 	}
-	
+
 	public MethodEntryRequest createMethodEntryRequest() {
 		MethodEntryRequest req = mgr.createMethodEntryRequest();
 		req.setSuspendPolicy(EventRequest.SUSPEND_ALL);
 		req.enable();
 		return req;
 	}
-	
+
 	public MethodExitRequest createMethodExitRequest(Consumer<MethodExitRequest> refine) {
 		MethodExitRequest req = mgr.createMethodExitRequest();
 		refine.accept(req);
@@ -162,14 +157,14 @@ public class RequestManager {
 		req.enable();
 		return req;
 	}
-	
+
 	public MethodExitRequest createMethodExitRequest() {
 		MethodExitRequest req = mgr.createMethodExitRequest();
 		req.setSuspendPolicy(EventRequest.SUSPEND_ALL);
 		req.enable();
 		return req;
 	}
-	
+
 	public ModificationWatchpointRequest createModificationWatchpointRequest(Field field) {
 		ModificationWatchpointRequest req = mgr.createModificationWatchpointRequest(field);
 		req.enable();
@@ -181,25 +176,25 @@ public class RequestManager {
 		req.enable();
 		return req;
 	}
-	
+
 	public MonitorContendedEnterRequest createMonitorContendedEnterRequest() {
 		MonitorContendedEnterRequest req = mgr.createMonitorContendedEnterRequest();
 		req.enable();
 		return req;
 	}
-	
+
 	public MonitorWaitedRequest createMonitorWaitedRequest() {
 		MonitorWaitedRequest req = mgr.createMonitorWaitedRequest();
 		req.enable();
 		return req;
 	}
-	
+
 	public MonitorWaitRequest createMonitorWaitRequest() {
 		MonitorWaitRequest req = mgr.createMonitorWaitRequest();
 		req.enable();
 		return req;
 	}
-	
+
 	public StepRequest createStepRequest(ThreadReference thread, int size, int depth, Consumer<StepRequest> refine) {
 		StepRequest req = mgr.createStepRequest(thread, size, depth);
 		refine.accept(req);
@@ -207,28 +202,28 @@ public class RequestManager {
 		req.enable();
 		return req;
 	}
-	
+
 	public StepRequest createStepRequest(ThreadReference thread, int size, int depth) {
 		StepRequest req = mgr.createStepRequest(thread, size, depth);
 		req.setSuspendPolicy(EventRequest.SUSPEND_ALL);
 		req.enable();
 		return req;
 	}
-	
+
 	public ThreadDeathRequest createThreadDeathRequest() {
 		ThreadDeathRequest req = mgr.createThreadDeathRequest();
 		req.setSuspendPolicy(EventRequest.SUSPEND_ALL);
 		req.enable();
 		return req;
 	}
-	
+
 	public ThreadStartRequest createThreadStartRequest() {
 		ThreadStartRequest req = mgr.createThreadStartRequest();
 		req.setSuspendPolicy(EventRequest.SUSPEND_ALL);
 		req.enable();
 		return req;
 	}
-	
+
 	public VMDeathRequest createVMDeathRequest() {
 		VMDeathRequest req = mgr.createVMDeathRequest();
 		req.setSuspendPolicy(EventRequest.SUSPEND_ALL);

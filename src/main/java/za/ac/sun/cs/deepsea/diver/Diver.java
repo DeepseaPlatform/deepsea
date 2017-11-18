@@ -2,113 +2,43 @@ package za.ac.sun.cs.deepsea.diver;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.sun.jdi.Method;
-
 import za.ac.sun.cs.deepsea.explorer.Explorer;
+import za.ac.sun.cs.deepsea.reporting.AbstractReporter;
+import za.ac.sun.cs.deepsea.reporting.Banner;
 import za.ac.sun.cs.deepsea.reporting.Reporter;
 import za.ac.sun.cs.green.expr.Constant;
 
 /**
- * Driver for dynamic symbolic execution. It collects all the settings that
- * apply to a DEEPSEA "session" and when the {@link #start()} method is called,
- * it conducts one or more "dives" into the target program.
- * 
- * @author Jaco Geldenhuys (geld@sun.ac.za)
+ * Driver for dynamic symbolic execution. When the {@link #start()} method is
+ * called, it conducts one or more "dives" into the target program.
  */
-public class Diver implements Reporter {
+public class Diver extends AbstractReporter {
 
-	/**
-	 * The minimum value that integer variables can assume by default.
-	 */
-	private static final int DEFAULT_MIN_INT_VALUE = 0;
-
-	/**
-	 * The maximum value that integer variables can assume by default.
-	 */
-	private static final int DEFAULT_MAX_INT_VALUE = 99;
-	
 	/**
 	 * The name of this instance of {@link Diver}.
 	 */
 	private final String name;
 
 	/**
-	 * The log handler associated with this {@link Diver} instance.
+	 * The logger. This is passed to dives.
 	 */
-	// private final LogHandler logHandler;
+	private final Logger logger;
 
 	/**
-	 * The log associated with this {@link Diver} instance.
+	 * The settings that control and apply to this session.
 	 */
-	private final Logger log;
+	private final Configuration config;
 
 	/**
-	 * A counter of how many {@link Dive} instances have been created.
+	 * A list of all reports that must be called when the session terminates.
 	 */
-	private int diveCounter;
-
-	/**
-	 * The fully qualified of the target class. This class should contain a Java
-	 * {@code main} method and it is the class that is run during each dive.
-	 */
-	private String target = null;
-
-	/**
-	 * Arguments pass to the target class when it is run during a dive.
-	 */
-	private String args = null;
-
-	/**
-	 * The database of triggers. Each trigger is a method that will switch the
-	 * dive to symbolic mode. The trigger also describes which arguments are
-	 * treated symbolically, and which arguments stay concrete.
-	 */
-	private final List<Trigger> triggers = new LinkedList<>();
-
-	private final Map<String, Object> delegates = new HashMap<>();
-
-	/**
-	 * Maps variable names to lower bounds. 
-	 */
-	private final Map<String, Integer> minBounds = new HashMap<>();
-
-	/**
-	 * Maps variable names to upper bounds. 
-	 */
-	private final Map<String, Integer> maxBounds = new HashMap<>();
-	
-	/**
-	 * Whether or not the output of the target program should be displayed
-	 * ({@code true}) or suppressed ({@code false}).
-	 */
-	private boolean produceOutput = false;
-
-	/**
-	 * The Explorer that directs the investigation of target programs.
-	 */
-	private Explorer explorer;
-
-	/**
-	 * TODO
-	 */
-	private List<Reporter> reporters = new LinkedList<>();
-
-	/**
-	 * TODO
-	 */
-	private List<String> configSettings = null;
+	private final List<Reporter> reporters = new LinkedList<>();
 
 	/**
 	 * Constructs a {@link Diver} instance. Such an instance represents one
@@ -116,17 +46,16 @@ public class Diver implements Reporter {
 	 * 
 	 * @param name
 	 *            the name for this instance
+	 * @param logger
+	 *            the logger for this session
+	 * @param config
+	 *            the settings for this session
 	 */
-	public Diver(final String name) {
+	public Diver(final String name, Logger logger, Configuration config) {
 		this.name = name;
-		this.log = LogManager.getLogger(Diver.class);
-		//this.log = Logger.getLogger(getClass().getCanonicalName() + "[" + name + "]");
-		// log.setUseParentHandlers(false);
-		// log.setLevel(Level.ALL);
-		// logHandler = new LogHandler(Level.ALL);
-		// log.addHandler(logHandler);
-		diveCounter = 0;
-		addReporter(this);
+		this.logger = logger;
+		this.config = config;
+		addReporter(this); // the diver is a reporter itself
 	}
 
 	/**
@@ -139,333 +68,87 @@ public class Diver implements Reporter {
 	}
 
 	/**
-	 * Return the {@link LogHandler} associated with this instance of
-	 * {@link Diver}.
+	 * Add a reporter to the list of reporters that are called at the end of
+	 * this session.
 	 * 
-	 * @return the log handler associated with this instance
-	 */
-//	public LogHandler getLogHandler() {
-//		return logHandler;
-//	}
-
-	/**
-	 * Return the {@link Logger} associated with this instance of {@link Diver}.
-	 * 
-	 * @return the log associated with this instance
-	 */
-	public Logger getLog() {
-		return log;
-	}
-
-	/**
-	 * Returns the current value of the dive counter and increments it.
-	 * 
-	 * @return the current value of dive counter
-	 */
-	public int getDiveId() {
-		return diveCounter++;
-	}
-
-	/**
-	 * Returns the target class.
-	 * 
-	 * @return the fully qualified target class
-	 */
-	public String getTarget() {
-		return target;
-	}
-
-	/**
-	 * Sets the target class.
-	 * 
-	 * @param target
-	 *            the fully qualified target class
-	 */
-	public void setTarget(String target) {
-		this.target = target;
-	}
-
-	/**
-	 * TODO
-	 * @return TODO
-	 */
-	public String getArgs() {
-		return args;
-	}
-
-	/**
-	 * TODO
-	 * @param args TODO
-	 */
-	public void setArgs(String args) {
-		this.args = args;
-	}
-
-	/**
-	 * TODO
-	 * @param configSettings TODO
-	 */
-	public void setConfigSettings(List<String> configSettings) {
-		this.configSettings = configSettings;
-	}
-
-	/**
-	 * TODO
-	 * @param reporter TODO
+	 * @param reporter
+	 *            the reporter to add
 	 */
 	public void addReporter(Reporter reporter) {
 		reporters.add(0, reporter);
 	}
 
 	/**
-	 * TODO
-	 * @param trigger TODO
-	 */
-	public void addTrigger(Trigger trigger) {
-		triggers.add(trigger);
-	}
-
-	/**
-	 * Finds the first trigger that matches the given method and class. If no
-	 * matching trigger is found, the method returns {@code null}.
-	 * 
-	 * @param method
-	 *            the method to match
-	 * @param className
-	 *            the name of the class to match
-	 * @return the first matching trigger or {@code null}
-	 */
-	public Trigger findTrigger(Method method, String className) {
-		for (Trigger trigger : triggers) {
-			if (trigger.match(className, method)) {
-				return trigger;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * Sets the minimum value of a variable.
-	 * 
-	 * @param variable the variable name
-	 * @param min the minimum value
-	 */
-	public void setMinBound(String variable, int min) {
-		minBounds.put(variable, min);
-	}
-
-	/**
-	 * Returns the minimum value associated with a variable.
-	 * 
-	 * @param variable the variable name
-	 * @param defaultValue the value to return if there is no bound available
-	 * @return the minimum value that the integer variable can assume
-	 */
-	public int getMinBound(String variable, int defaultValue) {
-		Integer min = minBounds.get(variable);
-		if (min == null) {
-			min = defaultValue;
-		}
-		return min;
-	}
-
-	/**
-	 * Returns the minimum value associated with a variable.
-	 * 
-	 * @param variable the variable name
-	 * @return the minimum value that the integer variable can assume
-	 */
-	public int getMinBound(String variable) {
-		return getMinBound(variable, DEFAULT_MIN_INT_VALUE);
-	}
-	
-	/**
-	 * Sets the maximum value of a variable.
-	 * 
-	 * @param variable the variable name
-	 * @param max the maximum value
-	 */
-	public void setMaxBound(String variable, int max) {
-		maxBounds.put(variable, max);
-	}
-
-	/**
-	 * Returns the maximum value associated with a variable.
-	 * 
-	 * @param variable the variable name
-	 * @param defaultValue the value to return if there is no bound available
-	 * @return the maximum value that the integer variable can assume
-	 */
-	public int getMaxBound(String variable, int defaultValue) {
-		Integer max = maxBounds.get(variable);
-		if (max == null) {
-			max = defaultValue;
-		}
-		return max;
-	}
-	
-	/**
-	 * Returns the maximum value associated with a variable.
-	 * 
-	 * @param variable the variable name
-	 * @return the maximum value that the integer variable can assume
-	 */
-	public int getMaxBound(String variable) {
-		return getMaxBound(variable, DEFAULT_MAX_INT_VALUE);
-	}
-
-	/**
-	 * TODO
-	 * @return TODO
-	 */
-	public boolean isProducingOutput() {
-		return produceOutput;
-	}
-
-	/**
-	 * TODO
-	 * @param produceOutput TODO
-	 */
-	public void produceOutput(boolean produceOutput) {
-		this.produceOutput = produceOutput;
-	}
-
-	/**
-	 * Returns the current explorer for this session.
-	 * 
-	 * @return the current instance of explorer
-	 */
-	public Explorer getExplorer() {
-		return explorer;
-	}
-
-	/**
-	 * Sets a new explorer for this session. Note that there is ever only
-	 * explorer for a session.
-	 * 
-	 * @param explorer
-	 *            the new explorer
-	 */
-	public void setExplorer(Explorer explorer) {
-		this.explorer = explorer;
-	}
-
-	/**
-	 * Time when work started.
-	 */
-	private Calendar started;
-
-	/**
-	 * Time when work stopped.
-	 */
-	private Calendar stopped;
-
-	/**
 	 * Run the diver.
 	 */
 	public void start() {
+		Explorer explorer = config.getExplorer();
 		if (explorer == null) {
-			log.fatal("No explorer specified -- terminating");
+			logger.fatal("No explorer specified -- terminating");
 		} else {
-			if (configSettings != null) {
-				final Level CONF = Level.forName("CONF", 350);
-				for (String setting : configSettings) {
-					log.log(CONF, setting);
-				}
-			}
-			started = Calendar.getInstance();
+			config.dumpConfig();
+			// config.dumpProperties();
+			addReporter(explorer);
+			recordStartingTime();
+			int diveCounter = 0;
 			Map<String, Constant> concreteValues = null;
 			do {
-				Dive d = new Dive(this, concreteValues);
+				Dive d = new Dive(name + "." + diveCounter++, logger, config, concreteValues);
 				if (!d.dive()) {
-					// A serious error has occurred.
-					return;
+					return; // A serious error has occurred.
 				}
 				concreteValues = explorer.refine(d);
 			} while (concreteValues != null);
-			stopped = Calendar.getInstance();
-			/*
-			 * Give each reporter a chance to report. Note that reporters are
-			 * called on in the *reverse* order of their registration.
-			 */
-			for (Reporter reporter : reporters) {
-				report(reporter);
-			}
+			recordStoppingTime();
+			invokeReporters();
 		}
 	}
 
 	/**
-	 * TODO
+	 * Reports on the session just completed.  In this case, it merely prints the starting and stopping time, and the duration of the run.
 	 * 
 	 * @param out
 	 *            the destination to which the report must be written
 	 */
 	public void report(PrintWriter out) {
-		out.println("Started: " + dateFormat.format(started.getTime()));
-		out.println("Stopped: " + dateFormat.format(stopped.getTime()));
-		long diff = stopped.getTimeInMillis() - started.getTimeInMillis();
-		long milli = diff % 1000;
-		long sec = (diff / 1000) % 60;
-		long min = (diff / 60000) % 60;
-		long hour = diff / 3600000;
-		if (hour > 0) {
-			out.printf("Duration: %d:%02d:%02d.%03d hrs\n", hour, min, sec, milli);
-		} else if (min > 0) {
-			out.printf("Duration: %d:%02d.%03d min\n", min, sec, milli);
-		} else if (sec > 0) {
-			out.printf("Duration: %d.%03d sec\n", sec, milli);
-		} else {
-			out.printf("Duration: %d ms\n", milli);
+		displayStartStopTimes(out);
+		displayDuration(out);
+	}
+
+	//======================================================================
+	//
+	// Routines for invoking all reporters.
+	//
+	//======================================================================
+
+	/**
+	 * Give each reporter a chance to report. Note that reporters are called on
+	 * in the *reverse* order of their registration.
+	 */
+	private void invokeReporters() {
+		for (Reporter reporter : reporters) {
+			report(reporter);
 		}
 	}
 
 	/**
 	 * Line separator
 	 */
-	static final String LS = System.getProperty("line.separator");
+	private static final String LS = System.getProperty("line.separator");
 
 	/**
-	 * Private date formatter, used for reports.
-	 */
-	private static final DateFormat dateFormat = new SimpleDateFormat("EEE d MMM yyyy HH:mm:ss");
-
-	/**
-	 * Generate and log the exporer's report.
+	 * Generates and log the exporer's report.
 	 * 
-	 * @param reporter TODO
+	 * @param reporter 
 	 */
 	private void report(Reporter reporter) {
-		StringBuilder sb = new StringBuilder();
-		sb.append("== ").append(reporter.getName()).append(' ');
-		while (sb.length() < 70) {
-			sb.append('=');
-		}
-		log.info("");
-		log.info(sb.toString());
+		Banner.displayBannerLine(reporter, '=', logger);
 		final StringWriter reportWriter = new StringWriter();
 		reporter.report(new PrintWriter(reportWriter));
 		String[] reportLines = reportWriter.toString().split(LS);
 		for (String line : reportLines) {
-			log.info(line);
+			logger.info(line);
 		}
-	}
-
-	/**
-	 * Add a new entry to the registry of delegates.
-	 * 
-	 * @param target the class name that is delegates
-	 * @param delegate the object that handles calls of the target class
-	 */
-	public void addDelegate(String target, Object delegate) {
-		delegates.put(target, delegate);
-	}
-
-	public Iterable<String> getDelegateTargets() {
-		return delegates.keySet();
-	}
-
-	public Object findDelegate(String target) {
-		return delegates.get(target);
 	}
 
 }

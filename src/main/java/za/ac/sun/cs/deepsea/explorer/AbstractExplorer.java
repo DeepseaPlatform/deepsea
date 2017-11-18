@@ -1,7 +1,8 @@
 package za.ac.sun.cs.deepsea.explorer;
 
-import za.ac.sun.cs.deepsea.diver.Diver;
-import za.ac.sun.cs.deepsea.reporting.Reporter;
+import org.apache.logging.log4j.Logger;
+
+import za.ac.sun.cs.deepsea.diver.Configuration;
 
 /**
  * Provides a concrete constructor for user-specified instances of
@@ -12,21 +13,19 @@ import za.ac.sun.cs.deepsea.reporting.Reporter;
 public abstract class AbstractExplorer implements Explorer {
 
 	/**
-	 * The {@link Diver} instance associated with this explorer.
+	 * The {@link Logger} instance associated with this explorer.
 	 */
-	protected final Diver diver;
+	protected final Logger logger;
 
 	/**
 	 * Constructs an {@link Explorer} instance with the given diver. It stores
-	 * the identify of the diver in an instance field and also registers this
-	 * {@link Explorer} as a {@link Reporter}.
+	 * the identify of the diver in an instance field..
 	 * 
-	 * @param diver
-	 *            the diver associated with this explorer
+	 * @param logger the log destination
+	 * @param properties properties that 
 	 */
-	public AbstractExplorer(Diver diver) {
-		this.diver = diver;
-		diver.addReporter(this);
+	public AbstractExplorer(Logger logger, Configuration config) {
+		this.logger = logger;
 	}
 
 }

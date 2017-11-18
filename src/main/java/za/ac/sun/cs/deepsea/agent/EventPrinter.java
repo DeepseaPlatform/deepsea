@@ -16,14 +16,12 @@ import com.sun.jdi.event.ThreadStartEvent;
 import com.sun.jdi.event.VMDeathEvent;
 import com.sun.jdi.event.VMDisconnectEvent;
 
-import za.ac.sun.cs.deepsea.diver.Diver;
-
 public class EventPrinter extends AbstractEventListener {
 
 	private final Logger log;
 
-	public EventPrinter(final Diver diver) {
-		this.log = diver.getLog();
+	public EventPrinter(Logger log) {
+		this.log = log;
 	}
 
 	@Override
