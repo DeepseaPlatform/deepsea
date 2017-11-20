@@ -1,5 +1,8 @@
 package za.ac.sun.cs.deepsea.diver;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -11,9 +14,14 @@ import com.sun.jdi.Type;
 
 import za.ac.sun.cs.deepsea.diver.Stepper.IntArray;
 
-public class Trigger {
+public class Trigger implements Serializable {
 
-	private final String name;
+	/**
+	 * Generated serial ID.
+	 */
+	private static final long serialVersionUID = 1994634569895877408L;
+
+	private String name;
 	
 	private Integer parameterCount = null;
 
@@ -117,7 +125,7 @@ public class Trigger {
 				if (parameterName[i] != null) {
 					sb.append(parameterName[i]).append(": ");
 				}
-				if (parameterType[i] == null) { sb.append("?"); }
+				if (parameterType[i] == null) { sb.append('?'); }
 				else if (parameterType[i] == Boolean.class) { sb.append("boolean"); }
 				else if (parameterType[i] == Integer.class) { sb.append("int"); }
 				else if (parameterType[i] == String.class) { sb.append("string"); }
@@ -127,6 +135,42 @@ public class Trigger {
 			stringRepr = sb.append(')').toString();
 		}
 		return stringRepr;
+	}
+
+	private void writeObject(ObjectOutputStream out) throws IOException {
+		out.writeUTF(name);
+		out.writeInt(parameterCount);
+		for (int i = 0; i < parameterCount; i++) {
+			out.writeUTF(parameterName[i]);
+			if (parameterType[i] == null) { out.writeUTF("?"); }
+			else if (parameterType[i] == Boolean.class) { out.writeUTF("boolean"); }
+			else if (parameterType[i] == Integer.class) { out.writeUTF("int"); }
+			else if (parameterType[i] == String.class) { out.writeUTF("string"); }
+			else if (parameterType[i] instanceof IntArray) {
+				out.writeUTF("int[]");
+				out.writeInt(((IntArray) parameterType[i]).getLength());
+			}
+			else { out.writeUTF("*"); }
+		}
+	}
+
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+		name = in.readUTF();
+		parameterCount = in.readInt();
+		parameterName = new String[parameterCount];
+		parameterType = new Integer[parameterCount];
+		symbolicNames.clear();
+		for (int i = 0; i < parameterCount; i++) {
+			parameterName[i] = in.readUTF();
+			symbolicNames.add(parameterName[i]);
+			String type = in.readUTF();
+			if (type.equals("?")) { parameterType[i] = null; }
+			else if (type.equals("boolean")) { parameterType[i] = Boolean.class; }
+			else if (type.equals("int")) { parameterType[i] = Integer.class; }
+			else if (type.equals("string")) { parameterType[i] = String.class; }
+			else if (type.equals("int[]")) { parameterType[i] = new IntArray(in.readInt()); }
+			else { parameterType[i] = Object.class; }
+		}
 	}
 
 }

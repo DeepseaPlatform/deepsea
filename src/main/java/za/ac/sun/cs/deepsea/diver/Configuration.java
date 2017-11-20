@@ -120,6 +120,11 @@ public class Configuration {
 	private boolean dumpProperties = false;
 
 	/**
+	 * Whether or not DEEPSEA will be distributed.
+	 */
+	private boolean distributed = false;
+
+	/**
 	 * The Explorer that directs the investigation of target programs.
 	 */
 	private Explorer explorer;
@@ -184,6 +189,9 @@ public class Configuration {
 	 * @return the logger
 	 */
 	public Logger getLogger() {
+		if (logger == null) {
+			logger = createLogger();
+		}
 		return logger;
 	}
 
@@ -467,6 +475,25 @@ public class Configuration {
 	}
 
 	/**
+	 * Sets whether DEEPSEA will be distributed.
+	 * 
+	 * @param distributed
+	 *            whether DEEPSEA will be distributed
+	 */
+	public void setDistributed(boolean distributed) {
+		this.distributed = distributed;
+	}
+
+	/**
+	 * Returns whether or not DEEPSEA will be distributed.
+	 * 
+	 * @return whether DEEPSEA will be distributed
+	 */
+	public boolean getDistributed() {
+		return distributed;
+	}
+
+	/**
 	 * Sets whether the properties should be dumped to the log.
 	 * 
 	 * @param dumpProperties
@@ -547,6 +574,7 @@ public class Configuration {
 			logger.log(CONF, "deepsea.echooutput = {}", getEchoOutput());
 			logger.log(CONF, "deepsea.dumpconfig = {}", getDumpConfig());
 			logger.log(CONF, "deepsea.dumpproperties = {}", getDumpProperties());
+			logger.log(CONF, "deepsea.distributed = {}", getDistributed());
 			// --- EXPLORER ---
 			Explorer e = getExplorer();
 			if (e != null) {
@@ -576,10 +604,73 @@ public class Configuration {
 
 	//======================================================================
 	//
-	// The rest of this file contains routines that reads properties from a
-	// Java properties file.
+	// The rest of this file contains routines that reads and writes
+	// properties from and to a Java properties file.
 	//
 	//======================================================================
+
+	/**
+	 * Write settings to a Java properties file.
+	 * 
+	 * @return a Java properties file that reflects the current configuration
+	 */
+	public Properties produceProperties() {
+		StringBuilder sb = new StringBuilder();
+		Properties properties = new Properties();
+		if (getTarget() != null) {
+			properties.setProperty("deepsea.target", getTarget());
+		}
+		if (getArgs() != null) {
+			properties.setProperty("deepsea.args", getArgs());
+		}
+		sb.setLength(0);
+		boolean isFirst = true;
+		for (Trigger trigger : getTriggers()) {
+			if (isFirst) {
+				isFirst = false;
+			} else {
+				sb.append(';');
+			}
+			sb.append(trigger.toString());
+		}
+		if (!isFirst) {
+			properties.setProperty("deepsea.triggers", sb.toString());
+		}
+		sb.setLength(0);
+		isFirst = true;
+		for (String target : getDelegateTargets()) {
+			if (isFirst) {
+				isFirst = false;
+			} else {
+				sb.append(';');
+			}
+			Object delegate = findDelegate(target);
+			sb.append(target).append(':').append(delegate.getClass().getName());
+		}
+		if (!isFirst) {
+			properties.setProperty("deepsea.delegates", sb.toString());
+		}
+		Set<String> vars = new TreeSet<>(minBounds.keySet());
+		vars.addAll(maxBounds.keySet());
+		for (String var : vars) {
+			if (!minBounds.containsKey(var)) {
+				properties.setProperty("deepsea.bounds." + var + ".max", "" + maxBounds.get(var));
+			} else if (!maxBounds.containsKey(var)) {
+				properties.setProperty("deepsea.bounds." + var + ".min", "" + minBounds.get(var));
+			} else {
+				properties.setProperty("deepsea.bounds." + var, minBounds.get(var) + ".." + maxBounds.get(var));
+			}
+		}
+		properties.setProperty("deepsea.echooutput", "" + getEchoOutput());
+		properties.setProperty("deepsea.dumpconfig", "" + getDumpConfig());
+		properties.setProperty("deepsea.dumpproperties", "" + getDumpProperties());
+		properties.setProperty("deepsea.distributed", "" + getDistributed());
+		Explorer e = getExplorer();
+		if (e != null) {
+			properties.setProperty("deepsea.explorer", e.getClass().getName());
+		}
+		return properties;
+	}
 
 	/**
 	 * Reads settings from a Java properties file.
@@ -603,7 +694,31 @@ public class Configuration {
 		processLogfile();
 		processDumpConfig();
 		processDumpProperties();
-		logger = createLogger(); // Need logger for following routines
+		processDistributed();
+		logger = getLogger(); // Need logger for following routines
+		processDelegates();
+		processExplorer();
+		return true;
+	}
+
+	/**
+	 * Reads settings from a Java properties object.
+	 * 
+	 * @param filename
+	 *            the name of the file to read from
+	 * @return {@code true} if and only if properties were read successfully
+	 */
+	public boolean processProperties(Properties properties) {
+		this.properties = properties;
+		processTarget();
+		processArgs();
+		processTriggers();
+		processBounds();
+		processEchoOutput();
+		processLogfile();
+		processDumpConfig();
+		processDumpProperties();
+		logger = getLogger(); // Need logger for following routines
 		processDelegates();
 		processExplorer();
 		return true;
@@ -828,6 +943,13 @@ public class Configuration {
 	 */
 	private void processDumpProperties() {
 		setDumpProperties(getBooleanProperty(properties, "deepsea.dumpproperties", getDumpProperties()));
+	}
+
+	/**
+	 * Reads and sets the "{@code deepsea.distributed}" setting.
+	 */
+	private void processDistributed() {
+		setDistributed(getBooleanProperty(properties, "deepsea.distributed", getDistributed()));
 	}
 
 	/**

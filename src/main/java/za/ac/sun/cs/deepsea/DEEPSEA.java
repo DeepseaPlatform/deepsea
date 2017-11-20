@@ -6,8 +6,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
+import org.jppf.client.JPPFClient;
 
 import za.ac.sun.cs.deepsea.diver.Diver;
+import za.ac.sun.cs.deepsea.distributed.Master;
 import za.ac.sun.cs.deepsea.diver.Configuration;
 import za.ac.sun.cs.deepsea.reporting.Banner;
 
@@ -45,12 +47,23 @@ public class DEEPSEA {
 		}
 		// Configuration has now been loaded and seems OK
 		Logger logger = config.getLogger();
-		Diver diver = new Diver("DEEPSEA", logger, config);
-		new Banner('~').println("DEEPSEA version " + getVersion()).display(logger, Level.INFO);
-		logger.info("");
-		diver.start();
-		logger.info("");
-		new Banner('~').println("DEEPSEA DONE").display(logger, Level.INFO);
+		if (config.getDistributed()) {
+			new Banner('#').println("DEEPSEA version " + getVersion() + " DISTRIBUTED").display(logger, Level.INFO);
+			try (JPPFClient client = new JPPFClient()) {
+				Master master = new Master(logger, config);
+				master.executeJob(client);
+			} catch (Exception x) {
+				x.printStackTrace();
+			}
+			new Banner('#').println("DEEPSEA DONE").display(logger, Level.INFO);
+		} else {
+			new Banner('~').println("DEEPSEA version " + getVersion()).display(logger, Level.INFO);
+			Diver diver = new Diver("DEEPSEA", logger, config);
+			logger.info("");
+			diver.start();
+			logger.info("");
+			new Banner('~').println("DEEPSEA DONE").display(logger, Level.INFO);
+		}
 	}
 
 	/**
