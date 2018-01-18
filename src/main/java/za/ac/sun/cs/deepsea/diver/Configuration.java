@@ -2,6 +2,7 @@ package za.ac.sun.cs.deepsea.diver;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -34,7 +35,12 @@ import za.ac.sun.cs.deepsea.reporting.Banner;
 /**
  * A container for user-configurable parameters for analysis.
  */
-public class Configuration {
+public class Configuration implements Serializable {
+
+	/**
+	 * Generated serial version
+	 */
+	private static final long serialVersionUID = -8641663835268556564L;
 
 	/**
 	 * The default name of the detailed log file.

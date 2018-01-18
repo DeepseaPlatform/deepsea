@@ -1,5 +1,7 @@
 package za.ac.sun.cs.deepsea.explorer;
 
+import java.io.Serializable;
+
 import org.apache.logging.log4j.Logger;
 
 import za.ac.sun.cs.deepsea.diver.Configuration;
@@ -7,10 +9,13 @@ import za.ac.sun.cs.deepsea.diver.Configuration;
 /**
  * Provides a concrete constructor for user-specified instances of
  * {@link Explorer} to conform to.
- * 
- * @author Jaco Geldenhuys (geld@sun.ac.za)
  */
-public abstract class AbstractExplorer implements Explorer {
+public abstract class AbstractExplorer implements Explorer, Serializable {
+
+	/**
+	 * Generated serial number. 
+	 */
+	private static final long serialVersionUID = 3728602658179766462L;
 
 	/**
 	 * The {@link Logger} instance associated with this explorer.

@@ -4,13 +4,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
-import org.jppf.client.JPPFClient;
 
-import za.ac.sun.cs.deepsea.diver.Diver;
 import za.ac.sun.cs.deepsea.distributed.Master;
 import za.ac.sun.cs.deepsea.diver.Configuration;
+import za.ac.sun.cs.deepsea.diver.Diver;
 import za.ac.sun.cs.deepsea.reporting.Banner;
 
 /**
@@ -49,12 +49,7 @@ public class DEEPSEA {
 		Logger logger = config.getLogger();
 		if (config.getDistributed()) {
 			new Banner('#').println("DEEPSEA version " + getVersion() + " DISTRIBUTED").display(logger, Level.INFO);
-			try (JPPFClient client = new JPPFClient()) {
-				Master master = new Master(logger, config);
-				master.executeJob(client);
-			} catch (Exception x) {
-				x.printStackTrace();
-			}
+			Master.executeJob(logger, config);
 			new Banner('#').println("DEEPSEA DONE").display(logger, Level.INFO);
 		} else {
 			new Banner('~').println("DEEPSEA version " + getVersion()).display(logger, Level.INFO);

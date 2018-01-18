@@ -3,15 +3,19 @@ package za.ac.sun.cs.deepsea.diver;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.logging.log4j.Logger;
 
+import com.sun.jdi.ReferenceType;
+import com.sun.jdi.ThreadReference;
 import com.sun.jdi.VirtualMachine;
 
 import za.ac.sun.cs.deepsea.agent.EventReader;
 import za.ac.sun.cs.deepsea.agent.RequestManager;
 import za.ac.sun.cs.deepsea.agent.StreamRedirector;
+import za.ac.sun.cs.deepsea.agent.VMConnectAttacher;
 import za.ac.sun.cs.deepsea.agent.VMConnectLauncher;
 import za.ac.sun.cs.deepsea.reporting.Banner;
 import za.ac.sun.cs.green.expr.Constant;
@@ -72,40 +76,74 @@ public class Dive {
 	 * TODO
 	 * @return whether a serious error has occurred
 	 */
+	public boolean dive(int port) {
+		Banner.displayBannerLine("starting dive " + name, '-', logger);
+		logger.trace("launching vm");
+		VirtualMachine vm = VMConnectAttacher.launchTarget(port);
+		return completeDive(vm);
+	}
+
+	/**
+	 * TODO
+	 * @return whether a serious error has occurred
+	 */
 	public boolean dive() {
 		Banner.displayBannerLine("starting dive " + name, '-', logger);
-
 		logger.trace("launching vm");
 		VirtualMachine vm = VMConnectLauncher.launchTarget(new String[] { config.getTarget(), config.getArgs() });
+		return completeDive(vm);
+	}
+	
+	/**
+	 * TODO
+	 * @return whether a serious error has occurred
+	 */
+	private boolean completeDive(VirtualMachine vm) {
 		logger.trace("target vm details:");
 		for (String detail : vm.description().split("\n")) {
 			logger.trace("  " + detail);
 		}
 
 		logger.trace("redirecting output");
+		InputStream es = null, is = null;
+		StreamRedirector er = null, or = null;
 		Process pr = vm.process();
-		InputStream es = pr.getErrorStream();
-		InputStream is = pr.getInputStream();
-		StreamRedirector er = new StreamRedirector(es, System.err, config.getEchoOutput());
-		StreamRedirector or = new StreamRedirector(is, System.out, config.getEchoOutput());
-		er.start();
-		or.start();
-
+		if (pr != null) {
+			es = pr.getErrorStream();
+			is = pr.getInputStream();
+			er = new StreamRedirector(es, System.err, config.getEchoOutput());
+			or = new StreamRedirector(is, System.out, config.getEchoOutput());
+			er.start();
+			or.start();
+		}
+		
 		logger.trace("issuing monitor requests");
 		RequestManager m = new RequestManager(vm.eventRequestManager());
 		m.addExclude("java.*", "javax.*", "sun.*", "com.sun.*");
 		m.addExclude(config.getDelegateTargets());
-		m.createClassPrepareRequest(r -> m.filterExcludes(r));
-
+		// m.createClassPrepareRequest(r -> m.filterExcludes(r));
+		m.createClassPrepareRequest(r -> {});
+		
 		logger.trace("setting up event monitoring");
 		EventReader ev = new EventReader(logger, vm.eventQueue());
 		Stepper st = new Stepper(logger, config, this, vm, m);
 		ev.addEventListener(st);
 		ev.start();
 
+//		List<ThreadReference> threads = vm.allThreads();
+//		int i = 0;
+//		for (ThreadReference t : threads) {
+//			logger.info("[[[ {}: {}", i++, t);
+//		}
+//		List<ReferenceType> classes = vm.allClasses();
+//		i = 0;
+//		for (ReferenceType c : classes) {
+//			logger.info("((( {}: {}", i++, c);
+//		}
+
 		logger.trace("starting vm");
 		vm.resume();
-
+		
 		logger.trace("waiting for completion");
 		while (!ev.isStopping()) {
 			try {
@@ -114,20 +152,22 @@ public class Dive {
 				// ignore
 			}
 		}
-
+		
 		logger.trace("shutting down event monitoring");
 		ev.stop();
-		er.interrupt();
-		or.interrupt();
-		try {
-			es.close();
-			is.close();
-		} catch (IOException x) {
-			x.printStackTrace();
+		if (pr != null) {
+			er.interrupt();
+			or.interrupt();
+			try {
+				es.close();
+				is.close();
+			} catch (IOException x) {
+				x.printStackTrace();
+			}
 		}
 		return st.isErrorFree();
 	}
-
+	
 	/**
 	 * Returns the path condition and signature collected by {@link #symbolizer} during the
 	 * most recent invocation of the target program.

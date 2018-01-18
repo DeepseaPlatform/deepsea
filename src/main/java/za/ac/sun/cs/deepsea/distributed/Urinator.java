@@ -28,6 +28,11 @@ public class Urinator extends AbstractReporter {
 	private final String name;
 
 	/**
+	 * The debugging port on which to connect to the SUT.
+	 */
+	private final int port;
+	
+	/**
 	 * The logger. This is passed to dives.
 	 */
 	private final Logger logger;
@@ -53,8 +58,9 @@ public class Urinator extends AbstractReporter {
 	 * @param config
 	 *            the settings for this session
 	 */
-	public Urinator(final String name, Logger logger, Configuration config) {
+	public Urinator(final String name, int port, Logger logger, Configuration config) {
 		this.name = name;
+		this.port = port;
 		this.logger = logger;
 		this.config = config;
 		addReporter(this); // the diver is a reporter itself
@@ -84,23 +90,23 @@ public class Urinator extends AbstractReporter {
 	 * Run the diver.
 	 */
 	public void start() {
+		config.dumpConfig();
+		// config.dumpProperties();
 		Explorer explorer = config.getExplorer();
 		if (explorer == null) {
 			logger.fatal("No explorer specified -- terminating");
 		} else {
-			config.dumpConfig();
-			// config.dumpProperties();
 			addReporter(explorer);
 			recordStartingTime();
 			int diveCounter = 0;
 			Map<String, Constant> concreteValues = null;
 			do {
 				Dive d = new Dive(name + "." + diveCounter++, logger, config, concreteValues);
-				if (!d.dive()) {
+				if (!d.dive(port)) {
 					return; // A serious error has occurred.
 				}
 				concreteValues = explorer.refine(d);
-				break;
+				break; /// <<<<--- TODO ---<<<<
 			} while (concreteValues != null);
 			recordStoppingTime();
 			invokeReporters();

@@ -219,7 +219,8 @@ public class Stepper extends AbstractEventListener {
 	 * Arrange the frames of the symbolic stack. This method is invoked when we
 	 * are in symbolic mode, and a methodEntry event has occurred.
 	 *
-	 * @param method the method that has been entered
+	 * @param method
+	 *            the method that has been entered
 	 * @return {@code true} if and only if everything has executed OK
 	 */
 	private boolean symbolicInvocation(Method method) {
@@ -257,11 +258,8 @@ public class Stepper extends AbstractEventListener {
 			try {
 				args = method.arguments();
 			} catch (AbsentInformationException x) {
-				new Banner('@')
-					.println("CANNOT OBTAIN APPLICATION INFORMATION")
-					.println("")
-					.println("COMPILE WITH THE -g FLAG (javac -g ...)")
-					.display(log, Level.FATAL);
+				new Banner('@').println("CANNOT OBTAIN APPLICATION INFORMATION").println("")
+						.println("COMPILE WITH THE -g FLAG (javac -g ...)").display(log, Level.FATAL);
 				errorFree = false;
 				return false;
 			}
@@ -330,8 +328,7 @@ public class Stepper extends AbstractEventListener {
 						}
 					} else {
 						for (int j = 0; j < arrayLength; j++) {
-							IntConstant value = new IntConstant(
-									((IntegerValue) actualArray.getValue(j)).intValue());
+							IntConstant value = new IntConstant(((IntegerValue) actualArray.getValue(j)).intValue());
 							symbolizer.putField(arrayId, "" + j, value);
 							dive.setActualValue(name + "$" + j, value);
 						}
@@ -389,6 +386,7 @@ public class Stepper extends AbstractEventListener {
 
 	@Override
 	public boolean classPrepare(ClassPrepareEvent event) {
+		// System.out.println("&&& " + event.referenceType().name() + " &&& " + config.getTarget());
 		if (config.getTarget().equals(event.referenceType().name())) {
 			mgr.createMethodEntryRequest(r -> mgr.filterExcludes(r));
 			for (String delegateTarget : config.getDelegateTargets()) {
@@ -403,6 +401,49 @@ public class Stepper extends AbstractEventListener {
 		return true;
 	}
 
+	/* UNUSED BUT MAY BE USEFUL IN THE FUTURE
+	private Value invokeRemote(ThreadReference thread, ObjectReference object, String methodName) {
+		List<Value> args = new ArrayList<>();
+		return invokeRemote(thread, object, methodName, args);
+	}
+
+	private Value invokeRemote(ThreadReference thread, ObjectReference object, String methodName, String arg0) {
+		List<Value> args = new ArrayList<>();
+		args.add(vm.mirrorOf(arg0));
+		return invokeRemote(thread, object, methodName, args);
+	}
+	
+	private Value invokeRemote(ThreadReference thread, ObjectReference object, String methodName, List<Value> args) {
+		ReferenceType rt = object.referenceType();
+		List<Method> methods = rt.methodsByName(methodName);
+		if (methods.isEmpty()) {
+			return null;
+		}
+		Method method = null;
+		for (int i = 0; i < methods.size(); i++) {
+			if (methods.get(i).argumentTypeNames().size() == args.size()) {
+				method = methods.get(i);
+				break;
+			}
+		}
+		Value value = null;
+		if (method != null) {
+			try {
+				value = object.invokeMethod(thread, method, args, ObjectReference.INVOKE_SINGLE_THREADED);
+			} catch (InvalidTypeException x) {
+				x.printStackTrace();
+			} catch (ClassNotLoadedException x) {
+				x.printStackTrace();
+			} catch (IncompatibleThreadStateException x) {
+				x.printStackTrace();
+			} catch (InvocationException x) {
+				x.printStackTrace();
+			}
+		}
+		return value;
+	}
+	*/
+	
 	public za.ac.sun.cs.deepsea.constantpool.Constant getConstant(ReferenceType clas, int index, byte tag) {
 		ConstantPool cp = cpMap.get(clas);
 		if (cp == null) {
@@ -444,7 +485,7 @@ public class Stepper extends AbstractEventListener {
 		}
 		return ((ConstantString) cp.getConstant(index)).getString(cp);
 	}
-	
+
 	private static final Class<?>[] argumentTypes = { Symbolizer.class, ThreadReference.class };
 
 	public int delegateMethod(ReferenceType clas, int index, Symbolizer symbolizer, ThreadReference thread) {
@@ -467,7 +508,7 @@ public class Stepper extends AbstractEventListener {
 					za.ac.sun.cs.deepsea.constantpool.Constants.CONSTANT_NameAndType);
 			String methodName = nt.getName(cp);
 			String signature = nt.getAsciiSignature(cp);
-			
+
 			try {
 				delegateMethod = delegate.getClass().getDeclaredMethod(methodName + signature, argumentTypes);
 			} catch (NoSuchMethodException | SecurityException e) {
@@ -488,7 +529,7 @@ public class Stepper extends AbstractEventListener {
 				za.ac.sun.cs.deepsea.constantpool.Constants.CONSTANT_NameAndType);
 		return countArguments(nt.getSignature(cp));
 	}
-	
+
 	public int getArgumentCount(ReferenceType clas, int index) {
 		ConstantPool cp = cpMap.get(clas);
 		if (cp == null) {

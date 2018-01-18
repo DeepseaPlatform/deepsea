@@ -82,12 +82,12 @@ public class Diver extends AbstractReporter {
 	 * Run the diver.
 	 */
 	public void start() {
+		config.dumpConfig();
+		// config.dumpProperties();
 		Explorer explorer = config.getExplorer();
 		if (explorer == null) {
 			logger.fatal("No explorer specified -- terminating");
 		} else {
-			config.dumpConfig();
-			// config.dumpProperties();
 			addReporter(explorer);
 			recordStartingTime();
 			int diveCounter = 0;

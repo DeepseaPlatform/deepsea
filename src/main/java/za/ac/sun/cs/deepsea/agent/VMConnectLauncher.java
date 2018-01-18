@@ -13,10 +13,8 @@ import com.sun.jdi.connect.VMStartException;
 
 public class VMConnectLauncher {
 
-	private static final String CONNECTOR = "com.sun.jdi.CommandLineLaunch";
-
 	public static VirtualMachine launchTarget(final String[] args) {
-		LaunchingConnector connector = findLaunchingConnector(CONNECTOR);
+		LaunchingConnector connector = findLaunchingConnector();
 		Map<String, Connector.Argument> arguments = connector.defaultArguments();
 		/* Was useful during debugging of issue #22. */
 //		for (String key : arguments.keySet()) {
@@ -41,11 +39,11 @@ public class VMConnectLauncher {
 		}
 	}
 
-	private static LaunchingConnector findLaunchingConnector(String name) {
-		List<Connector> connectors = Bootstrap.virtualMachineManager().allConnectors();
-		for (Connector connector : connectors) {
-			if (connector.name().equals(name)) {
-				return (LaunchingConnector) connector;
+	private static LaunchingConnector findLaunchingConnector() {
+		List<LaunchingConnector> connectors = Bootstrap.virtualMachineManager().launchingConnectors();
+		for (LaunchingConnector connector : connectors) {
+			if ("com.sun.jdi.CommandLineLaunch".equals(connector.name())) {
+				return connector;
 			}
 		}
 		throw new Error("No launching connector");
