@@ -3,13 +3,10 @@ package za.ac.sun.cs.deepsea.diver;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.logging.log4j.Logger;
 
-import com.sun.jdi.ReferenceType;
-import com.sun.jdi.ThreadReference;
 import com.sun.jdi.VirtualMachine;
 
 import za.ac.sun.cs.deepsea.agent.EventReader;
