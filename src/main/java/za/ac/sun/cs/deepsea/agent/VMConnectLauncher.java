@@ -13,7 +13,7 @@ import com.sun.jdi.connect.VMStartException;
 
 public class VMConnectLauncher {
 
-	public static VirtualMachine launchTarget(final String[] args) {
+	public static VirtualMachine launchTarget(final String jarFile, final String[] args) {
 		LaunchingConnector connector = findLaunchingConnector();
 		Map<String, Connector.Argument> arguments = connector.defaultArguments();
 		/* Was useful during debugging of issue #22. */
@@ -26,6 +26,13 @@ public class VMConnectLauncher {
 			throw new Error("Bad launching connector");
 		}
 		mainArg.setValue(String.join(" ", args));
+		if (jarFile != null) {
+			Connector.Argument optionsArg = (Connector.Argument) arguments.get("options");
+			if (optionsArg == null) {
+				throw new Error("Bad launching connector");
+			}
+			optionsArg.setValue("-cp " + jarFile);
+		}
 		try {
 			VirtualMachine vm = connector.launch(arguments);
 			vm.setDebugTraceMode(0);

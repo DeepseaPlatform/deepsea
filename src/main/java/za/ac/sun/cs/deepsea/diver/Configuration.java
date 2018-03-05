@@ -68,6 +68,13 @@ public class Configuration implements Serializable {
 	protected Logger logger = null;
 
 	/**
+	 * The file name of the jar file that contains the system-under-test (SUT).
+	 * The properties file can (and must) still contain all the other properties
+	 * that is usually specified for "jar-less" projects.
+	 */
+	protected String jar = null;
+	
+	/**
 	 * The fully qualified of the target class. This class should contain a Java
 	 * {@code main} method and it is the class that is run during each dive.
 	 */
@@ -207,6 +214,25 @@ public class Configuration implements Serializable {
 	//
 	//======================================================================
 
+	/**
+	 * Returns the jar file that contain the SUT.
+	 * 
+	 * @return the name of the jar file
+	 */
+	public String getJar() {
+		return jar;
+	}
+	
+	/**
+	 * Sets the jar file that contain the SUT.
+	 * 
+	 * @param jar
+	 *            the name of the jar file
+	 */
+	public void setJar(String jar) {
+		this.jar = jar;
+	}
+	
 	/**
 	 * Returns the target class.
 	 * 
@@ -692,6 +718,7 @@ public class Configuration implements Serializable {
 		} catch (IOException x) {
 			return false;
 		}
+		processJar();
 		processTarget();
 		processArgs();
 		processTriggers();
@@ -716,6 +743,7 @@ public class Configuration implements Serializable {
 	 */
 	public boolean processProperties(Properties properties) {
 		this.properties = properties;
+		processJar();
 		processTarget();
 		processArgs();
 		processTriggers();
@@ -730,6 +758,18 @@ public class Configuration implements Serializable {
 		return true;
 	}
 
+	/**
+	 * Reads and sets the "{@code deepsea.jar}" setting.
+	 * 
+	 * @return {@code true} if and only if the property was read successfully
+	 */
+	private void processJar() {
+		String p = properties.getProperty("deepsea.jar");
+		if (p != null) {
+			setJar(p);
+		}
+	}
+	
 	/**
 	 * Reads and sets the "{@code deepsea.target}" setting.
 	 * 

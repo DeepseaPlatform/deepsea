@@ -29,6 +29,7 @@ import za.ac.sun.cs.green.expr.IntVariable;
  * 
  * @author Jaco Geldenhuys (geld@sun.ac.za)
  */
+@SuppressWarnings("serial")
 public class DepthFirstExplorer extends AbstractExplorer {
 
 	//	/*
