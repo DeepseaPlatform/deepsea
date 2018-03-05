@@ -69,12 +69,14 @@ public class DEEPSEA {
 	 */
 	private static String getVersion() {
 		InputStream in = DEEPSEA.class.getResourceAsStream("/VERSION");
-		try (BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
-			String line = br.readLine();
-			if (line != null) {
-				return line;
+		if (in != null) {
+			try (BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
+				String line = br.readLine();
+				if (line != null) {
+					return line;
+				}
+			} catch (IOException x) {
 			}
-		} catch (IOException x) {
 		}
 		return "unspecified";
 	}

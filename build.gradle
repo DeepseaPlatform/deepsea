@@ -33,7 +33,7 @@ task generateVersion {
 	doFirst {
 		def stdout = new ByteArrayOutputStream()
 		exec {
-			commandLine 'git', 'describe', '--tags', '--abbrev=0'
+			commandLine 'git', 'describe', '--tags'
 			standardOutput = stdout
 		}
 		def version = stdout.toString().trim()
