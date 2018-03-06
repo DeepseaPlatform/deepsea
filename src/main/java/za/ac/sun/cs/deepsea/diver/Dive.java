@@ -12,7 +12,6 @@ import com.sun.jdi.VirtualMachine;
 import za.ac.sun.cs.deepsea.agent.EventReader;
 import za.ac.sun.cs.deepsea.agent.RequestManager;
 import za.ac.sun.cs.deepsea.agent.StreamRedirector;
-import za.ac.sun.cs.deepsea.agent.VMConnectAttacher;
 import za.ac.sun.cs.deepsea.agent.VMConnectLauncher;
 import za.ac.sun.cs.deepsea.reporting.Banner;
 import za.ac.sun.cs.green.expr.Constant;
@@ -67,17 +66,6 @@ public class Dive {
 		this.config = config;
 		this.symbolizer = new Symbolizer(logger);
 		this.concreteValues = concreteValues;
-	}
-
-	/**
-	 * TODO
-	 * @return whether a serious error has occurred
-	 */
-	public boolean dive(int port) {
-		Banner.displayBannerLine("starting dive " + name, '-', logger);
-		logger.trace("launching vm");
-		VirtualMachine vm = VMConnectAttacher.launchTarget(port);
-		return completeDive(vm);
 	}
 
 	/**

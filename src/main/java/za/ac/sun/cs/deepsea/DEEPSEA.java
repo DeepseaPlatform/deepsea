@@ -1,14 +1,8 @@
 package za.ac.sun.cs.deepsea;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 
-import za.ac.sun.cs.deepsea.distributed.Master;
 import za.ac.sun.cs.deepsea.diver.Configuration;
 import za.ac.sun.cs.deepsea.diver.Diver;
 import za.ac.sun.cs.deepsea.reporting.Banner;
@@ -47,38 +41,12 @@ public class DEEPSEA {
 		}
 		// Configuration has now been loaded and seems OK
 		Logger logger = config.getLogger();
-		if (config.getDistributed()) {
-			new Banner('#').println("DEEPSEA version " + getVersion() + " DISTRIBUTED").display(logger, Level.INFO);
-			Master.executeJob(logger, config);
-			new Banner('#').println("DEEPSEA DONE").display(logger, Level.INFO);
-		} else {
-			new Banner('~').println("DEEPSEA version " + getVersion()).display(logger, Level.INFO);
-			Diver diver = new Diver("DEEPSEA", logger, config);
-			logger.info("");
-			diver.start();
-			logger.info("");
-			new Banner('~').println("DEEPSEA DONE").display(logger, Level.INFO);
-		}
-	}
-
-	/**
-	 * Tries to read the DEEPSEA version from a file.
-	 * 
-	 * @return a string that contains the version number of
-	 *         "{@code unspecified}"
-	 */
-	private static String getVersion() {
-		InputStream in = DEEPSEA.class.getResourceAsStream("/VERSION");
-		if (in != null) {
-			try (BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
-				String line = br.readLine();
-				if (line != null) {
-					return line;
-				}
-			} catch (IOException x) {
-			}
-		}
-		return "unspecified";
+		new Banner('~').println("DEEPSEA version " + BuildConfig.VERSION).display(logger, Level.INFO);
+		Diver diver = new Diver("DEEPSEA", logger, config);
+		logger.info("");
+		diver.start();
+		logger.info("");
+		new Banner('~').println("DEEPSEA DONE").display(logger, Level.INFO);
 	}
 
 }

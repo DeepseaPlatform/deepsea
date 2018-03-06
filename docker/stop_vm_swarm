@@ -1,0 +1,8 @@
+#!/bin/sh
+# Stops 3 (THREE) virtualbox-based docker machines
+
+docker-machine ssh myvm3 "docker swarm leave"
+docker-machine ssh myvm2 "docker swarm leave"
+docker-machine ssh myvm1 "docker swarm leave -f"
+docker-machine kill myvm3 myvm2 myvm1
+docker-machine rm -f myvm3 myvm2 myvm1

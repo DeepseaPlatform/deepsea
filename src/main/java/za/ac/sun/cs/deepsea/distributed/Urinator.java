@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.apache.logging.log4j.Logger;
 
+import redis.clients.jedis.Jedis;
 import za.ac.sun.cs.deepsea.diver.Configuration;
 import za.ac.sun.cs.deepsea.diver.Dive;
 import za.ac.sun.cs.deepsea.explorer.Explorer;
@@ -96,21 +97,30 @@ public class Urinator extends AbstractReporter {
 		if (explorer == null) {
 			logger.fatal("No explorer specified -- terminating");
 		} else {
-			addReporter(explorer);
-			recordStartingTime();
-			int diveCounter = 0;
-			Map<String, Constant> concreteValues = null;
-			do {
-				Dive d = new Dive(name + "." + diveCounter++, logger, config, concreteValues);
-				if (!d.dive(port)) {
-					return; // A serious error has occurred.
+			try (Jedis jedis = new Jedis("redis")) {
+				addReporter(explorer);
+				recordStartingTime();
+				int diveCounter = 0;
+				Map<String, Constant> concreteValues = null;
+				jedis.lpush("TASKS", encode(concreteValues));
+				int outstanding = 1;
+				while (outstanding > 0) {
+					String result = jedis.brpop(0, "RESULTS").get(1);
+					while (!result.equals("DONE")) {
+						// concreteValues = explorer.refine(d);
+						result = jedis.brpop(0, "RESULTS").get(1);
+					}
+					outstanding--;
 				}
-				concreteValues = explorer.refine(d);
-				break; /// <<<<--- TODO ---<<<<
-			} while (concreteValues != null);
-			recordStoppingTime();
-			invokeReporters();
+				recordStoppingTime();
+				invokeReporters();
+				
+			}
 		}
+	}
+
+	private String encode(Map<String, Constant> concreteValues) {
+		return null;
 	}
 
 	/**
