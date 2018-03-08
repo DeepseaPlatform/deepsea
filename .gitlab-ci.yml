@@ -16,4 +16,5 @@ build:
     paths:
       - build/docs/javadoc
       - build/install/deepsea/lib/*.jar
+      - build/resources/main
     expire_in: 1 week
