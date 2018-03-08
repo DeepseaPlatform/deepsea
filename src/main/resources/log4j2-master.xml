@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN" strict="true">
     <Appenders>
-	    	<Console name="LOG" target="SYSTEM_OUT">
-	    		<PatternLayout pattern="%-6level %msg%n"/>
-	    	</Console>
+		<Appender type="Socket" name="LOG" host="127.0.0.1" port="9987">
+			<JsonLayout properties="true" complete="true" compact="true"/>
+		</Appender>
 	</Appenders>
 	<Loggers>
     		<Root level="ALL">

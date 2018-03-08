@@ -1,13 +1,17 @@
 package za.ac.sun.cs.deepsea.distributed;
 
-import org.apache.logging.log4j.Level;
+import java.lang.management.ManagementFactory;
+
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/*
 import za.ac.sun.cs.deepsea.BuildConfig;
 import za.ac.sun.cs.deepsea.distributed.Master;
 import za.ac.sun.cs.deepsea.diver.Configuration;
 import za.ac.sun.cs.deepsea.diver.Diver;
 import za.ac.sun.cs.deepsea.reporting.Banner;
+*/
 
 /**
  * Master controller for the DEEPSEA project distributed version. It expects a single
@@ -23,8 +27,22 @@ public class Master {
 	 * 
 	 * @param args
 	 *            command-line arguments.
+	 * @throws InterruptedException
+	 *             if the 1-second delay is interrupted
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
+		String jvmName = ManagementFactory.getRuntimeMXBean().getName();
+		Logger LOGGER = LogManager.getLogger(jvmName);
+		LOGGER.info("I am the master");
+		for (int i = 0; i < 20; i++) {
+			System.out.println("Iteration: " + i);
+			LOGGER.info("Iteration {}", i);
+			Thread.sleep(1000);
+		}
+		LOGGER.info("Done");
+	}
+
+		/*
 		Configuration config = new Configuration();
 		if (args.length < 1) {
 			new Banner('@').println("DEEPSEA PROBLEM\nMISSING PROPERTIES FILE\n")
@@ -49,6 +67,6 @@ public class Master {
 		//urinator.start();
 		logger.info("");
 		new Banner('#').println("DEEPSEA DONE").display(logger, Level.INFO);
-	}
+		*/
 
 }

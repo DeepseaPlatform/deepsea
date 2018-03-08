@@ -36,8 +36,9 @@ buildConfig {
 dependencies {
 	compile files("${System.properties['java.home']}/../lib/tools.jar")
 	compile files("lib/green.jar")
-	compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.9.0'
-	compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.9.0'
+	compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.10.0'
+	compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.10.0'
+	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.4'
 	compile group: 'org.apfloat', name: 'apfloat', version: '1.8.2'
 	compile group: 'redis.clients', name: 'jedis', version: '2.4.2'
 	testCompile group: 'junit', name: 'junit', version: '4.12'
