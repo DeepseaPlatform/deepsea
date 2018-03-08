@@ -5,13 +5,11 @@ import java.lang.management.ManagementFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-/*
-import za.ac.sun.cs.deepsea.BuildConfig;
+//import za.ac.sun.cs.deepsea.BuildConfig;
 import za.ac.sun.cs.deepsea.distributed.Master;
 import za.ac.sun.cs.deepsea.diver.Configuration;
 import za.ac.sun.cs.deepsea.diver.Diver;
-import za.ac.sun.cs.deepsea.reporting.Banner;
-*/
+//import za.ac.sun.cs.deepsea.reporting.Banner;
 
 /**
  * Master controller for the DEEPSEA project distributed version. It expects a single

@@ -11,8 +11,9 @@ cache:
     - .gradle/caches
 build:
   script:
-    - ./gradlew build javadoc
+    - ./gradlew clean installDist javadoc
   artifacts:
     paths:
       - build/docs/javadoc
+      - build/install/deepsea/lib/*.jar
     expire_in: 1 week

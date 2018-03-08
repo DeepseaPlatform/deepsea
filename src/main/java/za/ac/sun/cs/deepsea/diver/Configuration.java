@@ -68,12 +68,12 @@ public class Configuration implements Serializable {
 	protected Logger logger = null;
 
 	/**
-	 * The file name of the jar file that contains the system-under-test (SUT).
-	 * The properties file can (and must) still contain all the other properties
-	 * that is usually specified for "jar-less" projects.
+	 * The file name of the jar file that contains the system-under-test (SUT). The
+	 * properties file can (and must) still contain all the other properties that is
+	 * usually specified for "jar-less" projects.
 	 */
 	protected String jar = null;
-	
+
 	/**
 	 * The fully qualified of the target class. This class should contain a Java
 	 * {@code main} method and it is the class that is run during each dive.
@@ -86,18 +86,18 @@ public class Configuration implements Serializable {
 	private String args = null;
 
 	/**
-	 * The database of triggers. Each trigger is a method that will switch the
-	 * dive to symbolic mode. The trigger also describes which arguments are
-	 * treated symbolically, and which arguments stay concrete.
+	 * The database of triggers. Each trigger is a method that will switch the dive
+	 * to symbolic mode. The trigger also describes which arguments are treated
+	 * symbolically, and which arguments stay concrete.
 	 */
 	private final List<Trigger> triggers = new LinkedList<>();
 
 	/**
-	 * The database of delegates. Each delegate is an object that may (or may
-	 * not) contain routines that are invoked when the responding method of the
-	 * class named by the key is called. In other words, if the database
-	 * contains the key-value pair <C, O>, and the method C.M is invoked, the
-	 * delegate O.M is invoked, if it exists.
+	 * The database of delegates. Each delegate is an object that may (or may not)
+	 * contain routines that are invoked when the responding method of the class
+	 * named by the key is called. In other words, if the database contains the
+	 * key-value pair &lt;C, O&gt;, and the method C.M is invoked, the delegate O.M
+	 * is invoked, if it exists.
 	 */
 	private final Map<String, Object> delegates = new HashMap<>();
 
@@ -147,15 +147,15 @@ public class Configuration implements Serializable {
 	 */
 	private final ClassLoader loader = Configuration.class.getClassLoader();
 
-	//======================================================================
+	// ======================================================================
 	//
 	// Logger constructor.
 	//
-	//======================================================================
+	// ======================================================================
 
 	/**
-	 * The name of the logger. Each logger has a name so that it can be
-	 * "accessed" from different contexts.
+	 * The name of the logger. Each logger has a name so that it can be "accessed"
+	 * from different contexts.
 	 */
 	private static final String LOGGER_NAME = "za.ac.sun.cs.deepsea.DEEPSEA";
 
@@ -208,11 +208,11 @@ public class Configuration implements Serializable {
 		return logger;
 	}
 
-	//======================================================================
+	// ======================================================================
 	//
 	// Getters and setters for the settings.
 	//
-	//======================================================================
+	// ======================================================================
 
 	/**
 	 * Returns the jar file that contain the SUT.
@@ -222,7 +222,7 @@ public class Configuration implements Serializable {
 	public String getJar() {
 		return jar;
 	}
-	
+
 	/**
 	 * Sets the jar file that contain the SUT.
 	 * 
@@ -232,7 +232,7 @@ public class Configuration implements Serializable {
 	public void setJar(String jar) {
 		this.jar = jar;
 	}
-	
+
 	/**
 	 * Returns the target class.
 	 * 
@@ -545,8 +545,8 @@ public class Configuration implements Serializable {
 	}
 
 	/**
-	 * Sets a new explorer for this session. Note that there is ever only
-	 * explorer for a session.
+	 * Sets a new explorer for this session. Note that there is ever only explorer
+	 * for a session.
 	 * 
 	 * @param explorer
 	 *            the new explorer
@@ -634,12 +634,12 @@ public class Configuration implements Serializable {
 		}
 	}
 
-	//======================================================================
+	// ======================================================================
 	//
 	// The rest of this file contains routines that reads and writes
 	// properties from and to a Java properties file.
 	//
-	//======================================================================
+	// ======================================================================
 
 	/**
 	 * Write settings to a Java properties file.
@@ -737,8 +737,8 @@ public class Configuration implements Serializable {
 	/**
 	 * Reads settings from a Java properties object.
 	 * 
-	 * @param filename
-	 *            the name of the file to read from
+	 * @param properties
+	 *            the properties object
 	 * @return {@code true} if and only if properties were read successfully
 	 */
 	public boolean processProperties(Properties properties) {
@@ -769,7 +769,7 @@ public class Configuration implements Serializable {
 			setJar(p);
 		}
 	}
-	
+
 	/**
 	 * Reads and sets the "{@code deepsea.target}" setting.
 	 * 
@@ -796,14 +796,13 @@ public class Configuration implements Serializable {
 
 	/**
 	 * Reads and sets the "{@code deepsea.triggers}" setting. The value of this
-	 * setting is expected to be a "<code>;</code>" separated list. Each
-	 * component is the fully qualified name of a method with its parameters.
-	 * The parameters is given as a "<code>,</code>" separated list of
-	 * "<code>name:type</code>" and "<code>type</code>" entries. Parameters with
-	 * a name is treated symbolically when the method is invoked; parameters
-	 * without a name remain concrete. A trigger is only activated when the
-	 * number of parameters and their types match; this caters for method
-	 * overloading.
+	 * setting is expected to be a "<code>;</code>" separated list. Each component
+	 * is the fully qualified name of a method with its parameters. The parameters
+	 * is given as a "<code>,</code>" separated list of "<code>name:type</code>" and
+	 * "<code>type</code>" entries. Parameters with a name is treated symbolically
+	 * when the method is invoked; parameters without a name remain concrete. A
+	 * trigger is only activated when the number of parameters and their types
+	 * match; this caters for method overloading.
 	 * 
 	 * @return {@code true} if and only if the property was read successfully
 	 */
@@ -891,10 +890,10 @@ public class Configuration implements Serializable {
 
 	/**
 	 * Reads and sets the "{@code deepsea.delegates}" setting. The value of this
-	 * setting is expected to be a "<code>;</code>" separated list. Each
-	 * component is a two-part mapping "X:Y", where both "X" and "Y" are fully
-	 * qualified names of classes. When the system calls a method of class "X",
-	 * a corresponding method of class "Y" is invoked.
+	 * setting is expected to be a "<code>;</code>" separated list. Each component
+	 * is a two-part mapping "X:Y", where both "X" and "Y" are fully qualified names
+	 * of classes. When the system calls a method of class "X", a corresponding
+	 * method of class "Y" is invoked.
 	 * 
 	 * @return {@code true} if and only if the property was read successfully
 	 */
@@ -1081,8 +1080,8 @@ public class Configuration implements Serializable {
 	 *            the {@link Properties} instance to read from
 	 * @param key
 	 *            the property key
-	 * @return the integer value associated with the key (or {@code null} if the
-	 *         key is absent or not an integer)
+	 * @return the integer value associated with the key (or {@code null} if the key
+	 *         is absent or not an integer)
 	 */
 	public static Integer getIntegerProperty(Properties properties, String key) {
 		String s = properties.getProperty(key);

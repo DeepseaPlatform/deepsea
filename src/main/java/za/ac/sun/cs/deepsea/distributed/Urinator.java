@@ -18,7 +18,7 @@ import za.ac.sun.cs.deepsea.reporting.Reporter;
 import za.ac.sun.cs.green.expr.Constant;
 
 /**
- * Driver for dynamic symbolic execution. When the {@link #start()} method is
+ * Driver for dynamic symbolic execution. When the {link #start()} method is
  * called, it conducts one or more "dives" into the target program.
  */
 public class Urinator extends AbstractReporter {
@@ -31,7 +31,7 @@ public class Urinator extends AbstractReporter {
 	/**
 	 * The debugging port on which to connect to the SUT.
 	 */
-	private final int port;
+	//private final int port;
 	
 	/**
 	 * The logger. This is passed to dives.
@@ -59,9 +59,9 @@ public class Urinator extends AbstractReporter {
 	 * @param config
 	 *            the settings for this session
 	 */
-	public Urinator(final String name, int port, Logger logger, Configuration config) {
+	public Urinator(final String name, /*int port,*/ Logger logger, Configuration config) {
 		this.name = name;
-		this.port = port;
+		//this.port = port;
 		this.logger = logger;
 		this.config = config;
 		addReporter(this); // the diver is a reporter itself
@@ -87,42 +87,42 @@ public class Urinator extends AbstractReporter {
 		reporters.add(0, reporter);
 	}
 
-	/**
-	 * Run the diver.
-	 */
-	public void start() {
-		config.dumpConfig();
-		// config.dumpProperties();
-		Explorer explorer = config.getExplorer();
-		if (explorer == null) {
-			logger.fatal("No explorer specified -- terminating");
-		} else {
-			try (Jedis jedis = new Jedis("redis")) {
-				addReporter(explorer);
-				recordStartingTime();
-				int diveCounter = 0;
-				Map<String, Constant> concreteValues = null;
-				jedis.lpush("TASKS", encode(concreteValues));
-				int outstanding = 1;
-				while (outstanding > 0) {
-					String result = jedis.brpop(0, "RESULTS").get(1);
-					while (!result.equals("DONE")) {
-						// concreteValues = explorer.refine(d);
-						result = jedis.brpop(0, "RESULTS").get(1);
-					}
-					outstanding--;
-				}
-				recordStoppingTime();
-				invokeReporters();
-				
-			}
-		}
-	}
-
-	private String encode(Map<String, Constant> concreteValues) {
-		return null;
-	}
-
+//	/**
+//	 * Run the diver.
+//	 */
+//	public void start() {
+//		config.dumpConfig();
+//		// config.dumpProperties();
+//		Explorer explorer = config.getExplorer();
+//		if (explorer == null) {
+//			logger.fatal("No explorer specified -- terminating");
+//		} else {
+//			try (Jedis jedis = new Jedis("redis")) {
+//				addReporter(explorer);
+//				recordStartingTime();
+//				int diveCounter = 0;
+//				Map<String, Constant> concreteValues = null;
+//				jedis.lpush("TASKS", encode(concreteValues));
+//				int outstanding = 1;
+//				while (outstanding > 0) {
+//					String result = jedis.brpop(0, "RESULTS").get(1);
+//					while (!result.equals("DONE")) {
+//						// concreteValues = explorer.refine(d);
+//						result = jedis.brpop(0, "RESULTS").get(1);
+//					}
+//					outstanding--;
+//				}
+//				recordStoppingTime();
+//				invokeReporters();
+//				
+//			}
+//		}
+//	}
+//
+//	private String encode(Map<String, Constant> concreteValues) {
+//		return null;
+//	}
+//
 	/**
 	 * Reports on the session just completed.  In this case, it merely prints the starting and stopping time, and the duration of the run.
 	 * 
