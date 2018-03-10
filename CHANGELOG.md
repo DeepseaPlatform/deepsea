@@ -19,9 +19,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 - Issue with build.gradle that caused CI to fail.
 
-## [0.0.1] - 2018-09-09
+## [0.0.1] - 2017-09-09
 
 First version after switching to gradle.
-
-[comment] <> (Added Changed Deprecated Removed Fixed Security)
-[comment] <> ([1.0.0] - 2017-06-20)
