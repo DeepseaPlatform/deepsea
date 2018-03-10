@@ -24,29 +24,29 @@ public class DEEPSEA {
 	 */
 	public static void main(String[] args) {
 		Configuration config = new Configuration();
+		Logger LOGGER = config.getLogger(); // works even with partial Configuration
 		if (args.length < 1) {
 			new Banner('@').println("DEEPSEA PROBLEM\nMISSING PROPERTIES FILE\n")
-					.println("USAGE: deepsea <properties file>").display(System.out);
+					.println("USAGE: deepsea <properties file>").display(LOGGER, Level.INFO);
 			return;
 		}
 		if (!config.processProperties(args[0])) {
 			new Banner('@').println("DEEPSEA PROBLEM\n").println("COULD NOT READ PROPERTY FILE \"" + args[0] + "\"")
-					.display(System.out);
+					.display(LOGGER, Level.INFO);
 			return;
 		}
 		if (config.getTarget() == null) {
 			new Banner('@').println("SUSPICIOUS PROPERTIES FILE\n")
-					.println("ARE YOU SURE THAT THE ARGUMENT IS A .properties FILE?").display(System.out);
+					.println("ARE YOU SURE THAT THE ARGUMENT IS A .properties FILE?").display(LOGGER, Level.INFO);
 			return;
 		}
 		// Configuration has now been loaded and seems OK
-		Logger logger = config.getLogger();
-		new Banner('~').println("DEEPSEA version " + BuildConfig.VERSION).display(logger, Level.INFO);
-		Diver diver = new Diver("DEEPSEA", logger, config);
-		logger.info("");
+		new Banner('~').println("DEEPSEA version " + BuildConfig.VERSION).display(LOGGER, Level.INFO);
+		Diver diver = new Diver("DEEPSEA", LOGGER, config);
+		LOGGER.info("");
 		diver.start();
-		logger.info("");
-		new Banner('~').println("DEEPSEA DONE").display(logger, Level.INFO);
+		LOGGER.info("");
+		new Banner('~').println("DEEPSEA DONE").display(LOGGER, Level.INFO);
 	}
 
 }

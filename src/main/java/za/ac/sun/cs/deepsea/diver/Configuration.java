@@ -3,6 +3,7 @@ package za.ac.sun.cs.deepsea.diver;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.management.ManagementFactory;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -18,14 +19,6 @@ import java.util.TreeSet;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.Appender;
-import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.appender.ConsoleAppender;
-import org.apache.logging.log4j.core.appender.FileAppender;
-import org.apache.logging.log4j.core.config.AppenderRef;
-import org.apache.logging.log4j.core.config.LoggerConfig;
-import org.apache.logging.log4j.core.appender.ConsoleAppender.Target;
-import org.apache.logging.log4j.core.layout.PatternLayout;
 
 import com.sun.jdi.Method;
 
@@ -65,7 +58,7 @@ public class Configuration implements Serializable {
 	/**
 	 * Logger to write to.
 	 */
-	protected Logger logger = null;
+	protected final Logger LOGGER;
 
 	/**
 	 * The file name of the jar file that contains the system-under-test (SUT). The
@@ -149,51 +142,13 @@ public class Configuration implements Serializable {
 
 	// ======================================================================
 	//
-	// Logger constructor.
+	// Constructor.
 	//
 	// ======================================================================
 
-	/**
-	 * The name of the logger. Each logger has a name so that it can be "accessed"
-	 * from different contexts.
-	 */
-	private static final String LOGGER_NAME = "za.ac.sun.cs.deepsea.DEEPSEA";
-
-	/**
-	 * Pattern for log messages that are written to the console.
-	 */
-	private static final String PATTERN_1 = "%-5level %msg%n";
-
-	/**
-	 * Pattern for log messages that are written to the log file.
-	 */
-	private static final String PATTERN_2 = "%highlight{%d{HH:mm:ss.SSS} [%-8.8t] %-5level - %msg%n}{CONF=magenta,PROPS=magenta,TRACE=black,DEBUG=blue,INFO=blue,WARN=black,ERROR=red,FATAL=red}";
-
-	/**
-	 * Configures and creates the logger.
-	 * 
-	 * @return the new logger
-	 */
-	private Logger createLogger() {
-		LoggerContext context = (LoggerContext) LogManager.getContext(false);
-		org.apache.logging.log4j.core.config.Configuration conf = context.getConfiguration();
-		PatternLayout pl1 = PatternLayout.newBuilder().withConfiguration(conf).withPattern(PATTERN_1).build();
-		Appender a1 = ConsoleAppender.newBuilder().setConfiguration(conf).withName("ConsoleLog")
-				.setTarget(Target.SYSTEM_OUT).withLayout(pl1).build();
-		a1.start();
-		PatternLayout pl2 = PatternLayout.newBuilder().withConfiguration(conf).withPattern(PATTERN_2).build();
-		Appender a2 = FileAppender.newBuilder().setConfiguration(conf).withName("FileLog").withFileName(getLogfile())
-				.withAppend(false).withLayout(pl2).build();
-		a2.start();
-		AppenderRef r1 = AppenderRef.createAppenderRef("ConsoleLog", Level.INFO, null);
-		AppenderRef r2 = AppenderRef.createAppenderRef("FileLog", null, null);
-		AppenderRef[] refs = new AppenderRef[] { r1, r2 };
-		LoggerConfig lc = LoggerConfig.createLogger(false, Level.TRACE, LOGGER_NAME, "true", refs, null, conf, null);
-		lc.addAppender(a1, Level.INFO, null);
-		lc.addAppender(a2, null, null);
-		conf.addLogger(LOGGER_NAME, lc);
-		context.updateLoggers();
-		return LogManager.getLogger(LOGGER_NAME);
+	public Configuration() {
+		String jvmName = ManagementFactory.getRuntimeMXBean().getName();
+		LOGGER = LogManager.getLogger(jvmName);
 	}
 
 	/**
@@ -202,10 +157,7 @@ public class Configuration implements Serializable {
 	 * @return the logger
 	 */
 	public Logger getLogger() {
-		if (logger == null) {
-			logger = createLogger();
-		}
-		return logger;
+		return LOGGER;
 	}
 
 	// ======================================================================
@@ -564,20 +516,20 @@ public class Configuration implements Serializable {
 	 * Dumps all the settings if the flag is set.
 	 */
 	public void dumpConfig() {
-		if (getDumpConfig() && (logger != null)) {
+		if (getDumpConfig() && (LOGGER != null)) {
 			// --- TARGET & ARGS ---
 			if (getTarget() != null) {
-				logger.log(CONF, "deepsea.target = {}", getTarget());
+				LOGGER.log(CONF, "deepsea.target = {}", getTarget());
 			}
 			if (getArgs() != null) {
-				logger.log(CONF, "deepsea.args = {}", getArgs());
+				LOGGER.log(CONF, "deepsea.args = {}", getArgs());
 			}
 			// --- TRIGGERS ---
 			int t = getNumberOfTriggers(), i = t;
 			for (Trigger trigger : getTriggers()) {
 				String pre = (i == t) ? "deepsea.triggers = " : "\t";
 				String post = (i > 1) ? ";\\" : "";
-				logger.log(CONF, "{}{}{}", pre, trigger.toString(), post);
+				LOGGER.log(CONF, "{}{}{}", pre, trigger.toString(), post);
 				i--;
 
 			}
@@ -587,7 +539,7 @@ public class Configuration implements Serializable {
 				Object delegate = findDelegate(target);
 				String pre = (j == d) ? "deepsea.delegate = " : "\t";
 				String post = (j > 1) ? ";\\" : "";
-				logger.log(CONF, "{}{}:{}{}", pre, target, delegate.getClass().getName(), post);
+				LOGGER.log(CONF, "{}{}:{}{}", pre, target, delegate.getClass().getName(), post);
 				j--;
 			}
 			// --- BOUNDS ---
@@ -595,22 +547,22 @@ public class Configuration implements Serializable {
 			vars.addAll(maxBounds.keySet());
 			for (String var : vars) {
 				if (!minBounds.containsKey(var)) {
-					logger.log(CONF, "deepsea.bounds.{}.max = {}", var, maxBounds.get(var));
+					LOGGER.log(CONF, "deepsea.bounds.{}.max = {}", var, maxBounds.get(var));
 				} else if (!maxBounds.containsKey(var)) {
-					logger.log(CONF, "deepsea.bounds.{}.min = {}", var, minBounds.get(var));
+					LOGGER.log(CONF, "deepsea.bounds.{}.min = {}", var, minBounds.get(var));
 				} else {
-					logger.log(CONF, "deepsea.bounds.{} = {}..{}", var, minBounds.get(var), maxBounds.get(var));
+					LOGGER.log(CONF, "deepsea.bounds.{} = {}..{}", var, minBounds.get(var), maxBounds.get(var));
 				}
 			}
 			// --- SOME BOOLEAN SETTINGS ---
-			logger.log(CONF, "deepsea.echooutput = {}", getEchoOutput());
-			logger.log(CONF, "deepsea.dumpconfig = {}", getDumpConfig());
-			logger.log(CONF, "deepsea.dumpproperties = {}", getDumpProperties());
-			logger.log(CONF, "deepsea.distributed = {}", getDistributed());
+			LOGGER.log(CONF, "deepsea.echooutput = {}", getEchoOutput());
+			LOGGER.log(CONF, "deepsea.dumpconfig = {}", getDumpConfig());
+			LOGGER.log(CONF, "deepsea.dumpproperties = {}", getDumpProperties());
+			LOGGER.log(CONF, "deepsea.distributed = {}", getDistributed());
 			// --- EXPLORER ---
 			Explorer e = getExplorer();
 			if (e != null) {
-				logger.log(CONF, "deepsea.explorer = {}", e.getClass().getName());
+				LOGGER.log(CONF, "deepsea.explorer = {}", e.getClass().getName());
 			}
 		}
 	}
@@ -624,12 +576,12 @@ public class Configuration implements Serializable {
 	 * Dumps all the properties if the flag is set and they exist.
 	 */
 	public void dumpProperties() {
-		if (getDumpProperties() && (properties != null) && (logger != null)) {
+		if (getDumpProperties() && (properties != null) && (LOGGER != null)) {
 			SortedSet<Object> sortedKeys = new TreeSet<>(properties.keySet());
 			for (Object key : sortedKeys) {
 				assert key instanceof String;
 				String k = key.toString();
-				logger.log(PROPS, "{} = {}", k, properties.getProperty(k));
+				LOGGER.log(PROPS, "{} = {}", k, properties.getProperty(k));
 			}
 		}
 	}
@@ -728,7 +680,6 @@ public class Configuration implements Serializable {
 		processDumpConfig();
 		processDumpProperties();
 		processDistributed();
-		logger = getLogger(); // Need logger for following routines
 		processDelegates();
 		processExplorer();
 		return true;
@@ -752,7 +703,6 @@ public class Configuration implements Serializable {
 		processLogfile();
 		processDumpConfig();
 		processDumpProperties();
-		logger = getLogger(); // Need logger for following routines
 		processDelegates();
 		processExplorer();
 		return true;
@@ -939,7 +889,7 @@ public class Configuration implements Serializable {
 						setMinBound(var, Integer.parseInt(bounds[0].trim()));
 						setMaxBound(var, Integer.parseInt(bounds[1].trim()));
 					} catch (NumberFormatException x) {
-						logger.warn("Bounds in \"" + k + "\" is malformed and ignored");
+						LOGGER.warn("Bounds in \"" + k + "\" is malformed and ignored");
 					}
 				}
 			}
@@ -1013,20 +963,20 @@ public class Configuration implements Serializable {
 			Constructor<?> constructor = null;
 			try {
 				constructor = classx.getConstructor(Logger.class, Configuration.class);
-				return constructor.newInstance(logger, this);
+				return constructor.newInstance(LOGGER, this);
 			} catch (NoSuchMethodException x) {
-				logger.fatal("constructor not found: " + objectName, x);
+				LOGGER.fatal("constructor not found: " + objectName, x);
 			}
 		} catch (SecurityException x) {
-			logger.fatal("constructor security error: " + objectName, x);
+			LOGGER.fatal("constructor security error: " + objectName, x);
 		} catch (IllegalArgumentException x) {
-			logger.fatal("constructor argument error: " + objectName, x);
+			LOGGER.fatal("constructor argument error: " + objectName, x);
 		} catch (InstantiationException x) {
-			logger.fatal("constructor instantiation error: " + objectName, x);
+			LOGGER.fatal("constructor instantiation error: " + objectName, x);
 		} catch (IllegalAccessException x) {
-			logger.fatal("constructor access error: " + objectName, x);
+			LOGGER.fatal("constructor access error: " + objectName, x);
 		} catch (InvocationTargetException x) {
-			logger.fatal("constructor invocation error: " + objectName, x);
+			LOGGER.fatal("constructor invocation error: " + objectName, x);
 		}
 		return null;
 	}
@@ -1043,9 +993,9 @@ public class Configuration implements Serializable {
 			try {
 				return loader.loadClass(className);
 			} catch (ClassNotFoundException x) {
-				logger.fatal("class not found: " + className, x);
+				LOGGER.fatal("class not found: " + className, x);
 			} catch (ExceptionInInitializerError x) {
-				logger.fatal("class not found: " + className, x);
+				LOGGER.fatal("class not found: " + className, x);
 			}
 		}
 		return null;
