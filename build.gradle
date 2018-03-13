@@ -20,6 +20,7 @@ version = getVersionName()
 
 repositories {
 	jcenter()
+	mavenLocal()
 }
 
 buildConfig {
@@ -35,7 +36,8 @@ buildConfig {
 
 dependencies {
 	compile files("${System.properties['java.home']}/../lib/tools.jar")
-	compile files("lib/green.jar")
+	// compile files("lib/green.jar")
+	compile group: 'za.ac.sun.cs', name: 'green', version: '0.0.1'
 	compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.10.0'
 	compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.10.0'
 	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.4'
@@ -49,4 +51,12 @@ javadoc {
 	options.noIndex true
 	options.noHelp true
 	options.noNavBar true
+}
+
+startScripts {
+	def u = unixStartScriptGenerator
+	String us = u.template.asString().replace('DEFAULT_JVM_OPTS=${defaultJvmOpts}','DEFAULT_JVM_OPTS="-Djava.library.path=/usr/local/lib"')
+    u.template = resources.text.fromString(us)
+    
+    // TODO repeat above for Windows 
 }
