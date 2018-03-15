@@ -6,6 +6,7 @@ plugins {
 }
 
 mainClassName = 'za.ac.sun.cs.deepsea.DEEPSEA'
+ext.greenRepoUrl = 'http://repo.jacogeld.org:8081/repository/snapshots/'
 
 def getVersionName = { ->
 	def stdout = new ByteArrayOutputStream()
@@ -20,7 +21,8 @@ version = getVersionName()
 
 repositories {
 	jcenter()
-	mavenLocal()
+	maven { url greenRepoUrl }
+	// mavenLocal()
 }
 
 buildConfig {
@@ -37,7 +39,7 @@ buildConfig {
 dependencies {
 	compile files("${System.properties['java.home']}/../lib/tools.jar")
 	// compile files("lib/green.jar")
-	compile group: 'za.ac.sun.cs', name: 'green', version: '0.0.1'
+	compile group: 'za.ac.sun.cs', name: 'green', version: '0.0.1-SNAPSHOT'
 	compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.10.0'
 	compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.10.0'
 	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.4'
