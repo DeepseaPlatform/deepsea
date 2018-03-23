@@ -6,6 +6,7 @@ plugins {
 }
 
 mainClassName = 'za.ac.sun.cs.deepsea.DEEPSEA'
+group = 'za.ac.sun.cs'
 ext.greenRepoUrl = 'http://repo.jacogeld.org:8081/repository/snapshots/'
 
 def getVersionName = { ->
@@ -29,9 +30,6 @@ buildConfig {
 	sourceSets {
 		main {
 			packageName = 'za.ac.sun.cs.deepsea'
-			// appName = project.name
-			// version = project.version
-			// buildConfigField "String" "MYSTRING" "value"
 		}
   	}
 }
