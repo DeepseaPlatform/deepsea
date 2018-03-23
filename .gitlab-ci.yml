@@ -17,4 +17,4 @@ build:
       - build/docs/javadoc
       - build/install/deepsea/lib/*.jar
       - build/resources/main
-    expire_in: 1 week
+    expire_in: 4 weeks
