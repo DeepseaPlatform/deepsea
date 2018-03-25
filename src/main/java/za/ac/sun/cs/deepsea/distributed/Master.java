@@ -36,6 +36,7 @@ public class Master {
 			new Banner('@').println("DEEPSEA PROBLEM\nMISSING PROPERTIES FILE\n").println("USAGE: deepsea <properties file>").display(LOGGER, Level.FATAL);
 			return;
 		}
+		LOGGER.info("loading configuration file {}",  args[0]);
 		Configuration config = new Configuration();
 		if (!config.processProperties(args[0])) {
 			new Banner('@').println("DEEPSEA PROBLEM\n").println("COULD NOT READ PROPERTY FILE \"" + args[0] + "\"").display(LOGGER, Level.FATAL);
