@@ -2,7 +2,6 @@ package za.ac.sun.cs.deepsea.distributed;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
-import java.util.HashMap;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -14,7 +13,6 @@ import za.ac.sun.cs.deepsea.distributed.Master;
 import za.ac.sun.cs.deepsea.diver.Configuration;
 import za.ac.sun.cs.deepsea.diver.Diver;
 import za.ac.sun.cs.deepsea.reporting.Banner;
-import za.ac.sun.cs.green.expr.Constant;
 
 /**
  * Master controller for the DEEPSEA project distributed version. It expects a single
@@ -54,13 +52,15 @@ public class Master {
 		LOGGER.info("");
 		try (Jedis jedis = new Jedis("redis")) {
 			jedis.lpush("TASKS", TaskResult.EMPTY.intoString());
+			LOGGER.debug("sent the first task");
 			int nrOfIncompleteTasks = 1;
 			while (nrOfIncompleteTasks > 0) {
 				nrOfIncompleteTasks--;
 				int N = Integer.parseInt(jedis.brpop(0, "RESULTS").get(1));
+				LOGGER.debug("received the next result set ({} results)", N);
 				while (N-- > 0) {
 					String resultString = jedis.brpop(0, "RESULTS").get(1);
-					TaskResult result = TaskResult.fromString(resultString);
+					/*TaskResult result =*/ TaskResult.fromString(resultString);
 				//   if (result is new) {
 				//     push(TASKS, R)
 				//   }

@@ -1,14 +1,7 @@
 package za.ac.sun.cs.deepsea.distributed;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.lang.management.ManagementFactory;
-import java.util.Base64;
-import java.util.Map;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -19,7 +12,6 @@ import za.ac.sun.cs.deepsea.BuildConfig;
 import za.ac.sun.cs.deepsea.diver.Configuration;
 import za.ac.sun.cs.deepsea.diver.Dive;
 import za.ac.sun.cs.deepsea.reporting.Banner;
-import za.ac.sun.cs.green.expr.Constant;
 
 public class Worker {
 
@@ -49,24 +41,27 @@ public class Worker {
 		new Banner('#').println("DEEPSEA version " + BuildConfig.VERSION + " DISTRIBUTED MASTER").display(LOGGER, Level.INFO);
 		LOGGER.info("");
 		try (Jedis jedis = new Jedis("redis")) {
+			LOGGER.debug("established jedis connection");
 			int diveCounter = 0;
 			while (true) {
-				String task = jedis.brpop(0, "TASKS").get(1);
-				if (task.equals("QUIT")) {
+				String taskString = jedis.brpop(0, "TASKS").get(1);
+				if (taskString.equals("QUIT")) {
+					LOGGER.debug("removed QUIT task");
 					break;
 				}
-				Map<String, Constant> concreteValues = decode(task);
-				Dive d = new Dive(jvmName + "-" + diveCounter++, LOGGER, config, concreteValues);
+				LOGGER.debug("removed actual task");
+				TaskResult task = TaskResult.fromString(taskString);
+				Dive d = new Dive(jvmName + "-" + diveCounter++, LOGGER, config, task.getValues());
 				if (d.dive()) {
 					// concreteValues = explorer.refine(d);
 				}
 			}
+		} catch (ClassNotFoundException x) {
+			LOGGER.fatal("class-not-found while de-serializing result", x);
+		} catch (IOException x) {
+			LOGGER.fatal("IO problem while de-serializing result", x);
 		}
 		new Banner('#').println("DEEPSEA DONE").display(LOGGER, Level.INFO);
-	}
-
-	private static Map<String, Constant> decode(String task) {
-		return null;
 	}
 
 }
