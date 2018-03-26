@@ -61,7 +61,8 @@ public class Master {
 				LOGGER.debug("received the next result set ({} results)", N);
 				while (N-- > 0) {
 					String resultString = jedis.brpop(0, "RESULTS").get(1);
-					/*TaskResult result =*/ TaskResult.fromString(resultString);
+					TaskResult result = TaskResult.fromString(resultString);
+					LOGGER.debug("processing result {}", result);
 				//   if (result is new) {
 				//     push(TASKS, R)
 				//   }

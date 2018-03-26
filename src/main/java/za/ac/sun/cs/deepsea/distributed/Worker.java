@@ -49,8 +49,8 @@ public class Worker {
 					LOGGER.debug("removed QUIT task");
 					break;
 				}
-				LOGGER.debug("removed actual task");
 				TaskResult task = TaskResult.fromString(taskString);
+				LOGGER.debug("removed task {}", task);
 				Dive d = new Dive(jvmName + "-" + diveCounter++, LOGGER, config, task.getValues());
 				if (d.dive()) {
 					// concreteValues = explorer.refine(d);

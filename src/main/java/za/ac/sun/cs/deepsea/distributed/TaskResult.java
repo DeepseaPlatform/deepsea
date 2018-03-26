@@ -22,6 +22,8 @@ public class TaskResult implements Serializable {
 	
 	private final Map<String, Constant> values;
 
+	private String string;
+
 	public static final TaskResult EMPTY = new TaskResult();
 
 	private TaskResult() {
@@ -51,6 +53,19 @@ public class TaskResult implements Serializable {
 		Object o = ois.readObject();
 		ois.close();
 		return (TaskResult) o;
+	}
+
+	@Override
+	public String toString() {
+		if (string == null) {
+			StringBuilder s = new StringBuilder();
+			s.append(path);
+			for (Map.Entry<String, Constant> e : values.entrySet()) {
+				s.append(e.getKey()).append(' ').append(e.getValue().toString());
+			}
+			string = s.toString();
+		}
+		return string;
 	}
 
 }
