@@ -1,16 +1,20 @@
 package za.ac.sun.cs.deepsea.distributed;
 
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.util.HashMap;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import redis.clients.jedis.Jedis;
 import za.ac.sun.cs.deepsea.BuildConfig;
 import za.ac.sun.cs.deepsea.distributed.Master;
 import za.ac.sun.cs.deepsea.diver.Configuration;
 import za.ac.sun.cs.deepsea.diver.Diver;
 import za.ac.sun.cs.deepsea.reporting.Banner;
+import za.ac.sun.cs.green.expr.Constant;
 
 /**
  * Master controller for the DEEPSEA project distributed version. It expects a single
@@ -43,15 +47,30 @@ public class Master {
 			return;
 		}
 		if (config.getTarget() == null) {
-			new Banner('@').println("SUSPICIOUS PROPERTIES FILE\n")
-			.println("ARE YOU SURE THAT THE ARGUMENT IS A .properties FILE?").display(System.out);
+			new Banner('@').println("SUSPICIOUS PROPERTIES FILE\n").println("ARE YOU SURE THAT THE ARGUMENT IS A .properties FILE?").display(LOGGER, Level.FATAL);
 			return;
 		}
-		// Configuration has now been loaded and seems OK
 		new Banner('#').println("DEEPSEA version " + BuildConfig.VERSION + " DISTRIBUTED MASTER").display(LOGGER, Level.INFO);
 		LOGGER.info("");
-		//Urinator urinator = new Urinator("DEEPSEA", logger, config);
-		//urinator.start();
+		try (Jedis jedis = new Jedis("redis")) {
+			jedis.lpush("TASKS", TaskResult.EMPTY.intoString());
+			int nrOfIncompleteTasks = 1;
+			while (nrOfIncompleteTasks > 0) {
+				nrOfIncompleteTasks--;
+				int N = Integer.parseInt(jedis.brpop(0, "RESULTS").get(1));
+				while (N-- > 0) {
+					String resultString = jedis.brpop(0, "RESULTS").get(1);
+					TaskResult result = TaskResult.fromString(resultString);
+				//   if (result is new) {
+				//     push(TASKS, R)
+				//   }
+				}
+			}
+		} catch (ClassNotFoundException x) {
+			LOGGER.fatal("class-not-found while de-serializing result", x);
+		} catch (IOException x) {
+			LOGGER.fatal("IO problem while de-serializing result", x);
+		}
 		LOGGER.info("");
 		new Banner('#').println("DEEPSEA DONE").display(LOGGER, Level.INFO);
 	}

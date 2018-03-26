@@ -1,8 +1,17 @@
 package za.ac.sun.cs.deepsea.distributed;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.lang.management.ManagementFactory;
+import java.util.Base64;
 import java.util.Map;
 
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import redis.clients.jedis.Jedis;
@@ -21,43 +30,39 @@ public class Worker {
 	 *            command-line arguments.
 	 */
 	public static void main(String[] args) {
-		Configuration config = new Configuration();
+		String jvmName = ManagementFactory.getRuntimeMXBean().getName();
+		Logger LOGGER = LogManager.getLogger(jvmName);
 		if (args.length < 1) {
-			new Banner('@').println("DEEPSEA PROBLEM\nMISSING PROPERTIES FILE\n")
-					.println("USAGE: deepsea <properties file>").display(System.out);
+			new Banner('@').println("DEEPSEA PROBLEM\nMISSING PROPERTIES FILE\n").println("USAGE: deepsea <properties file>").display(LOGGER, Level.FATAL);
 			return;
 		}
+		LOGGER.info("loading configuration file {}",  args[0]);
+		Configuration config = new Configuration();
 		if (!config.processProperties(args[0])) {
-			new Banner('@').println("DEEPSEA PROBLEM\n").println("COULD NOT READ PROPERTY FILE \"" + args[0] + "\"")
-					.display(System.out);
+			new Banner('@').println("DEEPSEA PROBLEM\n").println("COULD NOT READ PROPERTY FILE \"" + args[0] + "\"").display(LOGGER, Level.FATAL);
 			return;
 		}
 		if (config.getTarget() == null) {
-			new Banner('@').println("SUSPICIOUS PROPERTIES FILE\n")
-					.println("ARE YOU SURE THAT THE ARGUMENT IS A .properties FILE?").display(System.out);
+			new Banner('@').println("SUSPICIOUS PROPERTIES FILE\n").println("ARE YOU SURE THAT THE ARGUMENT IS A .properties FILE?").display(LOGGER, Level.FATAL);
 			return;
 		}
-		// Configuration has now been loaded and seems OK
-		Logger logger = config.getLogger();
-		new Banner('#').println("DEEPSEA version " + BuildConfig.VERSION + " DISTRIBUTED WORKER").display(logger, Level.INFO);
+		new Banner('#').println("DEEPSEA version " + BuildConfig.VERSION + " DISTRIBUTED MASTER").display(LOGGER, Level.INFO);
+		LOGGER.info("");
 		try (Jedis jedis = new Jedis("redis")) {
+			int diveCounter = 0;
 			while (true) {
 				String task = jedis.brpop(0, "TASKS").get(1);
 				if (task.equals("QUIT")) {
 					break;
 				}
 				Map<String, Constant> concreteValues = decode(task);
-				Dive d = new Dive("????", logger, config, concreteValues);
+				Dive d = new Dive(jvmName + "-" + diveCounter++, LOGGER, config, concreteValues);
 				if (d.dive()) {
 					// concreteValues = explorer.refine(d);
 				}
 			}
 		}
-//		Urinator urinator = new Urinator("DEEPSEA", logger, config);
-//		logger.info("");
-//		urinator.start();
-//		logger.info("");
-		new Banner('#').println("DEEPSEA DONE").display(logger, Level.INFO);
+		new Banner('#').println("DEEPSEA DONE").display(LOGGER, Level.INFO);
 	}
 
 	private static Map<String, Constant> decode(String task) {
