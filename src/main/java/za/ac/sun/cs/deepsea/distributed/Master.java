@@ -51,6 +51,7 @@ public class Master {
 		new Banner('#').println("DEEPSEA version " + BuildConfig.VERSION + " DISTRIBUTED MASTER").display(LOGGER, Level.INFO);
 		LOGGER.info("");
 		try (Jedis jedis = new Jedis("redis")) {
+			LOGGER.debug("established jedis connection");
 			jedis.lpush("TASKS", TaskResult.EMPTY.intoString());
 			LOGGER.debug("sent the first task");
 			int nrOfIncompleteTasks = 1;
