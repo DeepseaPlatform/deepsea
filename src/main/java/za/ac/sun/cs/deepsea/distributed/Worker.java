@@ -38,7 +38,7 @@ public class Worker {
 			new Banner('@').println("SUSPICIOUS PROPERTIES FILE\n").println("ARE YOU SURE THAT THE ARGUMENT IS A .properties FILE?").display(LOGGER, Level.FATAL);
 			return;
 		}
-		new Banner('#').println("DEEPSEA version " + BuildConfig.VERSION + " DISTRIBUTED MASTER").display(LOGGER, Level.INFO);
+		new Banner('#').println("DEEPSEA version " + BuildConfig.VERSION + " DISTRIBUTED WORKER").display(LOGGER, Level.INFO);
 		LOGGER.info("");
 		try (Jedis jedis = new Jedis("redis")) {
 			LOGGER.debug("established jedis connection");
