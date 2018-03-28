@@ -25,6 +25,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.util.MultiPartInputStreamParser;
 
+import redis.clients.jedis.Jedis;
 import za.ac.sun.cs.deepsea.BuildConfig;
 import za.ac.sun.cs.deepsea.diver.Configuration;
 import za.ac.sun.cs.deepsea.diver.Diver;
@@ -43,6 +44,8 @@ public class Master {
 	
 	private static final String FAVICON = "favicon.ico";
 
+	private static final String WORKDIR = "/work";
+	
 	private static Logger LOGGER;
 
 	private static final String[] HEADER = {
@@ -147,6 +150,8 @@ public class Master {
 
 	private static DeapseaRunner runner = null;
 
+	private static Jedis jedis;
+
 	/**
 	 * The main function.
 	 * 
@@ -158,6 +163,7 @@ public class Master {
 		String jvmName = ManagementFactory.getRuntimeMXBean().getName();
 		LOGGER = LogManager.getLogger(jvmName);
 		new Banner('#').println("DEEPSEA version " + BuildConfig.VERSION + " DISTRIBUTED MASTER").display(LOGGER, Level.INFO);
+		jedis = new Jedis("redis");
 		Server server = new Server(WEB_PORT);
         server.setHandler(new RootHandler());
         server.start();
@@ -224,7 +230,7 @@ public class Master {
 						InputStream in = part.getInputStream();
 						byte[] buffer = new byte[in.available()];
 					    in.read(buffer);
-					    File ff = new File("/tmp/" + filename);
+					    File ff = new File(WORKDIR + "/" + filename);
 					    try (OutputStream out = new FileOutputStream(ff)) {
 					    		out.write(buffer);
 					    }
@@ -234,17 +240,17 @@ public class Master {
 					    		runner.addFile(filename);
 					    }
 					}
-					// runner.start();
+					runner.start();
 					response.setStatus(303);
 					response.setHeader("Location", "/");
 					baseRequest.setHandled(true);
 				} else if (uri.equals("/quit") && (runner != null)) {
-//					runner.interrupt();
-//					try {
-//						runner.join();
-//					} catch (InterruptedException ignore) {
-//						// ignore this exception
-//					}
+					runner.shutdown();
+					try {
+						runner.join();
+					} catch (InterruptedException ignore) {
+						// ignore this exception
+					}
 					runner = null;
 					response.setStatus(303);
 					response.setHeader("Location", "/");
@@ -281,7 +287,9 @@ public class Master {
 		private String propertiesFile;
 
 		private final Set<String> supportFiles = new HashSet<>();
-		
+
+		private boolean isRunning;
+
 		/**
 		 * @param propertiesFile
 		 */
@@ -299,6 +307,65 @@ public class Master {
 	
 		@Override
 		public void start() {
+			isRunning = true; // do this as early as possible
+			cleanJedisQueues();
+			String propFile = WORKDIR + "/" + propertiesFile;
+			Configuration config = new Configuration();
+			if (!config.processProperties(propFile)) {
+				new Banner('@').println("DEEPSEA PROBLEM\n").println("COULD NOT READ PROPERTY FILE \"" + propFile + "\"").display(LOGGER, Level.FATAL);
+				return;
+			}
+			if (config.getTarget() == null) {
+				new Banner('@').println("SUSPICIOUS PROPERTIES FILE\n").println("ARE YOU SURE THAT THE ARGUMENT IS A .properties FILE?").display(LOGGER, Level.FATAL);
+				return;
+			}
+			new Banner('O').println("DEEPSEA version " + BuildConfig.VERSION + " DISTRIBUTED MASTER").display(LOGGER, Level.INFO);
+			LOGGER.info("");
+			jedis.set("PROPERTIES", propertiesFile);
+			LOGGER.debug("set the propertiesFile: {}", propertiesFile);
+			try {
+				jedis.lpush("TASKS", TaskResult.EMPTY.intoString());
+				LOGGER.debug("sent the first task");
+				int nrOfIncompleteTasks = 1;
+				while (isRunning && (nrOfIncompleteTasks > 0)) {
+					LOGGER.debug("waiting for results");
+					int N = Integer.parseInt(jedis.brpop(0, "RESULTS").get(1));
+					nrOfIncompleteTasks--;
+					LOGGER.debug("received the next result set ({} results)", N);
+					while (N-- > 0) {
+						String resultString = jedis.brpop(0, "RESULTS").get(1);
+						TaskResult result = TaskResult.fromString(resultString);
+						LOGGER.debug("processing result {}", result);
+						if (mustExplore(LOGGER, result.getPath())) {
+							jedis.lpush("TASKS", result.intoString());
+						}
+					}
+				}
+			} catch (ClassNotFoundException x) {
+				LOGGER.fatal("class-not-found while de-serializing result", x);
+			} catch (IOException x) {
+				LOGGER.fatal("IO problem while de-serializing result", x);
+			} finally {
+				isRunning = false;
+				cleanJedisQueues();
+			}
+			LOGGER.info("");
+			new Banner('O').println("DEEPSEA DONE").display(LOGGER, Level.INFO);
+		}
+
+		private boolean mustExplore(Logger lOGGER, String path) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		private void cleanJedisQueues() {
+			jedis.del("TASKS");
+			jedis.del("RESULTS");
+			jedis.del("PROPERTIES");
+		}
+
+		public void shutdown() {
+			isRunning = false;
 		}
 
 	}
