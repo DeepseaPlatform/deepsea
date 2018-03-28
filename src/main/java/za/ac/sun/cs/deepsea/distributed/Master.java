@@ -24,6 +24,8 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.util.MultiPartInputStreamParser;
+import org.eclipse.jetty.util.log.AbstractLogger;
+import org.eclipse.jetty.util.log.Log;
 
 import redis.clients.jedis.Jedis;
 import za.ac.sun.cs.deepsea.BuildConfig;
@@ -164,10 +166,97 @@ public class Master {
 		LOGGER = LogManager.getLogger(jvmName);
 		new Banner('#').println("DEEPSEA version " + BuildConfig.VERSION + " DISTRIBUTED MASTER").display(LOGGER, Level.INFO);
 		jedis = new Jedis("redis");
+		Log.setLog(new JettyLogger());
 		Server server = new Server(WEB_PORT);
         server.setHandler(new RootHandler());
         server.start();
         server.join();
+	}
+
+	private static class JettyLogger extends AbstractLogger {
+
+		private final String name;
+
+		private boolean debugEnabled = false;
+
+		public JettyLogger() {
+			name = "JettyToLog4j2";
+		}
+
+		private JettyLogger(String name) {
+			this.name = name;
+		}
+		
+		@Override
+		public String getName() {
+			return name;
+		}
+
+		@Override
+		public void warn(String msg, Object... args) {
+			LOGGER.warn(msg, args);
+		}
+
+		@Override
+		public void warn(Throwable thrown) {
+			LOGGER.warn(thrown);
+		}
+
+		@Override
+		public void warn(String msg, Throwable thrown) {
+			LOGGER.warn(msg, thrown);
+		}
+
+		@Override
+		public void info(String msg, Object... args) {
+			LOGGER.info(msg, args);
+		}
+
+		@Override
+		public void info(Throwable thrown) {
+			LOGGER.info(thrown);
+		}
+
+		@Override
+		public void info(String msg, Throwable thrown) {
+			LOGGER.info(msg, thrown);
+		}
+
+		@Override
+		public boolean isDebugEnabled() {
+			return debugEnabled;
+		}
+
+		@Override
+		public void setDebugEnabled(boolean enabled) {
+			debugEnabled = enabled;
+		}
+
+		@Override
+		public void debug(String msg, Object... args) {
+			LOGGER.debug(msg, args);
+		}
+
+		@Override
+		public void debug(Throwable thrown) {
+			LOGGER.debug(thrown);
+		}
+
+		@Override
+		public void debug(String msg, Throwable thrown) {
+			LOGGER.debug(msg, thrown);
+		}
+
+		@Override
+		public void ignore(Throwable ignored) {
+			// do nothing
+		}
+
+		@Override
+		protected org.eclipse.jetty.util.log.Logger newLogger(String fullname) {
+			return new JettyLogger(fullname);
+		}
+		
 	}
 
 	private static class RootHandler extends AbstractHandler {
@@ -369,119 +458,5 @@ public class Master {
 		}
 
 	}
-
-//				errorPage(socket, pout, "403", "Forbidden", "You do not have permission to access the requested URL.");
-
-//	private static void runOnce(String[] args) {
-//		if (args.length < 1) {
-//			new Banner('@').println("DEEPSEA PROBLEM\nMISSING PROPERTIES FILE\n").println("USAGE: deepsea <properties file>").display(LOGGER, Level.FATAL);
-//			return;
-//		}
-//		LOGGER.info("loading configuration file {}",  args[0]);
-//		Configuration config = new Configuration();
-//		if (!config.processProperties(args[0])) {
-//			new Banner('@').println("DEEPSEA PROBLEM\n").println("COULD NOT READ PROPERTY FILE \"" + args[0] + "\"").display(LOGGER, Level.FATAL);
-//			return;
-//		}
-//		if (config.getTarget() == null) {
-//			new Banner('@').println("SUSPICIOUS PROPERTIES FILE\n").println("ARE YOU SURE THAT THE ARGUMENT IS A .properties FILE?").display(LOGGER, Level.FATAL);
-//			return;
-//		}
-//		LOGGER.info("");
-//		try (Jedis jedis = new Jedis("redis")) {
-//			LOGGER.debug("established jedis connection");
-//			jedis.lpush("TASKS", TaskResult.EMPTY.intoString());
-//			LOGGER.debug("sent the first task");
-//			int nrOfIncompleteTasks = 1;
-//			while (nrOfIncompleteTasks > 0) {
-//				LOGGER.debug("waiting for results");
-//				int N = Integer.parseInt(jedis.brpop(0, "RESULTS").get(1));
-//				nrOfIncompleteTasks--;
-//				LOGGER.debug("received the next result set ({} results)", N);
-//				while (N-- > 0) {
-//					String resultString = jedis.brpop(0, "RESULTS").get(1);
-//					TaskResult result = TaskResult.fromString(resultString);
-//					LOGGER.debug("processing result {}", result);
-//					if (mustExplore(LOGGER, result.getPath())) {
-//						jedis.lpush("TASKS", result.intoString());
-//					}
-//				}
-//			}
-//		} catch (ClassNotFoundException x) {
-//			LOGGER.fatal("class-not-found while de-serializing result", x);
-//		} catch (IOException x) {
-//			LOGGER.fatal("IO problem while de-serializing result", x);
-//		}
-//		LOGGER.info("");
-//		new Banner('#').println("DEEPSEA DONE").display(LOGGER, Level.INFO);
-//	}
-//
-//	private static boolean mustExplore(Logger LOGGER, String signature) {
-////		char[] signArray = signature.toCharArray();
-////		int signLength = signature.length();
-////		if (!visitedSignatures.add(signArray.toString())) {
-////			LOGGER.debug("revisit of signature \"" + signature + "\", truncating");
-////			revisitCounter++;
-////			while ((signature.length() > 0) && (visitedSignatures.contains(signature)
-////					|| infeasibleSignatures.contains(signature))) {
-////				signature = signature.substring(0, signature.length());
-////			}
-////		}
-////		LOGGER.info("path signature: " + signature);
-////		while (signature.length() > 0) {
-////			/*
-////			 * Flip the first char ('0' <-> '1') of signature.
-////			 */
-////			SegmentedPathCondition npc = spc.getNegated1st();
-////			if (visitedSignatures.contains(npc.getSignature())) {
-////				/*
-////				 * We now know that both this path condition and the
-////				 * complementary path condition (i.e., with the first conjunct
-////				 * negated) have been visited. We therefore record that their
-////				 * common prefix has been visited, and we drop the first
-////				 * conjunct and try to negate the new first conjunct.
-////				 */
-////				visitedSignatures.add(spc.getParent().getSignature());
-////				spc = spc.getParent();
-////				logger.debug("dropping first conjunct -> " + spc.getPathCondition());
-////			} else {
-////				// negate first conjunct of path condition and check if it has a model
-////				logger.debug("trying <" + npc.getSignature() + "> " + npc.getPathCondition());
-////				Instance instance = new Instance(solver, null, npc.getPathCondition());
-////				@SuppressWarnings("unchecked")
-////				Map<IntVariable, Object> model = (Map<IntVariable, Object>) instance.request("model");
-////				if (model == null) {
-////					infeasibleSignatures.add(npc.getSignature());
-////					logger.debug("no model");
-////					unSatCounter++;
-////					// again drop the first conjunct
-////					spc = spc.getParent();
-////				} else {
-////					// translate model
-////					Map<String, Constant> newModel = new HashMap<>();
-////					for (IntVariable variable : model.keySet()) {
-////						String name = variable.getName();
-////						Constant value = new IntConstant((Integer) model.get(variable));
-////						newModel.put(name, value);
-////					}
-////					String modelString = newModel.entrySet().stream().filter(p -> !p.getKey().startsWith("$"))
-////							.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue())).toString();
-////					logger.debug("new model: {}", modelString);
-////					if (visitedModels.add(modelString)) {
-////						return newModel;
-////					} else {
-////						logger.debug("model {} has been visited before, recurring", modelString);
-////						return refine(spc.getParent());
-////					}
-////				}
-////			}
-////		}
-////		logger.debug("all signatures explored");
-////		return null;
-////		
-////		
-////		
-//		return false;
-//	}
 
 }
