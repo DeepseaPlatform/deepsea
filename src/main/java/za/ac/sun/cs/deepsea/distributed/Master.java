@@ -283,6 +283,9 @@ public class Master {
 					baseRequest.setHandled(true);
 				} else if (uri.equals("/favicon.ico")) {
 					File f = new File(Master.class.getClassLoader().getResource(FAVICON).getFile());
+					if (!f.exists()) {
+						f = new File("/" + FAVICON);
+					}
 					try (RandomAccessFile raf = new RandomAccessFile(f, "r")) {
 						int size = (int) raf.length();
 						byte[] data = new byte[size];
@@ -437,6 +440,7 @@ public class Master {
 			} finally {
 				isRunning = false;
 				cleanJedisQueues();
+				removeFiles();
 			}
 			LOGGER.info("");
 			new Banner('O').println("DEEPSEA DONE").display(LOGGER, Level.INFO);
@@ -453,6 +457,13 @@ public class Master {
 			jedis.del("PROPERTIES");
 		}
 
+		private void removeFiles() {
+			for (String supportFile : supportFiles) {
+				new File(WORKDIR + "/" + supportFile).delete();
+			}
+			new File(WORKDIR + "/" + propertiesFile).delete();
+		}
+		
 		public void shutdown() {
 			isRunning = false;
 		}
