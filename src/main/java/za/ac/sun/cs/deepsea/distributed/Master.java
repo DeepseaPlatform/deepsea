@@ -1,15 +1,18 @@
 package za.ac.sun.cs.deepsea.distributed;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 import java.lang.management.ManagementFactory;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletException;
@@ -42,246 +45,20 @@ import za.ac.sun.cs.deepsea.reporting.Banner;
  */
 public class Master {
 	
+	private static final String REDIS_HOST = "redis";
+	// private static final String REDIS_HOST = "127.0.0.1";
+	
 	private static final int WEB_PORT = 8080;
 	
 	private static final String FAVICON = "favicon.ico";
 
 	private static final String WORKDIR = "/work";
+	// private static final String WORKDIR = "/tmp/work";
+
+	public static final String LOGFILE = "/logging/deepsea.log";
+	// public static final String LOGFILE = "/tmp/logging/deepsea.log";
 	
 	private static Logger LOGGER;
-
-	private static final String[] HEADER = {
-		"<!DOCTYPE html>",
-		"<html en=\"en\">",
-		"<head>",
-		"<meta charset=\"utf-8\">",
-		"<title>DEEPSEA</title>",
-	};
-	
-	private static final String[] HEADER_END = {
-		"</head>",
-	};
-	
-	private static final String[] STYLE = {
-		"<style>",
-			"body{",
-				"position:relative;",
-				"margin:0;",
-				"padding:2rem;",
-				"font-family:\"Helvetica Neue\",Arial,sans-serif;",
-			"}",
-			"h1{",
-				"font-weight:600;",
-			"}",
-			"input{",
-				"display:block;",
-				"margin-top:1rem;",
-				"font-size:1rem;",
-				"line-height:1.1rem;",
-				"padding:.5rem;",
-			"}",
-			"input[type=submit]{",
-				"font-size:1.1rem;",
-				"line-height:1.1rem;",
-				"font-weight:700;",
-				"padding:1rem;",
-				"border:0;",
-				"background:#2196f3;",
-				"color:#fff;",
-			"}",
-		"</style>",
-	};
-
-	private static final String[] JAVASCRIPT_0 = {
-		"<script>",
-			"var numberOfInputs = 1;",
-			"function addMoreFiles(ev) {",
-				"var flist = document.querySelector(\"#file_list\");",
-				"if (flist == null) return;",
-				"var ifile = document.createElement(\"input\");",
-				"if (ifile == null) return;",
-				"ifile.setAttribute(\"type\", \"file\");",
-				"ifile.setAttribute(\"name\", \"files\" + numberOfInputs + \"[]\");",
-				"ifile.setAttribute(\"id\", \"files\" + numberOfInputs);",
-				"ifile.setAttribute(\"multiple\", true);",
-				"flist.appendChild(ifile);",
-				"numberOfInputs++;",
-			"}",
-			"document.addEventListener(\"DOMContentLoaded\", function (event) {",
-				"var element = document.querySelector(\"#more_files\");",
-				"if (element == null) return;",
-				"element.addEventListener(\"click\", addMoreFiles, false);",
-			"});",
-		"</script>",
-	};
-
-	private static final String[] JAVASCRIPT_1 = {
-		"<script>",
-			"var scrollelems = [\"html\", \"body\"];",
-			"var load = 30 * 1024;",
-			"var poll = 1000;",
-			"var fix_rn = true;",
-			"var kill = false;",
-			"var loading = false;",
-			"var pause = false;",
-			"var log_data = \"\";",
-			"var log_file_size = 0;",
-			"function scroll(where) {",
-				"for (var i = 0; i < scrollelems.length; i++) {",
-					"var s = document.querySelector(scrollelems[i]);",
-					"if (s == null) continue;",
-					"if (where === -1) {",
-						"s.scrollTop(window.getComputedStyle(s).height);",
-					"} else {",
-						"s.scrollTop(where);",
-					"}",
-				"}",
-			"}",
-			"function ajax(range, success, failure) {",
-				"var xhr = new XMLHttpRequest();",
-				"xhr.open(\"POST\", \"/log?\" + new Date().getTime(), true);",
-				"xhr.setRequestHeader(\"X-Requested-With\", \"XMLHttpRequest\");",
-				"xhr.setRequestHeader(\"Range\", range);",
-				"xhr.responseType = \"text\";",
-				"xhr.onreadystatechange = function() {",
-					"if (xhr.readyState === 4) {",
-						"if (xhr.status < 300) success(xhr.responseText, xhr) else failure(xhr);",
-					"}",
-				"};",
-				"xhr.send(data);",
-			"}",
-			"function getLog() {",
-				"if (kill | loading) return;",
-				"loading = true;",
-				"var range;",
-				"var first_load;",
-				"var must_get_206;",
-				"if (log_file_size === 0) {",
-					"range = \"-\" + load.toString();",
-					"first_load = true;",
-					"must_get_206 = false;",
-				"} else {",
-					"range = (log_file_size - 1).toString() + \"-\";",
-					"first_load = false;",
-					"must_get_206 = log_file_size > 1;",
-				"}",
-				"ajax(\"bytes=\" + range",
-					"function (data, xhr) {",
-						"loading = false;",
-						"var content_size;",
-						"if (xhr.status === 206) {",
-							"var c_r = xhr.getResponseHeader(\"Content-Range\");",
-							"if (!c_r) throw \"Server did not respond with a Content-Range\";",
-							"log_file_size = parseInt2(c_r.split(\"/\")[1]);",
-							"content_size = parseInt2(xhr.getResponseHeader(\"Content-Length\"));",
-						"} else if (xhr.status === 200) {",
-							"if (must_get_206) throw \"Expected 206 Partial Content\";",
-							"content_size = log_file_size = parseInt2(xhr.getResponseHeader(\"Content-Length\"));",
-						"} else {",
-							"throw \"Unexpected status \" + xhr.status;",
-						"}",
-						"if (first_load && data.length > load) throw \"Server's response was too long\";",
-						"var added = false;",
-						"if (first_load) {",
-							"if (content_size < log_file_size) {",
-								"var start = data.indexOf(\"\\n\");",
-								"log_data = data.substring(start + 1);",
-							"} else {",
-								"log_data = data;",
-							"}",
-							"added = true;",
-						"} else {",
-							"log_data += data.substring(1);",
-							"if (log_data.length > load) {",
-								"var start = log_data.indexOf(\"\\n\", log_data.length - load);",
-								"log_data = log_data.substring(start + 1);",
-							"}",
-							"if (data.length > 1) added = true;",
-						"}",
-						"if (added) show_log(added);",
-						"setTimeout(get_log, poll);",
-					"},",
-					"function (xhr) {",
-						"loading = false;",
-						"if (xhr.status === 416 || xhr.status == 404) {",
-							"log_file_size = 0;",
-							"log_data = \"\";",
-							"show_log();",
-							"setTimeout(get_log, poll);",
-						"} else {",
-							"throw \"Unknown AJAX Error (status \" + xhr.status + \")\";",
-						"}",
-				"});",
-			"}",
-			"function showLog() {",
-				"if (pause) return;",
-				"var t = log_data;",
-				"if (fix_rn) { t = t.replace(/\n/g, \"\\r\\n\");",
-				"var dataelem = document.querySelector(\"#data\");",
-				"if (dataelem == null) return;",
-				"dataelem.textContent = t;",
-				"scroll(-1);",
-			"}",
-			"function togglePause(ev) {",
-				"pause = !pause;",
-				"var element = document.querySelector(\"#pause\");",
-				"if (element == null) return;",
-				"element.textContent = (pause ? \"Unpause\", \"Pause\");",
-				"showLog();",
-				"ev.preventDefault();",
-			"}",
-			"function error(what) {",
-				"kill = true;",
-				"var dataelem = document.querySelector(\"#data\");",
-				"if (dataelem == null) return;",
-				"dataelem.textContent = \"An error occured.\r\nReloading may help.\r\n\" + what);",
-				"scroll(0);",
-				"return false;",
-			"}",		
-			"document.addEventListener(\"DOMContentLoaded\", function (event) {",
-				"window.onerror = error;",
-				"var element = document.querySelector(\"#pause\");",
-				"if (element == null) return;",
-				"element.addEventListener(\"click\", togglePause, false);",
-				"getLog();",
-			"});",
-		"</script>",
-	};
-		
-	private static final String[] FORM_0 = {
-		"<form method=\"post\" action=\"/run\" enctype=\"multipart/form-data\">",
-			"<h2>Properties file</h2>",
-			"<input class=\"propfile files\" type=\"file\" name=\"propfile\" id=\"propfile\">",
-			"<h2>Jar libraries</h2>",
-			"<div id=\"file_list\">",
-				"<input class=\"jarfile files\" type=\"file\" name=\"files0[]\" id=\"files0\" multiple>",
-			"</div>",
-			"<input type=\"button\" id=\"more_files\" value=\"Click for more files\">",
-			"<input id=\"launch\" type=\"submit\" name=\"submit\" value=\"Launch\">",
-		"</form>",
-	};
-	
-	private static final String[] FORM_1 = {
-			"<form method=\"post\" action=\"/quit\" enctype=\"multipart/form-data\">",
-				"<input id=\"quit\" type=\"submit\" name=\"submit\" value=\"Quit\">",
-			"</form>",
-		};
-		
-	private static final String[] BODY_0 = {
-		"<body>",
-		"<h1>DEEPSEA</h1>",
-	};
-	
-	private static final String[] BODY_1 = {
-		"<body>",
-		"<h1>Bad request</h1>",
-		"<p>Your browser sent a request that this server does not understand.</p>",
-	};
-	
-	private static final String[] BODY_END = {
-		"</body>",
-		"</html>",
-	};
 
 	private static DeapseaRunner runner = null;
 
@@ -298,7 +75,7 @@ public class Master {
 		String jvmName = ManagementFactory.getRuntimeMXBean().getName();
 		LOGGER = LogManager.getLogger(jvmName);
 		new Banner('#').println("DEEPSEA version " + BuildConfig.VERSION + " DISTRIBUTED MASTER").display(LOGGER, Level.INFO);
-		jedis = new Jedis("redis");
+		jedis = new Jedis(REDIS_HOST);
 		Log.setLog(new JettyLogger());
 		Server server = new Server(WEB_PORT);
         server.setHandler(new RootHandler());
@@ -400,21 +177,14 @@ public class Master {
 //			LOGGER.info("method: {}", method);
 			if (method.equals("GET")) {
 				String uri = request.getRequestURI();
-//				LOGGER.info("get uri: ({})", uri);
+				LOGGER.info("get uri: ({})", uri);
 				if (uri.equals("index.html") || uri.equals("/")) {
 					response.setStatus(HttpServletResponse.SC_OK);
 					response.setContentType("text/html; charset=utf-8");
 					if (runner == null) {
-						produceOutput(response.getWriter(), HEADER, STYLE, JAVASCRIPT_0, HEADER_END, BODY_0, FORM_0, BODY_END);
+						MasterHtml.outputMainPage(response.getWriter());
 					} else {
-						produceOutput(response.getWriter(), HEADER, STYLE, JAVASCRIPT_1, HEADER_END, BODY_0);
-						response.getWriter().print("<p>Running <code>");
-						response.getWriter().print(runner.getPropertiesFile());
-						response.getWriter().println("</code></p>");
-						produceOutput(response.getWriter(), FORM_1);
-						response.getWriter().println("<p><a id=\"pause\" href=\"#\">Pause</a></p>");
-						response.getWriter().println("<pre id=\"data\">Loading...</pre>");
-						produceOutput(response.getWriter(), BODY_END);
+						MasterHtml.outputRunningPage(response.getWriter(), runner.getPropertiesFile());
 					}
 					baseRequest.setHandled(true);
 				} else if (uri.equals("/favicon.ico")) {
@@ -435,12 +205,12 @@ public class Master {
 				} else {
 					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 					response.setContentType("text/html; charset=utf-8");
-					produceOutput(response.getWriter(), HEADER, STYLE, HEADER_END, BODY_1, BODY_END);
+					MasterHtml.outputBadRequest(response.getWriter());
 					baseRequest.setHandled(true);
 				}
 			} else {
 				String uri = request.getRequestURI();
-//				LOGGER.info("post uri: ({})", uri);
+				LOGGER.info("post uri: ({})", uri);
 				if (uri.equals("/run") && (runner == null)) {
 					InputStream is = request.getInputStream();
 				    String ct = request.getContentType();
@@ -458,8 +228,8 @@ public class Master {
 						InputStream in = part.getInputStream();
 						byte[] buffer = new byte[in.available()];
 					    in.read(buffer);
-					    File ff = new File(WORKDIR + "/" + filename);
-					    try (OutputStream out = new FileOutputStream(ff)) {
+					    File f = new File(WORKDIR + "/" + filename);
+					    try (OutputStream out = new FileOutputStream(f)) {
 					    		out.write(buffer);
 					    }
 					    if (fieldname.equals("propfile")) {
@@ -468,7 +238,9 @@ public class Master {
 					    		runner.addFile(filename);
 					    }
 					}
+					LOGGER.debug("Starting deepsea thread");
 					runner.start();
+					LOGGER.debug("Started deepsea thread");
 					response.setStatus(303);
 					response.setHeader("Location", "/");
 					baseRequest.setHandled(true);
@@ -483,23 +255,52 @@ public class Master {
 					response.setStatus(303);
 					response.setHeader("Location", "/");
 					baseRequest.setHandled(true);
+				} else if (uri.equals("/log") && (runner != null)) {
+					String rangeHeader = request.getHeader("Range");
+					Pattern pattern = Pattern.compile("^bytes=(\\d*)-(\\d*)");
+					Matcher matcher = pattern.matcher(rangeHeader);
+					if (matcher.matches()) {
+						// Read the file
+						File f = new File(LOGFILE);
+						InputStream in = new FileInputStream(f);
+						int totalLength = in.available();
+						byte[] buffer = new byte[totalLength];
+						in.read(buffer);
+						in.close();
+						// Parse the range
+						String firstString = matcher.group(1);
+						String secondString = matcher.group(2);
+						int first = Math.max(0, firstString.trim().isEmpty() ? 0 : Integer.parseInt(firstString));
+						int second = Math.max(first, Math.min(totalLength, secondString.trim().isEmpty() ? Integer.MAX_VALUE : Integer.parseInt(secondString)));
+						int length = second - first;
+						LOGGER.debug("Log request: rangeHeader={} totalLength={} first={} second={} length={}", rangeHeader, totalLength, first, second, length);
+						if (length > 0) {
+							response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+							response.setHeader("Content-Range", "bytes " + first + "-" + (second-1) + "/" + totalLength);
+							response.setContentLength(length);
+							response.getOutputStream().write(buffer, first, length);
+							baseRequest.setHandled(true);
+						} else {
+							response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+							response.setContentType("text/html; charset=utf-8");
+							MasterHtml.outputBadRequest(response.getWriter());
+							baseRequest.setHandled(true);
+						}
+					} else {
+						response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+						response.setContentType("text/html; charset=utf-8");
+						MasterHtml.outputBadRequest(response.getWriter());
+						baseRequest.setHandled(true);
+					}
 				} else {
 					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 					response.setContentType("text/html; charset=utf-8");
-					produceOutput(response.getWriter(), HEADER, STYLE, HEADER_END, BODY_1, BODY_END);
+					MasterHtml.outputBadRequest(response.getWriter());
 					baseRequest.setHandled(true);
 				}
 			}
 		}
 
-		private void produceOutput(PrintWriter out, String[]... content) {
-			for (String[] part : content) {
-				for (String line : part) {
-					out.println(line);
-				}
-			}
-		}
-		
 	}
 
 	private static class DeapseaRunner extends Thread {
@@ -534,7 +335,7 @@ public class Master {
 		}
 	
 		@Override
-		public void start() {
+		public void run() {
 			isRunning = true; // do this as early as possible
 			cleanJedisQueues();
 			String propFile = WORKDIR + "/" + propertiesFile;
@@ -556,8 +357,17 @@ public class Master {
 				LOGGER.debug("sent the first task");
 				int nrOfIncompleteTasks = 1;
 				while (isRunning && (nrOfIncompleteTasks > 0)) {
-					LOGGER.debug("waiting for results");
-					int N = Integer.parseInt(jedis.brpop(0, "RESULTS").get(1));
+					LOGGER.debug("waiting for results...");
+					List<String> results = null;
+					try {
+						results = jedis.brpop(3, "RESULTS");
+					} catch (ClassCastException x) {
+						// ignore
+					}
+					if (results == null) {
+						continue;
+					}
+					int N = Integer.parseInt(results.get(1));
 					nrOfIncompleteTasks--;
 					LOGGER.debug("received the next result set ({} results)", N);
 					while (N-- > 0) {
@@ -588,20 +398,36 @@ public class Master {
 		}
 
 		private void cleanJedisQueues() {
+			LOGGER.debug("Deleting redis queues");
 			jedis.del("TASKS");
 			jedis.del("RESULTS");
 			jedis.del("PROPERTIES");
 		}
 
 		private void removeFiles() {
+			LOGGER.debug("Deleting working files");
 			for (String supportFile : supportFiles) {
-				new File(WORKDIR + "/" + supportFile).delete();
+				String filename = WORKDIR + "/" + supportFile; 
+				if (new File(filename).delete()) {
+					LOGGER.info("Deleted {}", filename);
+				} else {
+					LOGGER.info("Failed to delete {}", filename);
+				}
 			}
-			new File(WORKDIR + "/" + propertiesFile).delete();
+			{
+				String filename = WORKDIR + "/" + propertiesFile; 
+				if (new File(filename).delete()) {
+					LOGGER.info("Deleted {}", filename);
+				} else {
+					LOGGER.info("Failed to delete {}", filename);
+				}
+			}
 		}
 		
 		public void shutdown() {
+			LOGGER.debug("Shutting down deepsea");
 			isRunning = false;
+			jedis.del("RESULTS");
 		}
 
 	}
