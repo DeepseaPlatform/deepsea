@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN" strict="true">
 	<Appenders>
-		<Console name="LOGCONSOLE" target="SYSTEM_OUT">
-			<PatternLayout pattern="%-6level %msg%n"/>
-		</Console>
+		<File name="LOGFILE" fileName="/tmp/deepsea-local.log">
+	    		<PatternLayout pattern="%-6level %msg%n"/>
+	    	</File>
 	</Appenders>
 	<Loggers>
 		<Root level="ALL">
-			<AppenderRef ref="LOGCONSOLE"/>
+			<AppenderRef ref="LOGFILE"/>
 		</Root>
 	</Loggers>
 </Configuration>

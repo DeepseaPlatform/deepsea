@@ -48,7 +48,7 @@ public class Master {
 	private static final String REDIS_HOST = "redis";
 	// private static final String REDIS_HOST = "127.0.0.1";
 	
-	private static final int WEB_PORT = 8080;
+	private static final int WEB_PORT = 8082;
 	
 	private static final String FAVICON = "favicon.ico";
 
