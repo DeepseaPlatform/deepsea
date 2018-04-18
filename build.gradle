@@ -9,15 +9,16 @@ mainClassName = 'za.ac.sun.cs.deepsea.DEEPSEA'
 group = 'za.ac.sun.cs'
 ext.greenRepoUrl = 'http://repo.jacogeld.org:8081/repository/snapshots/'
 
-#def getVersionName = { ->
-#	def stdout = new ByteArrayOutputStream()
-#	exec {
-#		commandLine 'git', 'describe', '--tags'
-#		standardOutput = stdout
-#	}
-#	return stdout.toString().trim()
-#}
-
+/*
+def getVersionName = { ->
+	def stdout = new ByteArrayOutputStream()
+	exec {
+		commandLine 'git', 'describe', '--tags'
+		standardOutput = stdout
+	}
+	return stdout.toString().trim()
+}
+*/
 version = '1.1.2'
 
 repositories {
