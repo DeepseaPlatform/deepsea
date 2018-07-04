@@ -5,9 +5,9 @@ public class Mystery {
 	public static void main(String[] args) {
 		System.out.println("start");
 		//preserveSomeHtmlTagsAndRemoveWhitespaces("<<<<<a href=\">    @");
-		//preserveSomeHtmlTagsAndRemoveWhitespaces("blah");
+		preserveSomeHtmlTagsAndRemoveWhitespaces("blah");
 		//preserveSomeHtmlTagsAndRemoveWhitespaces(" <<  <a hRef=\"\">    ");
-		preserveSomeHtmlTagsAndRemoveWhitespaces("<<<<<<<<<<<<<<<");
+		//preserveSomeHtmlTagsAndRemoveWhitespaces("<<<<<<<<<<<<<<<");
 		System.out.println ("end");
 	}
 

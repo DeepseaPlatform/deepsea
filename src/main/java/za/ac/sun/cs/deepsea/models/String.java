@@ -34,6 +34,36 @@ public class String {
 	public String(Logger logger, Configuration config) {
 	}
 
+	public boolean length____I(Symbolizer symbolizer, ThreadReference thread) {
+		SymbolicFrame frame = symbolizer.getTopFrame();
+		int thisAddress = intConstantValue(frame.pop());
+		frame.push(symbolizer.getField(thisAddress, "length"));
+		return true;
+	}
+
+	public boolean charAt__I__C(Symbolizer symbolizer, ThreadReference thread) {
+		SymbolicFrame frame = symbolizer.getTopFrame();
+		Expression index = frame.pop();
+		int thisAddress = intConstantValue(frame.pop());
+		int thisLength = intConstantValue(symbolizer.getField(thisAddress, "length"));
+		Expression guard = Operation.apply(Operator.AND, Operation.apply(Operator.GE, index, Operation.ZERO),
+				Operation.apply(Operator.LT, index, new IntConstant(thisLength)));
+		if (index instanceof IntConstant) {
+			Expression thisChar = symbolizer.getField(thisAddress, "" + ((IntConstant) index).getValue());
+			frame.push(thisChar); 
+		} else {
+			Expression var = new IntVariable(Symbolizer.getNewVariableName(), 0, 1);
+			for (int i = 0; i < thisLength; i++) {
+				Expression eq = Operation.apply(Operator.AND, Operation.apply(Operator.EQ, index, new IntConstant(i)),
+						Operation.apply(Operator.EQ, var, symbolizer.getField(thisAddress, "" + i)));
+				guard = Operation.apply(Operator.AND, guard, eq);
+			}
+			frame.push(var);
+		}
+		symbolizer.pushExtraConjunct(guard);
+		return true;
+	}
+
 	/**
 	 * Abstract implementation of the {@code startsWith(String)} operation.
 	 * 

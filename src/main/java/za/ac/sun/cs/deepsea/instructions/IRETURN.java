@@ -15,7 +15,7 @@ public class IRETURN extends Instruction {
 	@Override
 	public void execute(StepEvent event, Symbolizer symbolizer) {
 		Expression e = symbolizer.getTopFrame().pop();
-		if (	symbolizer.popFrame()) {
+		if (symbolizer.popFrame()) {
 			symbolizer.getTopFrame().push(e);
 		}
 	}
