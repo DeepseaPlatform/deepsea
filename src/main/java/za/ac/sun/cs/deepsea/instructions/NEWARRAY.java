@@ -6,6 +6,7 @@ import za.ac.sun.cs.deepsea.diver.Stepper;
 import za.ac.sun.cs.deepsea.diver.SymbolicFrame;
 import za.ac.sun.cs.deepsea.diver.Symbolizer;
 import za.ac.sun.cs.green.expr.IntConstant;
+import za.ac.sun.cs.green.expr.Operation;
 
 /**
  * UNIMPLEMENTED &amp; BROKEN
@@ -34,7 +35,10 @@ public class NEWARRAY extends Instruction {
 	public void execute(StepEvent event, Symbolizer symbolizer) {
 		int objectId = symbolizer.createArray();
 		SymbolicFrame frame = symbolizer.getTopFrame();
-		frame.pop();
+		int n = ((IntConstant) frame.pop()).getValue();
+		for (int i = 0; i < n; i++) {
+			symbolizer.addArrayValue(objectId, i, Operation.ZERO);
+		}
 		frame.push(new IntConstant(objectId));
 	}
 
