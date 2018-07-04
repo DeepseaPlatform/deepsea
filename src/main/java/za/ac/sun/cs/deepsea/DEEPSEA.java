@@ -16,6 +16,8 @@ import za.ac.sun.cs.deepsea.reporting.Banner;
  */
 public class DEEPSEA {
 
+	public static final String VERSION = "in transition";
+	
 	/**
 	 * The main function.
 	 * 
@@ -41,7 +43,7 @@ public class DEEPSEA {
 			return;
 		}
 		// Configuration has now been loaded and seems OK
-		new Banner('~').println("DEEPSEA version " + BuildConfig.VERSION).display(LOGGER, Level.INFO);
+		new Banner('~').println("DEEPSEA version " + VERSION).display(LOGGER, Level.INFO);
 		Diver diver = new Diver("DEEPSEA", LOGGER, config);
 		LOGGER.info("");
 		diver.start();

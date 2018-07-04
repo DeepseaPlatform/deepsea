@@ -31,7 +31,7 @@ import org.eclipse.jetty.util.log.AbstractLogger;
 import org.eclipse.jetty.util.log.Log;
 
 import redis.clients.jedis.Jedis;
-import za.ac.sun.cs.deepsea.BuildConfig;
+import za.ac.sun.cs.deepsea.DEEPSEA;
 import za.ac.sun.cs.deepsea.diver.Configuration;
 import za.ac.sun.cs.deepsea.diver.Diver;
 import za.ac.sun.cs.deepsea.reporting.Banner;
@@ -74,7 +74,7 @@ public class Master {
 	public static void main(String[] args) throws Exception {
 		String jvmName = ManagementFactory.getRuntimeMXBean().getName();
 		LOGGER = LogManager.getLogger(jvmName);
-		new Banner('#').println("DEEPSEA version " + BuildConfig.VERSION + " DISTRIBUTED MASTER").display(LOGGER, Level.INFO);
+		new Banner('#').println("DEEPSEA version " + DEEPSEA.VERSION + " DISTRIBUTED MASTER").display(LOGGER, Level.INFO);
 		jedis = new Jedis(REDIS_HOST);
 		Log.setLog(new JettyLogger());
 		Server server = new Server(WEB_PORT);
@@ -348,7 +348,7 @@ public class Master {
 				new Banner('@').println("SUSPICIOUS PROPERTIES FILE\n").println("ARE YOU SURE THAT THE ARGUMENT IS A .properties FILE?").display(LOGGER, Level.FATAL);
 				return;
 			}
-			new Banner('O').println("DEEPSEA version " + BuildConfig.VERSION + " DISTRIBUTED MASTER").display(LOGGER, Level.INFO);
+			new Banner('O').println("DEEPSEA version " + DEEPSEA.VERSION + " DISTRIBUTED MASTER").display(LOGGER, Level.INFO);
 			LOGGER.info("");
 			jedis.set("PROPERTIES", propertiesFile);
 			LOGGER.debug("set the propertiesFile: {}", propertiesFile);

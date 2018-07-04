@@ -8,7 +8,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import redis.clients.jedis.Jedis;
-import za.ac.sun.cs.deepsea.BuildConfig;
+import za.ac.sun.cs.deepsea.DEEPSEA;
 import za.ac.sun.cs.deepsea.diver.Configuration;
 import za.ac.sun.cs.deepsea.diver.Dive;
 import za.ac.sun.cs.deepsea.reporting.Banner;
@@ -38,7 +38,7 @@ public class Worker {
 			new Banner('@').println("SUSPICIOUS PROPERTIES FILE\n").println("ARE YOU SURE THAT THE ARGUMENT IS A .properties FILE?").display(LOGGER, Level.FATAL);
 			return;
 		}
-		new Banner('#').println("DEEPSEA version " + BuildConfig.VERSION + " DISTRIBUTED WORKER").display(LOGGER, Level.INFO);
+		new Banner('#').println("DEEPSEA version " + DEEPSEA.VERSION + " DISTRIBUTED WORKER").display(LOGGER, Level.INFO);
 		LOGGER.info("");
 		try (Jedis jedis = new Jedis("redis")) {
 			LOGGER.debug("established jedis connection");
