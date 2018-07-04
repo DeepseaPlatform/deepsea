@@ -130,7 +130,7 @@ public class Stepper extends AbstractEventListener {
 			log.trace("class: {} method: {} bci: {}", clsName, methodSign, bci);
 		} else {
 			symbolizer.execute(event, loc, ins);
-			if (log.getLevel().isMoreSpecificThan(Level.TRACE)) {
+			if (log.getLevel().isLessSpecificThan(Level.TRACE)) {
 				sb.setLength(0);
 				if (symbolizer.inSymbolicMode()) {
 					sb.append("$$$ ");
@@ -149,7 +149,8 @@ public class Stepper extends AbstractEventListener {
 						if ((SHOW_STACK_ENTRY_COUNT > 0) && (k > 0)) {
 							sb.append(" ...");
 						}
-						sb.append(" }");
+						sb.append(" } locals: ").append(frame.locals.toString());
+						sb.append(" data: ").append(symbolizer.getInstanceData());
 					}
 				}
 				log.trace(sb.toString());

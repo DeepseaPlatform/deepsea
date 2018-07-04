@@ -91,6 +91,10 @@ public class Symbolizer {
 		}
 	}
 
+	public Map<String, Expression> getInstanceData() {
+		return instanceData;
+	}
+
 	public static String getNewVariableName() {
 		return "$" + newVariableCount++;
 	}
