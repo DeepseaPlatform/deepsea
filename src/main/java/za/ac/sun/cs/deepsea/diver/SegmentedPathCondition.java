@@ -104,7 +104,7 @@ public class SegmentedPathCondition {
 	 *            the expression to negate
 	 * @return the negation of the expression
 	 */
-	private Expression negate(Expression expression) {
+	public static Expression negate(Expression expression) {
 		if (expression instanceof Operation) {
 			Operation operation = (Operation) expression;
 			switch (operation.getOperator()) {

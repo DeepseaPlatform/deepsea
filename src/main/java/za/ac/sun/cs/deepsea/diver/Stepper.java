@@ -311,7 +311,7 @@ public class Stepper extends AbstractEventListener {
 					Expression expr = new IntConstant(arrayId);
 					if (symbolic) {
 						for (int j = 0; j < arrayLength; j++) {
-							String entryName = name + "$" + j;
+							String entryName = name + Symbolizer.FIELD_SEPARATOR + j;
 							Constant concrete = ((entryName == null) || (concreteValues == null)) ? null
 									: concreteValues.get(entryName);
 							int min = config.getMinBound(entryName, config.getMinBound(name));
@@ -331,7 +331,7 @@ public class Stepper extends AbstractEventListener {
 						for (int j = 0; j < arrayLength; j++) {
 							IntConstant value = new IntConstant(((IntegerValue) actualArray.getValue(j)).intValue());
 							symbolizer.putField(arrayId, "" + j, value);
-							dive.setActualValue(name + "$" + j, value);
+							dive.setActualValue(name + Symbolizer.FIELD_SEPARATOR + j, value);
 						}
 					}
 					sframe.setLocal(i, expr);
@@ -347,7 +347,7 @@ public class Stepper extends AbstractEventListener {
 						char[] newStringChars = new char[stringLength];
 						stringValue.getChars(0, stringLength, newStringChars, 0);
 						for (int j = 0; j < stringLength; j++) {
-							String entryName = name + "$" + j;
+							String entryName = name + Symbolizer.FIELD_SEPARATOR + j;
 							Constant concrete = ((entryName == null) || (concreteValues == null)) ? null
 									: concreteValues.get(entryName);
 							Expression entryExpr = new IntVariable(entryName, 0, 255);
@@ -367,7 +367,7 @@ public class Stepper extends AbstractEventListener {
 						for (int j = 0; j < stringLength; j++) {
 							IntConstant value = new IntConstant(stringValue.charAt(j));
 							symbolizer.putField(stringId, "" + j, value);
-							dive.setActualValue(name + "$" + j, value);
+							dive.setActualValue(name + Symbolizer.FIELD_SEPARATOR + j, value);
 						}
 					}
 					sframe.setLocal(i, expr);

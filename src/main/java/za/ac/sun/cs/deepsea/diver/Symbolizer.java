@@ -26,6 +26,12 @@ import za.ac.sun.cs.green.expr.Operation.Operator;
 
 public class Symbolizer {
 
+	public static final String FIELD_SEPARATOR = "_C_"; // ":::"
+	
+	public static final String INDEX_SEPARATOR = "_D_"; // "$"
+
+	public static final String NEW_VAR_PREFIX = "_D_"; // "$"
+	
 	private final Logger log;
 
 	private boolean inSymbolicMode;
@@ -96,7 +102,7 @@ public class Symbolizer {
 	}
 
 	public static String getNewVariableName() {
-		return "$" + newVariableCount++;
+		return NEW_VAR_PREFIX + newVariableCount++;
 	}
 
 	public SegmentedPathCondition getSegmentedPathCondition() {
@@ -158,7 +164,7 @@ public class Symbolizer {
 				char branch = '1';
 				if (loc.codeIndex() != pendingTarget) {
 					branch = '0';
-					pendingConjunct = new Operation(Operator.NOT, pendingConjunct);
+					pendingConjunct = SegmentedPathCondition.negate(pendingConjunct);
 				}
 //				signature = branch + signature;
 //				if (pendingExtraConjunct != null) {
@@ -178,12 +184,12 @@ public class Symbolizer {
 	}
 
 	public void putField(int objectId, String fieldName, Expression value) {
-		String fullFieldName = objectId + ":::" + fieldName;
+		String fullFieldName = objectId + FIELD_SEPARATOR + fieldName;
 		instanceData.put(fullFieldName, value);
 	}
 
 	public Expression getField(int objectId, String fieldName) {
-		String fullFieldName = objectId + ":::" + fieldName;
+		String fullFieldName = objectId + FIELD_SEPARATOR + fieldName;
 		Expression value = instanceData.get(fullFieldName);
 		if (value == null) {
 			// TODO create bounds on fields
@@ -206,7 +212,7 @@ public class Symbolizer {
 	 */
 	public void addArrayValue(int arrayId, int index, Expression value) {
 		/*
-		String arrayIndexName = arrayId + ":::" + index;
+		String arrayIndexName = arrayId + FIELD_SEPARATOR + index;
 		instanceData.put(arrayIndexName, value);
 		*/
 		putField(arrayId,""+index,value);
@@ -215,7 +221,7 @@ public class Symbolizer {
 	public Expression getArrayValue(int arrayId, int index) {
 		return getField(arrayId,""+index);
 		/*
-		String arrayIndexName = arrayId + ":::" + index;
+		String arrayIndexName = arrayId + FIELD_SEPARATOR + index;
 		Expression value = instanceData.get(arrayIndexName);
 		if (value == null) {
 			// TODO create bounds on fields

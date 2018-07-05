@@ -708,6 +708,10 @@ public class Configuration implements Serializable {
 		return true;
 	}
 
+	public Properties getProperties() {
+		return properties;
+	}
+
 	/**
 	 * Reads and sets the "{@code deepsea.jar}" setting.
 	 * 
