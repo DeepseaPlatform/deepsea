@@ -20,7 +20,6 @@ import za.ac.sun.cs.green.Instance;
 import za.ac.sun.cs.green.expr.Constant;
 import za.ac.sun.cs.green.expr.IntConstant;
 import za.ac.sun.cs.green.expr.IntVariable;
-import za.ac.sun.cs.green.service.ModelCoreService;
 
 /**
  * An explorer that tries to explore paths in a depth-first pattern.
@@ -32,7 +31,7 @@ import za.ac.sun.cs.green.service.ModelCoreService;
  * @author Jaco Geldenhuys (geld@sun.ac.za)
  */
 @SuppressWarnings("serial")
-public class DepthFirstExplorer extends AbstractExplorer {
+public class DepthFirstExplorerOLD extends AbstractExplorer {
 
 	//	/*
 	//	 * Prefix for all properties that apply to this explorer. For example, to
@@ -98,16 +97,19 @@ public class DepthFirstExplorer extends AbstractExplorer {
 	 * @param config
 	 *            configuration settings
 	 */
-	public DepthFirstExplorer(Logger logger, Configuration config) {
+	public DepthFirstExplorerOLD(Logger logger, Configuration config) {
 		super(logger, config);
 		this.solver = new Green("DEEPSEA");
-		Properties greenProperties = config.getProperties();
+		Properties greenProperties = new Properties();
 		greenProperties.setProperty("green.log.level", "OFF");
 		greenProperties.setProperty("green.services", "model");
 		greenProperties.setProperty("green.service.model", "(bounder modeller)");
 		greenProperties.setProperty("green.service.model.bounder", "za.ac.sun.cs.green.service.bounder.BounderService");
-		greenProperties.setProperty("green.service.model.modeller", "za.ac.sun.cs.green.service.z3.ModelCoreZ3Service");
-		// greenProperties.setProperty("green.store", "za.ac.sun.cs.green.store.redis.RedisStore");
+		greenProperties.setProperty("green.service.model.canonizer",
+				"za.ac.sun.cs.green.service.canonizer.ModelCanonizerService");
+		greenProperties.setProperty("green.service.model.modeller", "za.ac.sun.cs.green.service.z3.ModelZ3JavaService");
+		//		greenProperties.setProperty("green.service.model", "(bounder (canonizer modeller))");
+		//		greenProperties.setProperty("green.service.model.modeller", "za.ac.sun.cs.green.service.choco3.ModelChoco3Service");
 		za.ac.sun.cs.green.util.Configuration greenConfig = new za.ac.sun.cs.green.util.Configuration(solver,
 				greenProperties);
 		greenConfig.configure();
@@ -292,10 +294,8 @@ public class DepthFirstExplorer extends AbstractExplorer {
 				// negate first conjunct of path condition and check if it has a model
 				logger.debug("trying <" + npc.getSignature() + "> " + npc.getPathCondition());
 				Instance instance = new Instance(solver, null, npc.getPathCondition());
-				Instance result = (Instance) instance.request("model");
 				@SuppressWarnings("unchecked")
-				Map<IntVariable, IntConstant> model = (Map<IntVariable, IntConstant>) result
-						.getData(ModelCoreService.MODEL_KEY);
+				Map<IntVariable, Object> model = (Map<IntVariable, Object>) instance.request("model");
 				if (model == null) {
 					infeasibleSignatures.add(npc.getSignature());
 					logger.debug("no model");
@@ -307,10 +307,7 @@ public class DepthFirstExplorer extends AbstractExplorer {
 					Map<String, Constant> newModel = new HashMap<>();
 					for (IntVariable variable : model.keySet()) {
 						String name = variable.getName();
-						if (name.startsWith(Symbolizer.NEW_VAR_PREFIX)) {
-							continue;
-						}
-						Constant value = model.get(variable);
+						Constant value = new IntConstant((Integer) model.get(variable));
 						newModel.put(name, value);
 					}
 					String modelString = newModel.entrySet().stream()
